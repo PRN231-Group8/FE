@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 $gutter: 1rem;
+@import "assets/layout/styles/layout/layout.scss";
 
 html {
     font-size: 15px;
@@ -10,3 +11,8 @@ html {
 @import "../node_modules/primeflex/primeflex.css";
 
 @import "primeng/resources/themes/lara-light-indigo/theme.css";
+
+/* Demo */
+@import "assets/demo/styles/flags/flags.css";
+@import "assets/demo/styles/badges.scss";
+@import "assets/demo/styles/code.scss";
