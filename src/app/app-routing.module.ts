@@ -16,18 +16,18 @@ import { NotfoundComponent } from './core/components/notfound/notfound.component
             ),
         },
         {
-          path: 'dashboard',
+          path: '',
           component: AppLayoutComponent,
           children: [
             {
-              path: '',
+              path: 'dashboard',
               loadChildren: () =>
                 import('./core/components/dashboard/dashboard.module').then(
                   (m) => m.DashboardModule,
                 ),
             },
             {
-              path: 'pages',
+              path: 'admin',
               loadChildren: () =>
                 import('./core/components/pages/pages.module').then(
                   (m) => m.PagesModule,
