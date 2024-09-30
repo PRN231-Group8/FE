@@ -12,7 +12,7 @@ import { CardModule } from 'primeng/card';
         TimelineModule,
         ButtonModule,
         CardModule,
-        TimelineDemoRoutingModule
+        TimelineDemoRoutingModule 
     ],
     declarations: [TimelineDemoComponent]
 })
