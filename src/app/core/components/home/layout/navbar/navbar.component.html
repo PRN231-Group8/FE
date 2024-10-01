@@ -1,19 +1,18 @@
-<nav class="flex align-items-center justify-content-between px-6">
+<nav class="flex align-items-center justify-content-between px-6 shadow-1 surface-800">
   <!-- Logo -->
-  <a routerLink="/" class="layout-topbar-logo">
+  <a routerLink="/" class="layout-topbar-logo z-8">
     <img
-      src="assets/layout/images/explore-now-logo.svg"
+      src="assets/layout/images/explore-now-dark-logo.svg"
       alt="logo"
-      class="h-7rem"
+      class="h-5rem"
     />
   </a>
 
-  <!-- Navigation Links (Hidden on smaller screens) -->
-  <ul class="lg:flex hidden gap-8 layout-topbar-menu">
+  <ul class="lg:flex hidden gap-6 layout-topbar-menu z-8">
     <li *ngFor="let link of NAV_LINKS" class="hover-link">
       <a
         routerLink="{{ link.href }}"
-        class="p-link text-800 hover:text-primary"
+        class="p-link text-0 hover:text-primary"
       >
         {{ link.label }}
       </a>

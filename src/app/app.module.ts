@@ -12,11 +12,10 @@ import { ProductService } from './services/product.service';
 import { RouterOutlet } from '@angular/router';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { AppLayoutModule } from './layout/app.layout.module';
-import { HomeModule } from './core/components/home/layout/home.module';
 
 @NgModule({
   declarations: [AppComponent, NotfoundComponent],
-  imports: [AppRoutingModule, RouterOutlet, AppLayoutModule, HomeModule],
+  imports: [AppRoutingModule, RouterOutlet, AppLayoutModule],
   providers: [
     {
       provide: LocationStrategy,

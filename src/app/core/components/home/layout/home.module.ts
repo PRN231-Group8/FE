@@ -1,25 +1,33 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NavbarComponent } from './navbar/navbar.component';
-import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
-import { MenubarModule } from 'primeng/menubar';
+import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
 import { HomeComponent } from './home.component';
-import { MainComponent } from '../main/main.component';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
+import { BadgeModule } from 'primeng/badge';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { InputTextModule } from 'primeng/inputtext';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { RippleModule } from 'primeng/ripple';
 
 @NgModule({
-  declarations: [
-    NavbarComponent,
-    FooterComponent,
-    HomeComponent,
-    MainComponent,
-  ],
+  declarations: [NavbarComponent, HomeComponent, FooterComponent],
   imports: [
-    CommonModule,
-    MenuModule,
-    ButtonModule,
-    MenubarModule,
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    BrowserAnimationsModule,
+    InputTextModule,
+    BadgeModule,
+    RadioButtonModule,
+    InputSwitchModule,
+    RippleModule,
+    RouterModule,
+    ButtonModule
   ],
 })
 export class HomeModule {}

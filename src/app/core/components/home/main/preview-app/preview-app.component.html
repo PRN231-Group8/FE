@@ -1,0 +1,101 @@
+<div class="flex flex-wrap justify-content-center" style="min-height: 200px">
+  <div
+    class="z-5 relative flex align-items-center justify-content-center p-4 font-bold"
+    style="width: 100px; height: 200px; right: 500px"
+  >
+    <p-image
+      src="assets/layout/images/travel-word.svg"
+      alt="Image"
+      width="500"
+      height="400"
+      class="w-full h-auto"
+    >
+    </p-image>
+  </div>
+  <div
+    class="z-1 relative flex align-items-center justify-content-center p-4"
+    style="width: 100px; height: 100px; right: 170px; top: 80px"
+  >
+    <p-image
+      src="assets/layout/images/travel-location-2.svg"
+      alt="Image"
+      width="800"
+      height="500"
+      class="w-full h-auto"
+    >
+    </p-image>
+  </div>
+  <div
+    class="z-2 relative flex align-items-center justify-content-center p-4"
+    style="width: 100px; height: 100px; top: 90px; left: 100px"
+  >
+    <p-image
+      src="assets/layout/images/travel-location-1.svg"
+      alt="Image"
+      width="600"
+      height="300"
+      class="w-full h-auto"
+    >
+    </p-image>
+  </div>
+  <div
+    class="z-0 relative flex align-items-center justify-content-center p-4"
+    style="width: 100px; height: 100px; top: 200px; right: 500px"
+  >
+    <p-image
+      src="assets/layout/images/orange-circle-background.svg"
+      alt="Image"
+      width="1550"
+      height="700"
+      class="w-full h-auto"
+    >
+    </p-image>
+  </div>
+</div>
+<div class="text-secondary text-lg text-justify pt-7 w-5">
+  We want to be on each of your journeys seeking the satisfaction of seeing the
+  incorruptible trip. We can help you on an adventure around the Vietnam in just
+  one app and a website. Check it out!
+</div>
+<div class="w-5 pt-5 flex align-items-center">
+  <p-rating [(ngModel)]="value" [readonly]="true" [cancel]="false">
+    <ng-template pTemplate="onicon" >
+      <img
+        src="assets/layout/images/star.png"
+        width="25px"
+        height="25px"
+        alt="icon 1"
+        class="mr-2"
+      />
+    </ng-template>
+    <ng-template pTemplate="officon">
+      <img
+        src="assets/layout/images/outline_star.png"
+        width="25px"
+        height="25px"
+        alt="icon 2"
+        class="mr-2"
+      />
+    </ng-template>
+  </p-rating>
+  <div class="font-bold pl-6">
+    198k 
+    <div class="font-normal">
+        Excellent Reviews
+    </div>
+  </div>
+  <div class="font-bold pl-8 text-right">
+    27k 
+    <div class="font-normal">
+        Great Reviews
+    </div>
+  </div>
+</div>
+<div class="pt-5 gap-6 flex align-items-center">
+  <p-button label="Explore Now" [outlined]="true" icon="pi pi-search"/>
+    
+    <a class="font-bold text-900">
+      <i class="pi pi-android pr-3" style="font-size: 1rem"></i>
+      Download the app?
+    </a>
+</div>
