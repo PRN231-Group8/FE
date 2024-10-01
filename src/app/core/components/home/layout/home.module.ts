@@ -13,6 +13,7 @@ import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
+import { ScrollTopModule } from 'primeng/scrolltop';
 
 @NgModule({
   declarations: [NavbarComponent, HomeComponent, FooterComponent],
@@ -27,7 +28,8 @@ import { RippleModule } from 'primeng/ripple';
     InputSwitchModule,
     RippleModule,
     RouterModule,
-    ButtonModule
+    ButtonModule,
+    ScrollTopModule
   ],
 })
 export class HomeModule {}

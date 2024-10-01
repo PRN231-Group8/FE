@@ -20,7 +20,7 @@ import { FormsModule } from '@angular/forms';
     HomeModule,
     ButtonModule,
     RatingModule,
-    FormsModule
+    FormsModule,
 ]
 })
 export class MainModule { }
