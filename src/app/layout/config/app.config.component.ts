@@ -80,20 +80,20 @@ export class AppConfigComponent {
         return this.layoutService.config().colorScheme;
     }
 
-    onConfigButtonClick() {
+    onConfigButtonClick(): void {
         this.layoutService.showConfigSidebar();
     }
 
-    changeTheme(theme: string, colorScheme: string) {
+    changeTheme(theme: string, colorScheme: string): void {
         this.theme = theme;
         this.colorScheme = colorScheme;
     }
 
-    decrementScale() {
+    decrementScale(): void {
         this.scale--;
     }
 
-    incrementScale() {
+    incrementScale(): void {
         this.scale++;
     }
 }

@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppLayoutComponent } from './layout/app.layout.component';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
+import { HomeComponent } from './core/components/home/layout/home.component';
 
 @NgModule({
   imports: [
@@ -10,24 +11,30 @@ import { NotfoundComponent } from './core/components/notfound/notfound.component
       [
         {
           path: '',
-          loadChildren: () =>
-            import('./core/components/landing/landing.module').then(
-              (m) => m.LandingModule,
-            ),
-        },
-        {
-          path: 'dashboard',
-          component: AppLayoutComponent,
+          component: HomeComponent,
           children: [
             {
               path: '',
+              loadChildren: () =>
+                import('./core/components/home/main/main.module').then(
+                  (m) => m.MainModule,
+                ),
+            }
+          ]
+        },
+        {
+          path: '',
+          component: AppLayoutComponent,
+          children: [
+            {
+              path: 'dashboard',
               loadChildren: () =>
                 import('./core/components/dashboard/dashboard.module').then(
                   (m) => m.DashboardModule,
                 ),
             },
             {
-              path: 'pages',
+              path: 'admin',
               loadChildren: () =>
                 import('./core/components/pages/pages.module').then(
                   (m) => m.PagesModule,

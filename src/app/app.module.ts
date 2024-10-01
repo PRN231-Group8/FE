@@ -14,21 +14,21 @@ import { NotfoundComponent } from './core/components/notfound/notfound.component
 import { AppLayoutModule } from './layout/app.layout.module';
 
 @NgModule({
-    declarations: [AppComponent, NotfoundComponent],
-    imports: [AppRoutingModule, RouterOutlet, AppLayoutModule],
-    providers: [
-        {
-            provide: LocationStrategy,
-            useClass: PathLocationStrategy
-        },
-        CountryService,
-        CustomerService,
-        EventService,
-        IconService,
-        NodeService,
-        PhotoService,
-        ProductService,
-    ],
-    bootstrap: [AppComponent]
+  declarations: [AppComponent, NotfoundComponent],
+  imports: [AppRoutingModule, RouterOutlet, AppLayoutModule],
+  providers: [
+    {
+      provide: LocationStrategy,
+      useClass: PathLocationStrategy,
+    },
+    CountryService,
+    CustomerService,
+    EventService,
+    IconService,
+    NodeService,
+    PhotoService,
+    ProductService,
+  ],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}
