@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppLayoutComponent } from './layout/app.layout.component';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
+import { HomeComponent } from './core/components/home/layout/home.component';
 
 @NgModule({
   imports: [
@@ -10,10 +11,16 @@ import { NotfoundComponent } from './core/components/notfound/notfound.component
       [
         {
           path: '',
-          loadChildren: () =>
-            import('./core/components/landing/landing.module').then(
-              (m) => m.LandingModule,
-            ),
+          component: HomeComponent,
+          children: [
+            {
+              path: '',
+              loadChildren: () =>
+                import('./core/components/home/main/main.module').then(
+                  (m) => m.MainModule,
+                ),
+            }
+          ]
         },
         {
           path: '',

@@ -1,0 +1,34 @@
+<nav class="flex align-items-center justify-content-between px-6">
+  <!-- Logo -->
+  <a routerLink="/" class="layout-topbar-logo">
+    <img
+      src="assets/layout/images/explore-now-logo.svg"
+      alt="logo"
+      class="h-7rem"
+    />
+  </a>
+
+  <!-- Navigation Links (Hidden on smaller screens) -->
+  <ul class="lg:flex hidden gap-8 layout-topbar-menu">
+    <li *ngFor="let link of NAV_LINKS" class="hover-link">
+      <a
+        routerLink="{{ link.href }}"
+        class="p-link text-800 hover:text-primary"
+      >
+        {{ link.label }}
+      </a>
+    </li>
+  </ul>
+
+  <!-- Login Button (Hidden on smaller screens) -->
+  <div class="lg:flex hidden align-items-center layout-topbar-menu pr-8">
+    <p-button
+      label="Login"
+      icon="pi pi-user"
+      severity="primary"
+    />
+  </div>
+
+  <!-- Hamburger Menu (Visible on small screens) -->
+  <i class="pi pi-bars text-500 text-xl lg:hidden cursor-pointer"></i>
+</nav>

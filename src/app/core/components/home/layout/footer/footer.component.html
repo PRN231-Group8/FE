@@ -1,0 +1,52 @@
+<footer class="flex justify-content-center mb-6">
+    <div class="flex flex-column gap-5 w-full padding-container max-container">
+        
+        <!-- Top Section of Footer -->
+        <div class="flex flex-column align-items-start justify-content-center md:flex-row gap-6">
+            
+            <!-- Logo -->
+            <a routerLink="/" class="layout-topbar-logo">
+                <img src="assets/layout/images/explore-now-logo.svg" alt="logo" class="h-7rem" />
+            </a>
+
+            <!-- Footer Links Section -->
+            <div class="flex flex-wrap gap-4 justify-content-between md:flex-1">
+                
+                <!-- Footer Links Columns -->
+                <div *ngFor="let column of FOOTER_LINKS" class="flex flex-column">
+                    <h4 class="mb-3">{{ column.title }}</h4>
+                    <ul class="list-none m-0 p-0">
+                        <li *ngFor="let link of column.links" class="mb-2">
+                            <a href="#" class="text-700 hover:text-primary">{{ link }}</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info Section -->
+                <div class="flex flex-column gap-3">
+                    <h4>{{ FOOTER_CONTACT_INFO.title }}</h4>
+                    <div *ngFor="let link of FOOTER_CONTACT_INFO.links" class="flex md:flex-column lg:flex-row gap-3">
+                        <p class="whitespace-nowrap">{{ link.label }}:</p>
+                        <p class="text-blue-500">{{ link.value }}</p>
+                    </div>
+                </div>
+
+                <!-- Social Media Section -->
+                <div class="flex flex-column">
+                    <h4 class="pl-6">{{ SOCIALS.title }}</h4>
+                    <ul class="list-none flex gap-3">
+                        <li *ngFor="let social of SOCIALS.links" class="pr-4">
+                            <a href="#">
+                                <img src="{{ social }}" alt="social icon" class="w-2rem h-2rem" />
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-top-1 border-gray-300"></div>
+
+        <p class="text-center text-secondary">2024 Explore Now | All rights reserved</p>
+    </div>
+</footer>
