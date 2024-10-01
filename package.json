@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "analyze": "ng build --configuration production --stats-json && webpack-bundle-analyzer dist/stats.json",
     "test": "ng test",
     "lint": "ng lint"
   },
@@ -54,7 +55,8 @@
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "prettier-eslint": "^16.3.0",
-    "typescript": "~5.4.2"
+    "typescript": "~5.4.2",
+    "webpack-bundle-analyzer": "^4.10.2"
   },
   "husky": {
     "hooks": {
