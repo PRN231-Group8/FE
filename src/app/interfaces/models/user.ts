@@ -1,14 +1,21 @@
 export interface User {
-    isSucceed?: boolean;
-    user?: string;
-    firstName?: string;
-    lastName?: string;
-    token?: string;
-    phoneNumber?: string;
-    email?: string;
-    role?: string;
-    address?: string;
-    dob?: Date;
-    avatarPath?: string | null;
-    userId?: string;
-  }
+  isSucceed?: boolean;
+  userId?: string;
+  firstName?: string;
+  lastName?: string;
+  dob?: Date;
+  gender?: string;
+  address?: string;
+  createdDate?: Date;
+  createdBy?: string;
+  lastUpdatedBy?: string;
+  lastUpdatedDate?: Date;
+  avatarPath?: string;
+  verifyToken?: string;
+  verifyTokenExpires?: Date;
+  isActived?: boolean;
+  phoneNumber?: string;
+  email?: string;
+  token?: string;
+  role?: string;
+}

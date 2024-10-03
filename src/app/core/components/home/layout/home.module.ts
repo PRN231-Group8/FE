@@ -19,10 +19,11 @@ import {
   GoogleSigninButtonModule,
   SocialAuthServiceConfig,
 } from '@abacritt/angularx-social-login';
-import { JwtInterceptor } from '../../../../_helper/jwt.interceptor';
 import { ErrorInterceptor } from '../../../../_helper/error.interceptor';
 import { environment } from '../../../../../environments/environment';
 import { AuthenticationService } from '../../../../services/authentication.service';
+import { ScrollTopModule } from 'primeng/scrolltop';
+import { JwtInterceptor } from '../../../../_helper/jwt.interceptor';
 
 @NgModule({
   declarations: [NavbarComponent, HomeComponent, FooterComponent],
@@ -39,6 +40,7 @@ import { AuthenticationService } from '../../../../services/authentication.servi
     RippleModule,
     RouterModule,
     ButtonModule,
+    ScrollTopModule
   ],
   providers: [
     AuthenticationService,

@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "statsJson": true,
             "outputPath": "dist/fe-explorenow",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -39,7 +40,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
+                  "maximumWarning": "2mb",
                   "maximumError": "1mb"
                 },
                 {
@@ -111,6 +112,6 @@
     "schematicCollections": [
       "@angular-eslint/schematics"
     ],
-    "analytics": false
+    "analytics": "797ef608-0f13-45c7-b505-7135d49b8fe2"
   }
 }

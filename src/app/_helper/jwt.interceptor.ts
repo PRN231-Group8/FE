@@ -1,31 +1,41 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthenticationGoogleService } from '../services/authentication.google.service';
+import {
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AuthenticationService } from '../services/authentication.service';
-import { environment } from '../../environments/environment';
 
+import { environment } from '../../environments/environment';
+import { AuthenticationService } from '../services/authentication.service';
+import { AuthenticationGoogleService } from '../services/authentication.google.service';
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-    constructor(
-        private authenticationService: AuthenticationService,
-        private authenticationGoogleServicel: AuthenticationGoogleService
-    ) {}
+  constructor(
+    private authenticationService: AuthenticationService,
+    private authenticationGoogleService: AuthenticationGoogleService,
+  ) {}
 
-    intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        const user = this.authenticationService.userValue;
-        const googleUser = this.authenticationGoogleServicel.userSocialValue;
-        const token = user?.token || googleUser?.token;
-        const isApiUrl = request.url.startsWith(environment.BACKEND_API_URL);
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
+    // add auth header with jwt if user is logged in and request is to the api url
+    const user = this.authenticationService.userValue;
+    const googleUser = this.authenticationGoogleService.userSocialValue;
+    const token = user?.token || googleUser?.token;
+    const isLoggedIn = !!token;
+    const isApiUrl = request.url.startsWith(environment.BACKEND_API_URL);
 
-        if (isApiUrl) {
-            request = request.clone({
-                setHeaders: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-        }
-
-        return next.handle(request);
+    if (isLoggedIn && isApiUrl) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
     }
+
+    return next.handle(request);
+  }
 }
