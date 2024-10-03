@@ -12,15 +12,63 @@ import { ProductService } from './services/product.service';
 import { RouterOutlet } from '@angular/router';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { AppLayoutModule } from './layout/app.layout.module';
+import { BrowserModule } from '@angular/platform-browser';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+// Third-party imports
+import {
+  GoogleLoginProvider,
+  GoogleSigninButtonModule,
+  SocialAuthServiceConfig,
+  SocialLoginModule,
+} from '@abacritt/angularx-social-login';
+import { environment } from '../environments/environment';
+import { JwtInterceptor } from './_helper/jwt.interceptor';
+import { ErrorInterceptor } from './_helper/error.interceptor';
+import { AuthenticationService } from './services/authentication.service';
+import { fakeBackendProvider } from './_helper/fake-backend';
+// Third-party imports
 
 @NgModule({
-  declarations: [AppComponent, NotfoundComponent],
-  imports: [AppRoutingModule, RouterOutlet, AppLayoutModule],
+  declarations: [
+    AppComponent,
+    NotfoundComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    RouterOutlet,
+    HttpClientModule,
+    BrowserAnimationsModule,
+    SocialLoginModule,
+    GoogleSigninButtonModule,
+    AppLayoutModule],
+  exports: [
+    SocialLoginModule,
+  ],
   providers: [
     {
       provide: LocationStrategy,
       useClass: PathLocationStrategy,
     },
+    AuthenticationService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(environment.GOOGLE_CLIENT_ID, {}),
+          },
+        ],
+        onError: (err) => {
+          console.error(err);
+        },
+      } as SocialAuthServiceConfig,
+    },
+    fakeBackendProvider,
     CountryService,
     CustomerService,
     EventService,
