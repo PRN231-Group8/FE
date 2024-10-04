@@ -27,12 +27,14 @@ import { JwtInterceptor } from './_helper/jwt.interceptor';
 import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { fakeBackendProvider } from './_helper/fake-backend';
+import { ButtonModule } from 'primeng/button';
 // Third-party imports
 
 @NgModule({
   declarations: [
     AppComponent,
-    NotfoundComponent],
+    NotfoundComponent,
+],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -41,9 +43,12 @@ import { fakeBackendProvider } from './_helper/fake-backend';
     BrowserAnimationsModule,
     SocialLoginModule,
     GoogleSigninButtonModule,
-    AppLayoutModule],
+    AppLayoutModule,
+    ButtonModule,
+  ],
   exports: [
     SocialLoginModule,
+    GoogleSigninButtonModule,
   ],
   providers: [
     {
