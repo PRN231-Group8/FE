@@ -2,13 +2,14 @@
   "name": "fe-explorenow",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "analyze": "ng build --configuration production --stats-json && webpack-bundle-analyzer dist/stats.json",
-    "test": "ng test",
-    "lint": "ng lint"
+  "ng": "ng",
+  "start": "ng serve",
+  "build:dev": "ng build --configuration development",
+  "build:prod": "ng build --configuration production",
+  "watch": "ng build --watch --configuration development",
+  "analyze": "ng build --configuration production --stats-json && webpack-bundle-analyzer dist/stats.json",
+  "test": "ng test",
+  "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
