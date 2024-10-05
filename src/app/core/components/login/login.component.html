@@ -1,0 +1,195 @@
+<p-toast></p-toast>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<div class="container" [ngClass]="{ 'sign-up-mode': signUpMode }">
+  <div class="forms-container">
+    <div class="signin-signup">
+      <!-- Sign in Form -->
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+        class="sign-in-form"
+      >
+        <h2 class="title">Sign in</h2>
+
+        <div class="input-field">
+          <i class="fas fa-user"></i>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="Username"
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Password"
+          />
+        </div>
+
+        <button type="submit" class="btn solid" [disabled]="loading">
+          <!-- Khi loading = true, hiển thị vòng xoay -->
+          <ng-container *ngIf="loading; else loginText">
+            <i class="pi pi-spin pi-spinner"></i> Logging in...
+          </ng-container>
+          <ng-template #loginText>Login</ng-template>
+        </button>
+        
+        <!-- Import spinner for google -->
+        <div *ngIf="isGoogleLoading" class="loading-overlay">
+          <div class="spinner"></div>
+        </div>
+
+        <p class="social-text">Or Sign in with social platforms</p>
+        <div class="social-media">
+          <a href="#" class="social-icon">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="social-icon">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <!-- Google button -->
+          <asl-google-signin-button
+            type="icon"
+            size="large"
+            shape="circle"
+          ></asl-google-signin-button>
+          <a href="#" class="social-icon">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </div>
+      </form>
+
+      <!-- Sign up Form -->
+      <form
+        [formGroup]="signUpForm"
+        (ngSubmit)="onSignUpSubmit()"
+        class="sign-up-form"
+      >
+        <h2 class="title">Sign up</h2>
+
+        <div class="input-field">
+          <i class="fas fa-user"></i>
+          <input
+            type="text"
+            formControlName="firstName"
+            placeholder="First Name"
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-user"></i>
+          <input
+            type="text"
+            formControlName="lastName"
+            placeholder="Last Name"
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-user"></i>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="Username"
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-envelope"></i>
+          <input type="email" formControlName="email" placeholder="Email" />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Password"
+          />
+        </div>
+
+        <div class="input-field">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Confirm Password"
+          />
+        </div>
+
+        <button type="submit" class="btn" [disabled]="loading">
+          <!-- Khi loading = true, hiển thị vòng xoay -->
+          <ng-container *ngIf="loading; else signUpText">
+            <i class="pi pi-spin pi-spinner"></i> Signing up...
+          </ng-container>
+          <ng-template #signUpText>Sign up</ng-template>
+        </button>
+
+        <p class="social-text">Or Sign up with social platforms</p>
+        <div class="social-media">
+          <a href="#" class="social-icon">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="social-icon">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="social-icon">
+            <i class="fab fa-google"></i>
+          </a>
+          <a href="#" class="social-icon">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="panels-container">
+    <div class="panel left-panel">
+      <div class="content">
+        <h3>New here?</h3>
+        <p>
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Debitis, ex
+          ratione. Aliquid!
+        </p>
+        <button
+          class="btn transparent"
+          (click)="onSignUpClick()"
+          id="sign-up-btn"
+        >
+          Sign up
+        </button>
+      </div>
+      <img
+        src="assets/demo/images/login/undraw_adventure_map_hnin.svg"
+        class="image"
+        alt=""
+      />
+    </div>
+
+    <div class="panel right-panel">
+      <div class="content">
+        <h3>One of us?</h3>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum
+          laboriosam ad deleniti.
+        </p>
+        <button
+          class="btn transparent"
+          (click)="onSignInClick()"
+          id="sign-in-btn"
+        >
+          Sign in
+        </button>
+      </div>
+      <img
+        src="assets/demo/images/login/undraw_stranded_traveler_pdbw.svg"
+        class="image"
+        alt=""
+      />
+    </div>
+  </div>
+</div>
