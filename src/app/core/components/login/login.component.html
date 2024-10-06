@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <div class="container" [ngClass]="{ 'sign-up-mode': signUpMode }">
   <div class="forms-container">
@@ -11,7 +12,6 @@
         </a>        
 
         <h2 class="title">Sign in</h2>
-
         <div class="input-field">
           <i class="fas fa-user"></i>
           <input type="text" formControlName="username" placeholder="User Name" />
@@ -29,20 +29,15 @@
           <ng-template #loginText>Sign in</ng-template>
         </button>
 
+        <!-- Import spinner for google -->
+        <div *ngIf="isGoogleLoading" class="loading-overlay">
+          <div class="spinner"></div>
+        </div>
+
         <p class="social-text">Or Sign in with social platforms</p>
-        <div class="social-media">
-          <a href="#" class="social-icon">
-            <i class="fab fa-facebook-f"></i>
-          </a>
-          <a href="#" class="social-icon">
-            <i class="fab fa-twitter"></i>
-          </a>
-          <a href="#" class="social-icon">
-            <i class="fab fa-google"></i>
-          </a>
-          <a href="#" class="social-icon">
-            <i class="fab fa-linkedin-in"></i>
-          </a>
+        <div class="social-media">  
+          <!-- Google button -->
+          <asl-google-signin-button type="icon" size="large" shape="circle"></asl-google-signin-button>
         </div>
       </form>
 
@@ -54,7 +49,6 @@
         </a>        
 
         <h2 class="title">Sign up</h2>
-
         <div class="input-field">
           <i class="fas fa-user"></i>
           <input type="text" formControlName="firstName" placeholder="First Name" />
@@ -93,20 +87,6 @@
         </button>
 
         <p class="social-text">Or Sign up with social platforms</p>
-        <div class="social-media">
-          <a href="#" class="social-icon">
-            <i class="fab fa-facebook-f"></i>
-          </a>
-          <a href="#" class="social-icon">
-            <i class="fab fa-twitter"></i>
-          </a>
-          <a href="#" class="social-icon">
-            <i class="fab fa-google"></i>
-          </a>
-          <a href="#" class="social-icon">
-            <i class="fab fa-linkedin-in"></i>
-          </a>
-        </div>
       </form>
     </div>
   </div>
@@ -115,9 +95,7 @@
     <div class="panel left-panel">
       <div class="content">
         <h3>New here?</h3>
-        <p>
-          Join us today and explore our exclusive features. Creating an account takes just a few moments!
-        </p>
+        <p>Join us today and explore our exclusive features. Creating an account takes just a few moments!</p>
         <button class="btn transparent" (click)="onSignUpClick()" id="sign-up-btn">Sign up</button>
       </div>
       <img src="assets/demo/images/login/undraw_adventure_map_hnin.svg" class="image" alt="" />
@@ -126,9 +104,7 @@
     <div class="panel right-panel">
       <div class="content">
         <h3>One of us?</h3>
-        <p>
-          Already have an account? Sign in to access your personalized and enjoy all the benefits!
-        </p>
+        <p>Already have an account? Sign in to access your personalized experience and enjoy all the benefits!</p>
         <button class="btn transparent" (click)="onSignInClick()" id="sign-in-btn">Sign in</button>
       </div>
       <img src="assets/demo/images/login/undraw_stranded_traveler_pdbw.svg" class="image" alt="" />

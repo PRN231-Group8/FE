@@ -1,22 +1,51 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { CommonModule } from '@angular/common';
+import { ToastModule } from 'primeng/toast';
+import {
+  GoogleSigninButtonModule,
+  SocialAuthService,
+  SocialUser,
+} from '@abacritt/angularx-social-login';
+import { AuthenticationGoogleService } from '../../../services/authentication.google.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ExternalAuthRequest } from '../../../interfaces/models/request/externalAuthRequest';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ToastModule,
+    GoogleSigninButtonModule,
+  ],
+  providers: [MessageService],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   signUpForm!: FormGroup;
   loading = false;
   error = '';
   signUpMode: boolean = false;
+  socialUser!: SocialUser;
+  showError?: boolean;
+  errorMessage: string = '';
+  isGoogleLoading: boolean = false;
 
   constructor(
+    private googleCommonService: AuthenticationGoogleService,
+    private socialAuthService: SocialAuthService,
     private formBuilder: FormBuilder,
     private authenticationService: AuthenticationService,
     private router: Router,
@@ -37,6 +66,18 @@ export class LoginComponent implements OnInit {
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
     });
+
+    this.socialAuthService.authState.subscribe(user => {
+      this.socialUser = user;
+      if (user) {
+        this.externalLogin(user);
+      }
+    });
+  }
+
+  // Destoy loading for google login
+  ngOnDestroy(): void {
+    this.setGoogleLoading(false);
   }
 
   onSubmit(): void {
@@ -178,5 +219,81 @@ export class LoginComponent implements OnInit {
 
   onSignInClick(): void {
     this.signUpMode = false;
+  }
+
+  // Login Google
+  private externalLogin(user: SocialUser): void {
+    this.showError = false;
+    if (!user || !user.provider || !user.idToken) {
+      return;
+    }
+    const externalAuth: ExternalAuthRequest = {
+      provider: user.provider,
+      idToken: user.idToken,
+    };
+    this.setGoogleLoading(true);
+    this.validateExternalAuth(externalAuth);
+  }
+
+  private validateExternalAuth(externalAuth: ExternalAuthRequest): void {
+    this.googleCommonService
+      .externalLogin('/api/auth/google', externalAuth)
+      .subscribe({
+        next: res => {
+          if (res && res.token) {
+            localStorage.setItem('socialUser', JSON.stringify(res));
+            this.authenticationService.setUserValue(res);
+
+            // Show success toast
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Google login successful',
+            });
+
+            // Delay navigation to allow toast to be seen
+            setTimeout(() => {
+              if (res.role === 'ADMIN') {
+                this.router.navigate(['/dashboard']);
+              } else {
+                this.router.navigate(['/']);
+              }
+              this.setGoogleLoading(false);
+            }, 2000);
+          } else {
+            this.handleError('Invalid response from server');
+          }
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('External login error:', err);
+          let errorMsg = 'An error occurred during login';
+          if (err.error instanceof ErrorEvent) {
+            errorMsg = `Error: ${err.error.message}`;
+          } else {
+            errorMsg = `Error Code: ${err.status}\nMessage: ${err.error?.message || err.message}`;
+          }
+          this.handleError(errorMsg);
+          this.setGoogleLoading(false);
+        },
+        complete: () => {
+          console.log('External login observable completed');
+        },
+      });
+  }
+
+  setGoogleLoading(isLoading: boolean): void {
+    this.isGoogleLoading = isLoading;
+  }
+
+  private handleError(message: string): void {
+    this.errorMessage = message;
+    this.showError = true;
+    console.error(this.errorMessage);
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: this.errorMessage,
+    });
+    this.googleCommonService.signOutExternal();
   }
 }

@@ -9,9 +9,13 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { AuthenticationService } from '../services/authentication.service';
+import { AuthenticationGoogleService } from '../services/authentication.google.service';
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private authenticationService: AuthenticationService) {}
+  constructor(
+    private authenticationService: AuthenticationService,
+    private authenticationGoogleService: AuthenticationGoogleService,
+  ) {}
 
   intercept(
     request: HttpRequest<any>,
@@ -19,7 +23,8 @@ export class JwtInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     // add auth header with jwt if user is logged in and request is to the api url
     const user = this.authenticationService.userValue;
-    const token = user?.token;
+    const googleUser = this.authenticationGoogleService.userSocialValue;
+    const token = user?.token || googleUser?.token;
     const isLoggedIn = !!token;
     const isApiUrl = request.url.startsWith(environment.BACKEND_API_URL);
 

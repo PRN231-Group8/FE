@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../interfaces/models/user';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { BaseResponse } from '../interfaces/models/base-response';
 import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
@@ -18,6 +19,7 @@ export class AuthenticationService {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private socialAuthService: SocialAuthService,
   ) {
     const storedUserString = localStorage.getItem('user');
     let storedUser: User | null = null;
@@ -81,11 +83,11 @@ export class AuthenticationService {
         }),
       );
   }
-
   logOut(): void {
     localStorage.removeItem('user');
     localStorage.removeItem('socialUser');
     this.userSubject.next(null);
+    this.socialAuthService.signOut();
     this.router.navigate(['/login']);
   }
 }
