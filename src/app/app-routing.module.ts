@@ -5,6 +5,7 @@ import { AppLayoutComponent } from './layout/app.layout.component';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { HomeComponent } from './core/components/home/layout/home.component';
 import { LoginComponent } from './core/components/login/login.component';
+import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 
 @NgModule({
   imports: [
@@ -46,6 +47,10 @@ import { LoginComponent } from './core/components/login/login.component';
         {
           path: 'login',
           component: LoginComponent,
+        },
+        {
+          path: 'verify-email',
+          component: VerifyEmailComponent,
         },
         { path: 'notfound', component: NotfoundComponent },
         { path: '**', redirectTo: '/notfound' },
