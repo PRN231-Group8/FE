@@ -1,23 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { MessageService } from 'primeng/api'; // Import MessageService
-import { ToastModule } from 'primeng/toast'; // Import ToastModule
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ToastModule],
-  providers: [MessageService], // Thêm MessageService vào providers
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -30,17 +20,15 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authenticationService: AuthenticationService,
     private router: Router,
-    private messageService: MessageService, // Inject MessageService
+    private messageService: MessageService,
   ) {}
 
   ngOnInit(): void {
-    // Form đăng nhập
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
     });
 
-    // Form đăng ký
     this.signUpForm = this.formBuilder.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -51,39 +39,43 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Đăng nhập
   onSubmit(): void {
     if (this.loginForm.invalid) {
+      if (this.loginForm.get('username')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Username is required',
+        });
+      }
+      if (this.loginForm.get('password')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Password is required',
+        });
+      }
       return;
     }
 
-    this.loading = true; // Bắt đầu hiển thị vòng xoay và khóa nút
-
+    this.loading = true;
     const { username, password } = this.loginForm.value;
 
     this.authenticationService.login(username, password).subscribe({
       next: user => {
-        // Hiển thị thông báo đăng nhập thành công
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
           detail: 'Login successful',
         });
-
-        // Trì hoãn 3 giây trước khi điều hướng
         setTimeout(() => {
-          if (user.role === 'ADMIN') {
-            this.router.navigate(['/dashboard']);
-          } else {
-            this.router.navigate(['/']);
-          }
-          this.loading = false; // Bỏ khóa nút sau khi điều hướng
-        }, 3000); // 3000ms = 3 giây
+          this.router.navigate([user.role === 'ADMIN' ? '/dashboard' : '/']);
+          this.loading = false;
+        }, 3000);
       },
       error: error => {
         this.error = error;
-        this.loading = false; // Bỏ khóa nút khi có lỗi
-        // Hiển thị thông báo lỗi
+        this.loading = false;
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -93,13 +85,54 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Đăng ký
   onSignUpSubmit(): void {
     if (this.signUpForm.invalid) {
+      if (this.signUpForm.get('firstName')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'First name is required',
+        });
+      }
+      if (this.signUpForm.get('lastName')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Last name is required',
+        });
+      }
+      if (this.signUpForm.get('username')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'User name is required',
+        });
+      }
+      if (this.signUpForm.get('email')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Email is required',
+        });
+      }
+      if (this.signUpForm.get('password')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Password is required',
+        });
+      }
+      if (this.signUpForm.get('confirmPassword')?.hasError('required')) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Confirm password is required',
+        });
+      }
       return;
     }
 
-    this.loading = true; // Khóa nút và hiển thị vòng xoay
+    this.loading = true;
     const { firstName, lastName, username, email, password, confirmPassword } =
       this.signUpForm.value;
 
@@ -118,20 +151,18 @@ export class LoginComponent implements OnInit {
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
-              detail: 'Registration successful',
+              detail: 'Registration successful, please verify your email.',
             });
 
-            // Trì hoãn 3 giây trước khi điều hướng
             setTimeout(() => {
-              this.router.navigate(['/']);
-              this.loading = false; // Mở khóa nút sau khi điều hướng
-            }, 3000); // 3000ms = 3 giây
+              this.onSignInClick();
+              this.loading = false;
+            }, 3000);
           }
         },
         error: () => {
           this.error = 'Registration failed, please try again.';
-          this.loading = false; // Mở khóa nút khi có lỗi
-          // Hiển thị thông báo lỗi
+          this.loading = false;
           this.messageService.add({
             severity: 'error',
             summary: 'Error',

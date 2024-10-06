@@ -1,0 +1,8 @@
+<p-toast></p-toast>
+
+<div class="verify-email-container">
+    <h1>Email Verification</h1>
+    <p>{{ verificationMessage }}</p>
+    <button *ngIf="!loading" class="custom-button" (click)="navigateToLogin()">Go to Login</button>   
+</div>
+<img src="assets/demo/images/login/logo-removebg-preview.png" alt="Logo" class="logo-background">
