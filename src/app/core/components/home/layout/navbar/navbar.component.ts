@@ -8,8 +8,8 @@ import { Component } from '@angular/core';
 export class NavbarComponent {
   NAV_LINKS = [
     { key: 'home', label: 'Home', href: '/' },
-    { key: 'about', label: 'About Us', href: '/about' },
-    { key: 'services', label: 'Services', href: '/services' },
+    { key: 'explore', label: 'Explore', href: '/explore' },
+    { key: 'sharing', label: 'Sharing', href: '/share' },
     { key: 'contact', label: 'Contact', href: '/contact' },
   ];
 }
