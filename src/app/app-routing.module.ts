@@ -21,13 +21,6 @@ import { LoginComponent } from './core/components/login/login.component';
                   m => m.MainModule,
                 ),
             },
-            {
-              path: 'explore',
-              loadChildren: () =>
-                import('./core/components/home/exploration/exploration.module').then(
-                  m => m.ExplorationModule
-                ),
-            },
           ],
         },
         {
@@ -61,6 +54,7 @@ import { LoginComponent } from './core/components/login/login.component';
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
         onSameUrlNavigation: 'reload',
+        enableTracing: true
       },
     ),
   ],

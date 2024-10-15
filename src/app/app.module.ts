@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { CountryService } from './services/country.service';
 import { CustomerService } from './services/customer.service';
 import { EventService } from './services/event.service';
@@ -28,6 +28,7 @@ import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { fakeBackendProvider } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
+import { HomeModule } from './core/components/home/layout/home.module';
 // Third-party imports
 
 @NgModule({
@@ -44,7 +45,9 @@ import { ButtonModule } from 'primeng/button';
     SocialLoginModule,
     GoogleSigninButtonModule,
     AppLayoutModule,
+    HomeModule,
     ButtonModule,
+    CommonModule
   ],
   exports: [
     SocialLoginModule,

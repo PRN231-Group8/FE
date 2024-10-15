@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
@@ -12,4 +14,10 @@ export class NavbarComponent {
     { key: 'sharing', label: 'Sharing', href: '/share' },
     { key: 'contact', label: 'Contact', href: '/contact' },
   ];
+
+  constructor(private router: Router, private route : ActivatedRoute, private location: Location) {}
+
+  navigateTo(url: string): void {
+    this.router.navigate([url], { relativeTo: this.route });
+  }
 }

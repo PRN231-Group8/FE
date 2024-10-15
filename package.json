@@ -2,14 +2,14 @@
   "name": "fe-explorenow",
   "version": "0.0.0",
   "scripts": {
-  "ng": "ng",
-  "start": "ng serve",
-  "build:dev": "ng build --configuration development",
-  "build:prod": "ng build --configuration production",
-  "watch": "ng build --watch --configuration development",
-  "analyze": "ng build --configuration production --stats-json && webpack-bundle-analyzer dist/stats.json",
-  "test": "ng test",
-  "lint": "ng lint"
+    "ng": "ng",
+    "start": "ng serve",
+    "build:dev": "ng build --configuration development",
+    "build:prod": "ng build --configuration production",
+    "watch": "ng build --watch --configuration development",
+    "analyze": "ng build --configuration production --stats-json && webpack-bundle-analyzer dist/stats.json",
+    "test": "ng test",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -22,15 +22,16 @@
     "@angular/platform-browser": "^17.3.0",
     "@angular/platform-browser-dynamic": "^17.3.12",
     "@angular/router": "^17.3.0",
+    "@bugsplat/ngx-animated-counter": "^18.0.0",
     "chart.js": "^4.4.4",
     "fullcalendar": "^6.1.15",
+    "jwt-decode": "^4.0.0",
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
     "primeng": "^17.18.10",
     "quill": "^2.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "jwt-decode": "^4.0.0",
     "zone.js": "~0.14.3"
   },
   "devDependencies": {

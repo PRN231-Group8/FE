@@ -1,1 +1,23 @@
-<p>exploration works!</p>
+<div class="exploration-page">
+    <h2>Filtered Tours</h2>
+  
+    <!-- Display the selected filters -->
+    <div class="filters">
+      <p><strong>Mood:</strong> {{ filters.mood }}</p>
+      <p><strong>From:</strong> {{ filters.from?.name }}</p>
+      <p><strong>To:</strong> {{ filters.to?.name }}</p>
+      <p><strong>Price Range:</strong> {{ filters.priceRange | currency:'VND' }}</p>
+      <p><strong>Transport:</strong> {{ filters.transport }}</p>
+    </div>
+  
+    <!-- Display filtered tours -->
+    <div class="tour-list">
+      <h3>Available Tours:</h3>
+      <div *ngFor="let tour of tours" class="tour-item">
+        <p><strong>{{ tour.name }}</strong></p>
+        <p>Price: {{ tour.price | currency:'VND' }}</p>
+        <p>Transport: {{ tour.transport }}</p>
+      </div>
+    </div>
+  </div>
+  
