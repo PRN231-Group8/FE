@@ -4,7 +4,6 @@ import { CommonService } from '../../../../services/common.service';
 @Component({
   selector: 'app-exploration',
   templateUrl: './exploration.component.html',
-  styleUrl: './exploration.component.scss'
 })
 export class ExplorationComponent implements OnInit {
   filters: any = {};

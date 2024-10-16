@@ -1,23 +1,34 @@
-<div class="exploration-page">
-    <h2>Filtered Tours</h2>
-  
-    <!-- Display the selected filters -->
-    <div class="filters">
-      <p><strong>Mood:</strong> {{ filters.mood }}</p>
-      <p><strong>From:</strong> {{ filters.from?.name }}</p>
-      <p><strong>To:</strong> {{ filters.to?.name }}</p>
-      <p><strong>Price Range:</strong> {{ filters.priceRange | currency:'VND' }}</p>
-      <p><strong>Transport:</strong> {{ filters.transport }}</p>
-    </div>
-  
-    <!-- Display filtered tours -->
-    <div class="tour-list">
-      <h3>Available Tours:</h3>
-      <div *ngFor="let tour of tours" class="tour-item">
-        <p><strong>{{ tour.name }}</strong></p>
-        <p>Price: {{ tour.price | currency:'VND' }}</p>
-        <p>Transport: {{ tour.transport }}</p>
+<div class="layout-wrapper">
+  <p-scrollTop />
+  <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <div class="layout-main-container">
+      <div class="layout-main overflow-hidden z-0">
+          <div class="layout-main-container">
+            <div class="exploration-page">
+              <h2>Filtered Tours</h2>
+            
+              <!-- Display the selected filters -->
+              <div class="filters">
+                <p><strong>Mood:</strong> {{ filters.mood }}</p>
+                <p><strong>From:</strong> {{ filters.from?.name }}</p>
+                <p><strong>To:</strong> {{ filters.to?.name }}</p>
+                <p><strong>Price Range:</strong> {{ filters.priceRange | currency:'VND' }}</p>
+                <p><strong>Transport:</strong> {{ filters.transport }}</p>
+              </div>
+            
+              <!-- Display filtered tours -->
+              <div class="tour-list">
+                <h3>Available Tours:</h3>
+                <div *ngFor="let tour of tours" class="tour-item">
+                  <p><strong>{{ tour.name }}</strong></p>
+                  <p>Price: {{ tour.price | currency:'VND' }}</p>
+                  <p>Transport: {{ tour.transport }}</p>
+                </div>
+              </div>
+            </div>          
+          </div>
       </div>
-    </div>
+      <app-shared-footer></app-shared-footer>
   </div>
-  
+  <div class="layout-mask"></div>
+</div>

@@ -2,14 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgxAnimatedCounterParams } from '@bugsplat/ngx-animated-counter';
 import { PrimeNGConfig } from 'primeng/api';
-import { CommonService } from '../../../../../services/common.service';
+import { CommonService } from '../../../../services/common.service';
+import { Product } from '../../../../interfaces/models/product';
+import { ProductService } from '../../../../services/product.service';
 
 @Component({
-  selector: 'app-landing',
+  selector: 'app-home',
   templateUrl: './landing.component.html',
+  providers: [ProductService],
 })
 export class LandingComponent implements OnInit {
-
   value: number = 4;
   public params: NgxAnimatedCounterParams = { start: 20, end: 198021, interval: 40, increment: 9319 };
   public params_2: NgxAnimatedCounterParams = { start: 0, end: 27857, interval: 40, increment: 1950 };
@@ -24,15 +26,20 @@ export class LandingComponent implements OnInit {
   moods!: any[];
   locations!: any[];
   transportOptions!: any[];
+  layout: 'list' | 'grid' = 'list';
+
+  products!: Product[];
 
   constructor(
     private commonService: CommonService,
     private primengConfig: PrimeNGConfig,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {
+    this.productService.getProducts().then((data: any) => (this.products = data.slice(0, 12)));
     this.primengConfig.zIndex = {
       modal: 1100,
       overlay: 1000,
@@ -112,10 +119,21 @@ export class LandingComponent implements OnInit {
       transport: this.selectedTransport,
     });
 
-    this.navigateTo('/explore');
+    this.router.navigate(['/explore']);
   }
 
-  navigateTo(url: string): void {
-    this.router.navigate([url], { relativeTo: this.route });
+  getSeverity(product: Product): any {
+    switch (product.inventoryStatus?.label) {
+        case 'INSTOCK':
+            return 'success';
+
+        case 'LOWSTOCK':
+            return 'warning';
+
+        case 'OUTOFSTOCK':
+            return 'danger';
+        default:
+            return null;
+    }
   }
 }

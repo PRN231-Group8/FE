@@ -2,16 +2,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
-  ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import { ToastModule } from 'primeng/toast'; // Import ToastModule
 import {
-  GoogleSigninButtonModule,
   SocialAuthService,
   SocialUser,
 } from '@abacritt/angularx-social-login';
@@ -23,13 +19,6 @@ import { ExternalAuthRequest } from '../../../interfaces/models/request/external
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ToastModule,
-    GoogleSigninButtonModule,
-  ],
   providers: [MessageService], // Thêm MessageService vào providers
 })
 export class LoginComponent implements OnInit, OnDestroy {

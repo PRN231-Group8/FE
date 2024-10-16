@@ -17,10 +17,15 @@ import { ImageModule } from 'primeng/image';
 import { NgxAnimatedCounterModule } from '@bugsplat/ngx-animated-counter';
 import { TabViewModule } from 'primeng/tabview';
 import { RatingModule } from 'primeng/rating';
-import { ExplorationComponent } from './exploration.component';
+import { LandingComponent } from './landing.component';
+import { LandingRoutingModule } from './landing-routing.module';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { DataViewModule } from 'primeng/dataview';
+import { TagModule } from 'primeng/tag';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @NgModule({
-  declarations: [ExplorationComponent],
+  declarations: [LandingComponent],
   imports: [
     FormsModule,
     HttpClientModule,
@@ -37,10 +42,15 @@ import { ExplorationComponent } from './exploration.component';
     DropdownModule,
     ImageModule,
     NgxAnimatedCounterModule,
+    LandingRoutingModule,
     TabViewModule,
     RatingModule,
     sharedModule,
+    DataViewModule,
+    TagModule,
+    InputNumberModule,
+    SkeletonModule
   ],
-  exports: [ExplorationComponent],
+  exports: [LandingComponent],
 })
-export class ExplorationModule {}
+export class LandingModule {}

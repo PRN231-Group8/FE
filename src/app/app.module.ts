@@ -1,7 +1,11 @@
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { CommonModule, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import {
+  CommonModule,
+  LocationStrategy,
+  PathLocationStrategy,
+} from '@angular/common';
 import { CountryService } from './services/country.service';
 import { CustomerService } from './services/customer.service';
 import { EventService } from './services/event.service';
@@ -9,7 +13,6 @@ import { IconService } from './services/icon.service';
 import { NodeService } from './services/node.service';
 import { PhotoService } from './services/photo.service';
 import { ProductService } from './services/product.service';
-import { RouterOutlet } from '@angular/router';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { BrowserModule } from '@angular/platform-browser';
@@ -28,30 +31,37 @@ import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { fakeBackendProvider } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
-import { HomeModule } from './core/components/home/layout/home.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ToastModule } from 'primeng/toast';
+import { LoginComponent } from './core/components/login/login.component';
+
 // Third-party imports
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NotfoundComponent,
-],
+  declarations: [AppComponent, NotfoundComponent, LoginComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    RouterOutlet,
     HttpClientModule,
     BrowserAnimationsModule,
     SocialLoginModule,
     GoogleSigninButtonModule,
     AppLayoutModule,
-    HomeModule,
     ButtonModule,
-    CommonModule
+    FormsModule,
+    CommonModule,
+    ReactiveFormsModule,
+    ToastModule,
+    GoogleSigninButtonModule,
   ],
   exports: [
     SocialLoginModule,
     GoogleSigninButtonModule,
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    FormsModule,
+    BrowserAnimationsModule,
   ],
   providers: [
     {
@@ -71,7 +81,7 @@ import { HomeModule } from './core/components/home/layout/home.module';
             provider: new GoogleLoginProvider(environment.GOOGLE_CLIENT_ID, {}),
           },
         ],
-        onError: (err) => {
+        onError: err => {
           console.error(err);
         },
       } as SocialAuthServiceConfig,
