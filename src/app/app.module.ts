@@ -13,13 +13,11 @@ import { IconService } from './services/icon.service';
 import { NodeService } from './services/node.service';
 import { PhotoService } from './services/photo.service';
 import { ProductService } from './services/product.service';
-import { RouterOutlet } from '@angular/router';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { MenuModule } from 'primeng/menu';
 import { ToastModule } from 'primeng/toast';
-import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
@@ -37,14 +35,17 @@ import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { fakeBackendProvider } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
+import { LoginComponent } from './core/components/login/login.component';
+import { MapApiService } from './services/map-api.service';
+import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
+
 // Third-party imports
 
 @NgModule({
-  declarations: [AppComponent, NotfoundComponent, VerifyEmailComponent],
+  declarations: [AppComponent, NotfoundComponent, LoginComponent, VerifyEmailComponent],
   imports: [
     AppRoutingModule,
-    RouterOutlet,
-    AppLayoutModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     BrowserModule,
     MenuModule,
@@ -57,8 +58,22 @@ import { ButtonModule } from 'primeng/button';
     GoogleSigninButtonModule,
     AppLayoutModule,
     ButtonModule,
+    FormsModule,
+    CommonModule,
+    ReactiveFormsModule,
+    ToastModule,
+    GoogleSigninButtonModule,
   ],
-  exports: [SocialLoginModule, GoogleSigninButtonModule],
+  exports: [
+    SocialLoginModule,
+    GoogleSigninButtonModule,
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    FormsModule,
+    ToastModule,
+    BrowserAnimationsModule,
+  ],
   providers: [
     {
       provide: LocationStrategy,
@@ -91,8 +106,7 @@ import { ButtonModule } from 'primeng/button';
     NodeService,
     PhotoService,
     ProductService,
-    MenuModule,
-    ToastModule,
+    MapApiService
   ],
   bootstrap: [AppComponent],
 })

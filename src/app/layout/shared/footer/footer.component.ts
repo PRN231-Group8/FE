@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-footer',
+  selector: 'app-shared-footer',
   templateUrl: './footer.component.html',
-  styleUrl: './footer.component.scss'
 })
 export class FooterComponent {
   FOOTER_LINKS = [
