@@ -158,7 +158,6 @@ export class LandingComponent implements OnInit {
         this.mapApiService.getCities().subscribe((mapData: any) => {
           mapData.forEach((map: any) => {
             if (this.address.includes(map.admin_name)) {
-              console.log('You are in or near:', map.city);
               this.selectedFrom = map.city;
             }
           });
