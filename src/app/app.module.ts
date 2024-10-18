@@ -17,8 +17,7 @@ import { NotfoundComponent } from './core/components/notfound/notfound.component
 import { AppLayoutModule } from './layout/app.layout.module';
 import { MenuModule } from 'primeng/menu';
 import { ToastModule } from 'primeng/toast';
-import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
@@ -36,27 +35,17 @@ import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { fakeBackendProvider } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ToastModule } from 'primeng/toast';
 import { LoginComponent } from './core/components/login/login.component';
 import { MapApiService } from './services/map-api.service';
+import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 
 // Third-party imports
 
 @NgModule({
-<<<<<<< HEAD
-  declarations: [AppComponent, NotfoundComponent, LoginComponent],
-=======
-  declarations: [AppComponent, NotfoundComponent, VerifyEmailComponent],
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
+  declarations: [AppComponent, NotfoundComponent, LoginComponent, VerifyEmailComponent],
   imports: [
     AppRoutingModule,
-<<<<<<< HEAD
     HttpClientModule,
-=======
-    RouterOutlet,
-    AppLayoutModule,
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
     BrowserAnimationsModule,
     BrowserModule,
     MenuModule,
@@ -75,7 +64,6 @@ import { MapApiService } from './services/map-api.service';
     ToastModule,
     GoogleSigninButtonModule,
   ],
-<<<<<<< HEAD
   exports: [
     SocialLoginModule,
     GoogleSigninButtonModule,
@@ -83,11 +71,9 @@ import { MapApiService } from './services/map-api.service';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+    ToastModule,
     BrowserAnimationsModule,
   ],
-=======
-  exports: [SocialLoginModule, GoogleSigninButtonModule],
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
   providers: [
     {
       provide: LocationStrategy,
@@ -120,12 +106,7 @@ import { MapApiService } from './services/map-api.service';
     NodeService,
     PhotoService,
     ProductService,
-<<<<<<< HEAD
     MapApiService
-=======
-    MenuModule,
-    ToastModule,
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
   ],
   bootstrap: [AppComponent],
 })

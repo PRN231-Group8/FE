@@ -6,13 +6,7 @@ import {
 } from '@angular/forms';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
-<<<<<<< HEAD
 import { MessageService } from 'primeng/api'; // Import MessageService
-=======
-import { MessageService } from 'primeng/api';
-import { CommonModule } from '@angular/common';
-import { ToastModule } from 'primeng/toast';
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
 import {
   SocialAuthService,
   SocialUser,
@@ -25,18 +19,7 @@ import { ExternalAuthRequest } from '../../../interfaces/models/request/external
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-<<<<<<< HEAD
   providers: [MessageService], // Thêm MessageService vào providers
-=======
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ToastModule,
-    GoogleSigninButtonModule,
-  ],
-  providers: [MessageService],
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;

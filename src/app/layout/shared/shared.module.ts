@@ -12,7 +12,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
 import { ScrollTopModule } from 'primeng/scrolltop';
-<<<<<<< HEAD:src/app/layout/shared/shared.module.ts
 import { FooterComponent } from './footer/footer.component';
 import { NavbarComponent } from './navbar/navbar.component';
 
@@ -21,13 +20,6 @@ import { NavbarComponent } from './navbar/navbar.component';
     FooterComponent,
     NavbarComponent,
   ],
-=======
-import { MenuModule } from 'primeng/menu';
-import { AvatarModule } from 'primeng/avatar';
-
-@NgModule({
-  declarations: [HomeComponent, FooterComponent],
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c:src/app/core/components/home/layout/home.module.ts
   imports: [
     BrowserModule,
     FormsModule,
@@ -41,19 +33,7 @@ import { AvatarModule } from 'primeng/avatar';
     RouterModule,
     ButtonModule,
     ScrollTopModule,
-<<<<<<< HEAD:src/app/layout/shared/shared.module.ts
     CommonModule,
-=======
-    NavbarComponent,
-    MenuModule,
-    BrowserModule,
-    AvatarModule,
-    MenuModule,
-    AvatarModule,
-    ButtonModule,
-    RippleModule,
-    RouterModule,
->>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c:src/app/core/components/home/layout/home.module.ts
   ],
   exports: [FooterComponent, NavbarComponent],
 })
