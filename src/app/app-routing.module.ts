@@ -4,8 +4,12 @@ import { RouterModule } from '@angular/router';
 import { AppLayoutComponent } from './layout/app.layout.component';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { LoginComponent } from './core/components/login/login.component';
+<<<<<<< HEAD
 import { LandingComponent } from './core/components/home/landing/landing.component';
 import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
+=======
+import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
+>>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
 
 @NgModule({
   imports: [
@@ -50,6 +54,10 @@ import { ExplorationComponent } from './core/components/home/exploration/explora
         {
           path: 'login',
           component: LoginComponent,
+        },
+        {
+          path: 'verify-email',
+          component: VerifyEmailComponent,
         },
         { path: 'notfound', component: NotfoundComponent },
         { path: '**', redirectTo: '/notfound' },

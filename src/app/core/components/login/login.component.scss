@@ -404,7 +404,18 @@ form.sign-in-form {
   height: 60px;
   animation: spin 1s linear infinite;
 }
-
+.sign-in-logo {
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 150px;
+  height: auto;
+}
+.sign-up-logo {
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 150px;
+  height: auto;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);

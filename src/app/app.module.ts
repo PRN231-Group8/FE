@@ -15,6 +15,11 @@ import { PhotoService } from './services/photo.service';
 import { ProductService } from './services/product.service';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { AppLayoutModule } from './layout/app.layout.module';
+import { MenuModule } from 'primeng/menu';
+import { ToastModule } from 'primeng/toast';
+import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -39,12 +44,27 @@ import { MapApiService } from './services/map-api.service';
 // Third-party imports
 
 @NgModule({
+<<<<<<< HEAD
   declarations: [AppComponent, NotfoundComponent, LoginComponent],
+=======
+  declarations: [AppComponent, NotfoundComponent, VerifyEmailComponent],
+>>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
   imports: [
-    BrowserModule,
     AppRoutingModule,
+<<<<<<< HEAD
     HttpClientModule,
+=======
+    RouterOutlet,
+    AppLayoutModule,
+>>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
     BrowserAnimationsModule,
+    BrowserModule,
+    MenuModule,
+    ToastModule,
+    ReactiveFormsModule,
+    CommonModule,
+    BrowserModule,
+    HttpClientModule,
     SocialLoginModule,
     GoogleSigninButtonModule,
     AppLayoutModule,
@@ -55,6 +75,7 @@ import { MapApiService } from './services/map-api.service';
     ToastModule,
     GoogleSigninButtonModule,
   ],
+<<<<<<< HEAD
   exports: [
     SocialLoginModule,
     GoogleSigninButtonModule,
@@ -64,11 +85,15 @@ import { MapApiService } from './services/map-api.service';
     FormsModule,
     BrowserAnimationsModule,
   ],
+=======
+  exports: [SocialLoginModule, GoogleSigninButtonModule],
+>>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
   providers: [
     {
       provide: LocationStrategy,
       useClass: PathLocationStrategy,
     },
+    MessageService,
     AuthenticationService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
@@ -95,7 +120,12 @@ import { MapApiService } from './services/map-api.service';
     NodeService,
     PhotoService,
     ProductService,
+<<<<<<< HEAD
     MapApiService
+=======
+    MenuModule,
+    ToastModule,
+>>>>>>> 351a901e1a17435f848ed083cdafe2911c75c69c
   ],
   bootstrap: [AppComponent],
 })
