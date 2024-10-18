@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NgxAnimatedCounterParams } from '@bugsplat/ngx-animated-counter';
 import { PrimeNGConfig } from 'primeng/api';
 import { CommonService } from '../../../../services/common.service';
-import { Product } from '../../../../interfaces/models/product';
 import { ProductService } from '../../../../services/product.service';
+import { HttpClient } from '@angular/common/http';
+import { MapApiService } from '../../../../services/map-api.service';
 
 @Component({
   selector: 'app-home',
@@ -12,34 +13,49 @@ import { ProductService } from '../../../../services/product.service';
   providers: [ProductService],
 })
 export class LandingComponent implements OnInit {
-  value: number = 4;
-  public params: NgxAnimatedCounterParams = { start: 20, end: 198021, interval: 40, increment: 9319 };
-  public params_2: NgxAnimatedCounterParams = { start: 0, end: 27857, interval: 40, increment: 1950 };
+  public params: NgxAnimatedCounterParams = {
+    start: 20,
+    end: 198021,
+    interval: 40,
+    increment: 9319,
+  };
+  public params_2: NgxAnimatedCounterParams = {
+    start: 0,
+    end: 27857,
+    interval: 40,
+    increment: 1950,
+  };
 
+  value: number = 4;
   activeIndex: number = 0;
+  priceRange: number = 1000000; // default: 1m VNĐ
+  lat: number = 0.0;
+  lng: number = 0.0;
+
   selectedFrom: any;
   selectedTo: any;
-  priceRange: number = 1000000; // default: 1m VNĐ
-  selectedTransport: string = 'Car (4 seats)';
-  locationLoading: boolean = true;
-  transportationLoading: boolean = true;
+
   moods!: any[];
   locations!: any[];
   transportOptions!: any[];
-  layout: 'list' | 'grid' = 'list';
 
-  products!: Product[];
+  address: string = '';
+  selectedTransport: string = 'Car (4 seats)';
+  citySuggestion: any[] | undefined;
+
+  locationLoading: boolean = true;
+  transportationLoading: boolean = true;
 
   constructor(
+    private http: HttpClient,
     private commonService: CommonService,
     private primengConfig: PrimeNGConfig,
     private router: Router,
-    private route: ActivatedRoute,
-    private productService: ProductService
+    private mapApiService: MapApiService,
   ) {}
 
   ngOnInit(): void {
-    this.productService.getProducts().then((data: any) => (this.products = data.slice(0, 12)));
+    this.getLocation();
     this.primengConfig.zIndex = {
       modal: 1100,
       overlay: 1000,
@@ -91,14 +107,12 @@ export class LandingComponent implements OnInit {
       },
     ];
 
-    // Mock data for locations and transport options
     this.locations = [
       { name: 'Hanoi' },
       { name: 'Ho Chi Minh City' },
       { name: 'Da Nang' },
       { name: 'Hue' },
     ];
-    this.locationLoading = false;
 
     this.transportOptions = [
       { label: 'Car (4 seats)', value: 'Car (4 seats)' },
@@ -108,9 +122,59 @@ export class LandingComponent implements OnInit {
     this.transportationLoading = false;
   }
 
-  // Function to search tours based on user inputs
+  getLocation(): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position: GeolocationPosition) => {
+          if (position) {
+            console.log(
+              'Latitude: ' +
+                position.coords.latitude +
+                'Longitude: ' +
+                position.coords.longitude,
+            );
+            this.lat = position.coords.latitude;
+            this.lng = position.coords.longitude;
+            this.reverseGeocode();
+          }
+        },
+        (error: GeolocationPositionError) => console.log(error),
+      );
+    } else {
+      alert('You should provide us your location to have better experience.');
+    }
+  }
+
+  // Method to call Nominatim API and get city name
+  reverseGeocode(): void {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${this.lat}&lon=${this.lng}&zoom=10&addressdetails=1`;
+
+    // Make HTTP GET request
+    this.http.get<any>(url).subscribe(
+      data => {
+        console.log(data);
+        this.address = data.display_name;
+        console.log('Current city:', this.address);
+
+        // fetch map API to get cities list
+        this.mapApiService.getCities().subscribe((mapData: any) => {
+          mapData.forEach((map: any) => {
+            if (this.address.includes(map.admin_name)) {
+              console.log('You are in or near:', map.city);
+              this.selectedFrom = map.city;
+            }
+          });
+          this.locationLoading = false;
+        });
+      },
+      error => {
+        console.error('Error fetching location data:', error);
+        this.locationLoading = false;
+      },
+    );
+  }
+
   searchTours(): void {
-    // Save user inputs in the shared service
     this.commonService.setSearchCriteria({
       mood: this.moods[this.activeIndex].title,
       from: this.selectedFrom,
@@ -120,20 +184,5 @@ export class LandingComponent implements OnInit {
     });
 
     this.router.navigate(['/explore']);
-  }
-
-  getSeverity(product: Product): any {
-    switch (product.inventoryStatus?.label) {
-        case 'INSTOCK':
-            return 'success';
-
-        case 'LOWSTOCK':
-            return 'warning';
-
-        case 'OUTOFSTOCK':
-            return 'danger';
-        default:
-            return null;
-    }
   }
 }

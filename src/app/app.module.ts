@@ -34,6 +34,7 @@ import { ButtonModule } from 'primeng/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { LoginComponent } from './core/components/login/login.component';
+import { MapApiService } from './services/map-api.service';
 
 // Third-party imports
 
@@ -94,6 +95,7 @@ import { LoginComponent } from './core/components/login/login.component';
     NodeService,
     PhotoService,
     ProductService,
+    MapApiService
   ],
   bootstrap: [AppComponent],
 })

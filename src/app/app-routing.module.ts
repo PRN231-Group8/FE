@@ -58,7 +58,6 @@ import { ExplorationComponent } from './core/components/home/exploration/explora
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
         onSameUrlNavigation: 'reload',
-        enableTracing: true
       },
     ),
   ],

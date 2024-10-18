@@ -18,6 +18,10 @@ import { NgxAnimatedCounterModule } from '@bugsplat/ngx-animated-counter';
 import { TabViewModule } from 'primeng/tabview';
 import { RatingModule } from 'primeng/rating';
 import { ExplorationComponent } from './exploration.component';
+import { TagModule } from 'primeng/tag';
+import { DataViewModule } from 'primeng/dataview';
+import { ProductService } from '../../../../services/product.service';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @NgModule({
   declarations: [ExplorationComponent],
@@ -40,7 +44,11 @@ import { ExplorationComponent } from './exploration.component';
     TabViewModule,
     RatingModule,
     sharedModule,
+    TagModule,
+    DataViewModule,
+    SkeletonModule
   ],
   exports: [ExplorationComponent],
+  providers: [ProductService]
 })
 export class ExplorationModule {}

@@ -23,6 +23,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { DataViewModule } from 'primeng/dataview';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 
 @NgModule({
   declarations: [LandingComponent],
@@ -49,7 +50,8 @@ import { SkeletonModule } from 'primeng/skeleton';
     DataViewModule,
     TagModule,
     InputNumberModule,
-    SkeletonModule
+    SkeletonModule,
+    AutoCompleteModule
   ],
   exports: [LandingComponent],
 })
