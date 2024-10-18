@@ -145,11 +145,9 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  // Method to call Nominatim API and get city name
   reverseGeocode(): void {
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${this.lat}&lon=${this.lng}&zoom=10&addressdetails=1`;
 
-    // Make HTTP GET request
     this.http.get<any>(url).subscribe(
       data => {
         console.log(data);
