@@ -38,11 +38,27 @@ import { ButtonModule } from 'primeng/button';
 import { LoginComponent } from './core/components/login/login.component';
 import { MapApiService } from './services/map-api.service';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
-
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextModule } from 'primeng/inputtext';
+import { TabMenuModule } from 'primeng/tabmenu';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
+import { PanelMenuModule } from 'primeng/panelmenu';
+import { ScrollTopModule } from 'primeng/scrolltop';
+import { CarouselModule } from 'primeng/carousel';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { sharedModule } from './layout/shared/shared.module';
+import { FileUploadModule } from 'primeng/fileupload';
 // Third-party imports
 
 @NgModule({
-  declarations: [AppComponent, NotfoundComponent, LoginComponent, VerifyEmailComponent],
+  declarations: [
+    AppComponent,
+    NotfoundComponent,
+    LoginComponent,
+    VerifyEmailComponent
+  ],
   imports: [
     AppRoutingModule,
     HttpClientModule,
@@ -63,6 +79,19 @@ import { VerifyEmailComponent } from './core/components/verify-email/verify-emai
     ReactiveFormsModule,
     ToastModule,
     GoogleSigninButtonModule,
+    InputTextareaModule,
+    InputTextModule,
+    MenuModule,
+    DropdownModule,
+    CalendarModule,
+    FloatLabelModule,
+    PanelMenuModule,
+    ScrollTopModule,
+    CarouselModule,
+    ContextMenuModule,
+    TabMenuModule,
+    sharedModule,
+    FileUploadModule,
   ],
   exports: [
     SocialLoginModule,
@@ -106,7 +135,7 @@ import { VerifyEmailComponent } from './core/components/verify-email/verify-emai
     NodeService,
     PhotoService,
     ProductService,
-    MapApiService
+    MapApiService,
   ],
   bootstrap: [AppComponent],
 })

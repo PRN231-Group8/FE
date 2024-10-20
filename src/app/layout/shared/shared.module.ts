@@ -14,12 +14,11 @@ import { RippleModule } from 'primeng/ripple';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { FooterComponent } from './footer/footer.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { MenuModule } from 'primeng/menu';
+import { AvatarModule } from 'primeng/avatar';
 
 @NgModule({
-  declarations: [
-    FooterComponent,
-    NavbarComponent,
-  ],
+  declarations: [FooterComponent, NavbarComponent],
   imports: [
     BrowserModule,
     FormsModule,
@@ -34,6 +33,9 @@ import { NavbarComponent } from './navbar/navbar.component';
     ButtonModule,
     ScrollTopModule,
     CommonModule,
+    MenuModule,
+    AvatarModule,
+    RouterModule,
   ],
   exports: [FooterComponent, NavbarComponent],
 })

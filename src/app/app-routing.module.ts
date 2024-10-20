@@ -7,6 +7,7 @@ import { LoginComponent } from './core/components/login/login.component';
 import { LandingComponent } from './core/components/home/landing/landing.component';
 import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
+import { ProfileComponent } from './core/components/profile/profile.component';
 
 @NgModule({
   imports: [
@@ -56,6 +57,14 @@ import { VerifyEmailComponent } from './core/components/verify-email/verify-emai
           path: 'verify-email',
           component: VerifyEmailComponent,
         },
+        {
+          path: 'profile',
+          component: ProfileComponent,
+          loadChildren: () =>
+            import('./core/components/profile/profile.module').then(
+              m => m.ProfileModule,
+            ),
+        },
         { path: 'notfound', component: NotfoundComponent },
         { path: '**', redirectTo: '/notfound' },
       ],
@@ -63,6 +72,7 @@ import { VerifyEmailComponent } from './core/components/verify-email/verify-emai
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
         onSameUrlNavigation: 'reload',
+        useHash: true,
       },
     ),
   ],
