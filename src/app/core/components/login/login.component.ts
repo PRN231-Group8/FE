@@ -1,16 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api'; // Import MessageService
-import {
-  SocialAuthService,
-  SocialUser,
-} from '@abacritt/angularx-social-login';
+import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { AuthenticationGoogleService } from '../../../services/authentication.google.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ExternalAuthRequest } from '../../../interfaces/models/request/externalAuthRequest';
@@ -96,7 +89,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Login successful',
+          detail: 'Sign in successful',
         });
         setTimeout(() => {
           this.router.navigate([user.role === 'ADMIN' ? '/dashboard' : '/']);
@@ -109,7 +102,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Login failed',
+          detail: 'Sign in failed',
         });
       },
     });
@@ -181,7 +174,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
-              detail: 'Registration successful, please verify your email.',
+              detail: 'Sign up successful, please verify your email.',
             });
 
             setTimeout(() => {
@@ -196,7 +189,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Registration failed',
+            detail: 'Sign up failed',
           });
         },
       });
