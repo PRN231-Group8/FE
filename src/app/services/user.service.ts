@@ -30,7 +30,7 @@ export class UserService {
     return this.http.post<BaseResponse<any>>(url, formData);
   }
   getUserByEmail(email: string): Observable<BaseResponse<UserProfileResponse>> {
-    const url = `${this.apiUrl}/by-email?email=${email}`;
+    const url = `${this.apiUrl}/${email}/email`;
     return this.http.get<BaseResponse<UserProfileResponse>>(url);
   }
 }
