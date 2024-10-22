@@ -62,7 +62,6 @@
     </ng-template>
   </p-menu>
 
-  <!-- Show when logged in -->
   <button
     *ngIf="isLoggedIn"
     type="button"
@@ -71,7 +70,6 @@
     (click)="toggleMenu($event)"
   ></button>
 
-  <!-- Show SignInNow button when not logged in -->
   <button
     *ngIf="!isLoggedIn"
     type="button"
