@@ -91,13 +91,7 @@ export class ProfileComponent implements OnInit {
           response => {
             this.loading = false;
             if (response.isSucceed && response.result) {
-              this.profileForm.patchValue({
-                firstName: response.result.firstName,
-                lastName: response.result.lastName,
-                dob: response.result.dob,
-                gender: response.result.gender,
-                avatarPath: response.result.avatarPath,
-              });
+              this.profileForm.patchValue(response.result);
               this.avatarUrl = response.result.avatarPath || this.avatarUrl;
               this.date = response.result.dob
                 ? new Date(response.result.dob)
@@ -234,7 +228,7 @@ export class ProfileComponent implements OnInit {
 
   private validateFile(file: File): boolean {
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-    const maxSizeInBytes = 5 * 1024 * 1024;
+    const maxSizeInBytes = 3 * 1024 * 1024;
     if (!allowedTypes.includes(file.type)) {
       this.messageService.add({
         severity: 'error',
@@ -247,7 +241,7 @@ export class ProfileComponent implements OnInit {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'File size exceeds 5MB limit',
+        detail: 'File size exceeds 3MB limit',
       });
       return false;
     }
