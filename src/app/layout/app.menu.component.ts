@@ -50,9 +50,9 @@ export class AppMenuComponent implements OnInit {
                         ]
                     },
                     {
-                        label: 'Crud',
+                        label: 'Tour Management',
                         icon: 'pi pi-fw pi-pencil',
-                        routerLink: ['admin/crud']
+                        routerLink: ['admin/tour']
                     },
                     {
                         label: 'Timeline',
