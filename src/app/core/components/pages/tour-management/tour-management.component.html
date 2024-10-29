@@ -1,0 +1,314 @@
+<!-- eslint-disable @angular-eslint/template/elements-content -->
+<div class="grid">
+  <div class="col-12">
+    <div class="card px-6 py-6">
+      <p-toast></p-toast>
+      <h5>Tour List</h5>
+      <p-table
+        #dt1
+        [value]="tours"
+        [columns]="cols"
+        dataKey="tourId"
+        [loading]="loading"
+        [rowHover]="true"
+        styleClass="p-datatable-gridlines"
+        [globalFilterFields]="['status', 'title', 'code']"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex justify-content-between flex-column sm:flex-row">
+            <div class="flex">
+              <button
+                pButton
+                label="Clear"
+                class="p-button-outlined mr-2"
+                icon="pi pi-filter-slash"
+                (click)="clear(dt1)"
+              ></button>
+              <button
+                pButton
+                pRipple
+                label="New"
+                icon="pi pi-plus"
+                class="p-button-success mr-2"
+                (click)="openNew()"
+              ></button>
+            </div>
+            <span class="p-input-icon-left mb-2">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                #filter
+                (input)="onGlobalFilter(dt1, $event)"
+                placeholder="Search Keyword"
+                class="w-full"
+              />
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="code" style="min-width: 8rem">
+              <div class="flex justify-content-between align-items-center">
+                Code
+                <p-sortIcon field="code"></p-sortIcon>
+                <p-columnFilter
+                  type="text"
+                  field="code"
+                  display="menu"
+                  placeholder="Search by Code"
+                ></p-columnFilter>
+              </div>
+            </th>
+            <th pSortableColumn="title" style="min-width: 12rem">
+              <div class="flex justify-content-between align-items-center">
+                Title
+                <p-sortIcon field="title"></p-sortIcon>
+                <p-columnFilter
+                  type="text"
+                  field="title"
+                  display="menu"
+                  placeholder="Search by Title"
+                ></p-columnFilter>
+              </div>
+            </th>
+            <th pSortableColumn="startDate" style="min-width: 10rem">
+              <div class="flex justify-content-between align-items-center">
+                Start Date
+                <p-sortIcon field="startDate"></p-sortIcon>
+                <p-columnFilter
+                  type="date"
+                  field="startDate"
+                  display="menu"
+                ></p-columnFilter>
+              </div>
+            </th>
+            <th pSortableColumn="endDate" style="min-width: 10rem">
+              <div class="flex justify-content-between align-items-center">
+                End Date
+                <p-sortIcon field="endDate"></p-sortIcon>
+                <p-columnFilter
+                  type="date"
+                  field="endDate"
+                  display="menu"
+                ></p-columnFilter>
+              </div>
+            </th>
+            <th pSortableColumn="totalPrice" style="min-width: 10rem">
+              <div class="flex justify-content-between align-items-center">
+                Total Price
+                <p-sortIcon field="totalPrice"></p-sortIcon>
+                <p-columnFilter
+                  type="numeric"
+                  field="totalPrice"
+                  display="menu"
+                  currency="USD"
+                ></p-columnFilter>
+              </div>
+            </th>
+            <th pSortableColumn="status" style="min-width: 8rem">
+              <div class="flex justify-content-between align-items-center">
+                Status
+                <p-sortIcon field="status"></p-sortIcon>
+                <p-columnFilter
+                  type="text"
+                  field="status"
+                  display="menu"
+                  placeholder="Search by Status"
+                ></p-columnFilter>
+              </div>
+            </th>
+            <th style="min-width: 10rem"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tour>
+          <tr>
+            <td>{{ tour.code }}</td>
+            <td>{{ tour.title }}</td>
+            <td>{{ tour.startDate | date: 'yyyy-MM-dd' }}</td>
+            <td>{{ tour.endDate | date: 'yyyy-MM-dd' }}</td>
+            <td>{{ tour.totalPrice | currency }}</td>
+            <td>{{ tour.status }}</td>
+            <td>
+              <div class="flex">
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-pencil"
+                  class="p-button-rounded p-button-success mr-2"
+                  (click)="editTour(tour)"
+                ></button>
+                <button
+                  pButton
+                  pRipple
+                  icon="pi pi-trash"
+                  class="p-button-rounded p-button-warning"
+                  (click)="deleteTour(tour)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">No tours found.</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="7">Loading tours data. Please wait.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div class="flex align-items-center justify-content-end">
+        <span class="mx-1 text-color">Items per page: </span>
+        <p-dropdown
+          appendTo="body"
+          [options]="rowsPerPageOptions"
+          [(ngModel)]="rows"
+          (ngModelChange)="onRowsChange($event)"
+        ></p-dropdown>
+        <p-paginator
+          (onPageChange)="onPageChange($event)"
+          [showCurrentPageReport]="true"
+          [first]="first"
+          [rows]="rows"
+          [totalRecords]="totalRecords"
+          currentPageReportTemplate="{first} - {last} of {totalRecords}"
+          [showPageLinks]="false"
+          [showFirstLastIcon]="false"
+        ></p-paginator>
+      </div>
+    </div>
+
+    <p-dialog
+      [(visible)]="createTourDialog"
+      [modal]="true"
+      [header]="isEdit ? 'Edit Tour' : 'Create New Tour'"
+      [style]="{ width: '50vw' }"
+      [closable]="false"
+      [dismissableMask]="true"
+      [blockScroll]="true"
+    >
+      <ng-template pTemplate="header">
+        <h2>{{ isEdit ? 'Edit Tour' : 'Create New Tour' }}</h2>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <form class="p-fluid">
+          <div class="p-field">
+            <label for="title">Tour Title</label>
+            <input
+              id="title"
+              type="text"
+              pInputText
+              [(ngModel)]="tour.title"
+              required
+            />
+          </div>
+
+          <div class="p-field">
+            <label for="code">Tour Code</label>
+            <input
+              id="code"
+              type="text"
+              pInputText
+              [(ngModel)]="tour.code"
+              required
+            />
+          </div>
+
+          <div class="p-field">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              rows="3"
+              pInputTextarea
+              [(ngModel)]="tour.description"
+              required
+            ></textarea>
+          </div>
+
+          <div class="p-field">
+            <label for="startDate">Start Date</label>
+            <p-calendar
+              [defaultDate]="defaultTime"
+              id="startDate"
+              [(ngModel)]="tour.startDate"
+              [showTime]="true"
+              [hourFormat]="'24'"
+              appendTo="body"
+              [stepMinute]="15"
+              required
+            ></p-calendar>
+          </div>
+
+          <div class="p-field">
+            <label for="endDate">End Date</label>
+            <p-calendar
+              [defaultDate]="defaultTime"
+              id="endDate"
+              [(ngModel)]="tour.endDate"
+              [showTime]="true"
+              [hourFormat]="'24'"
+              appendTo="body"
+              [stepMinute]="15"
+              required
+            ></p-calendar>
+          </div>
+
+          <div class="p-field">
+            <label for="totalPrice">Total Price</label>
+            <input
+              id="totalPrice"
+              type="number"
+              pInputText
+              [(ngModel)]="tour.totalPrice"
+              required
+            />
+          </div>
+
+          <div class="p-field">
+            <label for="status">Status</label>
+            <p-dropdown
+              [options]="statusOptions"
+              [(ngModel)]="selectedStatus"
+              placeholder="Select Status"
+              appendTo="body"
+              required
+            ></p-dropdown>
+          </div>
+        </form>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button
+          pButton
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="hideDialog()"
+        ></button>
+        <button
+          pButton
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="saveTour()"
+          [disabled]="!isFormValid()"
+        ></button>
+      </ng-template>
+    </p-dialog>
+
+    <!--Delete Room Dialog-->
+    <p-dialog [(visible)]="deleteTourDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+            <span *ngIf="tour">Are you sure you want to delete Room Number <b>{{tour.title}}</b>?</span>
+        </div>
+        <ng-template pTemplate="footer">
+            <p-button icon="pi pi-times" severity="secondary" label="No" (click)="deleteTourDialog = false"></p-button>
+            <p-button icon="pi pi-check" label="Yes" (click)="confirmDelete()"></p-button>
+        </ng-template>
+    </p-dialog>
+  </div>
+</div>
