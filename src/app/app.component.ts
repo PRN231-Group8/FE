@@ -4,14 +4,14 @@ import { PrimeNGConfig } from 'primeng/api';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
   title = 'fe-explorenow';
 
-  constructor(private primengConfig: PrimeNGConfig) { }
+  constructor(private primengConfig: PrimeNGConfig) {}
 
-    ngOnInit(): void {
-        this.primengConfig.ripple = true;
-    }
+  ngOnInit(): void {
+    this.primengConfig.ripple = true;
+  }
 }

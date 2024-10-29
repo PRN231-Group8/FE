@@ -11,8 +11,8 @@ import { RatingModule } from 'primeng/rating';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
-    declarations: [MainComponent, PreviewAppComponent],
-    imports: [
+  declarations: [MainComponent, PreviewAppComponent],
+  imports: [
     CommonModule,
     MainRoutingModule,
     ImageModule,
@@ -21,6 +21,6 @@ import { FormsModule } from '@angular/forms';
     ButtonModule,
     RatingModule,
     FormsModule,
-]
+  ],
 })
-export class MainModule { }
+export class MainModule {}

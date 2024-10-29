@@ -9,26 +9,30 @@ import { BadgeModule } from 'primeng/badge';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { RippleModule } from 'primeng/ripple';
-import { AppMenuComponent } from './app.menu.component';
 import { AppMenuitemComponent } from './app.menuitem.component';
 import { RouterModule } from '@angular/router';
-import { AppTopBarComponent } from './app.topbar.component';
-import { AppFooterComponent } from './app.footer.component';
 import { AppConfigModule } from './config/config.module';
-import { AppSidebarComponent } from './app.sidebar.component';
 import { AppLayoutComponent } from './app.layout.component';
+import { sharedModule } from './shared/shared.module';
+import { AppSidebarComponent } from './app.sidebar.component';
+import { AppMenuComponent } from './app.menu.component';
+import { CommonModule } from '@angular/common';
+import { AppFooterComponent } from './app.footer.component';
+import { AppTopBarComponent } from './app.topbar.component';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
     declarations: [
         AppMenuitemComponent,
-        AppTopBarComponent,
-        AppFooterComponent,
+        AppLayoutComponent,
         AppMenuComponent,
         AppSidebarComponent,
-        AppLayoutComponent,
+        AppFooterComponent,
+        AppTopBarComponent
     ],
     imports: [
         BrowserModule,
+        CommonModule,
         FormsModule,
         HttpClientModule,
         BrowserAnimationsModule,
@@ -39,7 +43,9 @@ import { AppLayoutComponent } from './app.layout.component';
         InputSwitchModule,
         RippleModule,
         RouterModule,
-        AppConfigModule
+        AppConfigModule,
+        sharedModule,
+        ToastModule
     ],
     exports: [AppLayoutComponent]
 })

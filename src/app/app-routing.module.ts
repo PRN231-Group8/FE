@@ -3,7 +3,11 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppLayoutComponent } from './layout/app.layout.component';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
-import { HomeComponent } from './core/components/home/layout/home.component';
+import { LoginComponent } from './core/components/login/login.component';
+import { LandingComponent } from './core/components/home/landing/landing.component';
+import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
+import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
+import { ProfileComponent } from './core/components/profile/profile.component';
 
 @NgModule({
   imports: [
@@ -11,36 +15,55 @@ import { HomeComponent } from './core/components/home/layout/home.component';
       [
         {
           path: '',
-          component: HomeComponent,
+          component: LandingComponent,
+          loadChildren: () =>
+            import('./core/components/home/landing/landing.module').then(
+              m => m.LandingModule,
+            ),
+        },
+        {
+          path: 'explore',
+          component: ExplorationComponent,
+          loadChildren: () =>
+            import('./core/components/home/exploration/exploration.module').then(
+              m => m.ExplorationModule,
+            ),
+        },
+        {
+          path: 'dashboard',
+          component: AppLayoutComponent,
           children: [
             {
               path: '',
               loadChildren: () =>
-                import('./core/components/home/main/main.module').then(
-                  (m) => m.MainModule,
-                ),
-            }
-          ]
-        },
-        {
-          path: '',
-          component: AppLayoutComponent,
-          children: [
-            {
-              path: 'dashboard',
-              loadChildren: () =>
                 import('./core/components/dashboard/dashboard.module').then(
-                  (m) => m.DashboardModule,
+                  m => m.DashboardModule,
                 ),
             },
             {
               path: 'admin',
               loadChildren: () =>
                 import('./core/components/pages/pages.module').then(
-                  (m) => m.PagesModule,
+                  m => m.PagesModule,
                 ),
             },
           ],
+        },
+        {
+          path: 'login',
+          component: LoginComponent,
+        },
+        {
+          path: 'verify-email',
+          component: VerifyEmailComponent,
+        },
+        {
+          path: 'profile',
+          component: ProfileComponent,
+          loadChildren: () =>
+            import('./core/components/profile/profile.module').then(
+              m => m.ProfileModule,
+            ),
         },
         { path: 'notfound', component: NotfoundComponent },
         { path: '**', redirectTo: '/notfound' },
@@ -49,6 +72,7 @@ import { HomeComponent } from './core/components/home/layout/home.component';
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
         onSameUrlNavigation: 'reload',
+        useHash: true,
       },
     ),
   ],
