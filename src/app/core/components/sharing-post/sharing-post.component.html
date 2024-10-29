@@ -1,0 +1,367 @@
+<div class="flex justify-content-center pb-6">
+  <!-- Post Creation Section -->
+  <div class="w-full shadow-6 border-round" style="max-width: 800px">
+    <div class="p-card p-p-3 p-mb-3">
+      <div class="flex align-items-center p-3">
+        <p-avatar
+          size="large"
+          [image]="userAvatarUrl"
+          class="mr-2"
+          shape="circle"
+        ></p-avatar>
+        <input
+          pInputText
+          [(ngModel)]="postContent"
+          class="p-inputtext-lg w-full p-3 border-round-xl"
+          placeholder="{{ userName }}, bạn đang nghĩ gì thế?"
+          (focus)="onFocus()"
+        />
+      </div>
+
+      <div
+        class="flex justify-content-between align-items-center justify-content-center mt-2 p-2"
+        style="border-top: 1px solid #9b9b9b"
+      >
+        <button
+          pButton
+          label="Ảnh/video"
+          icon="pi pi-images"
+          class="flex align-items-center justify-content-center p-button-text text-success font-bold"
+          (click)="openPhotoVideoModal()"
+        ></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Creating Post -->
+<p-dialog
+  header="Tạo bài viết"
+  [(visible)]="showCreatePostModal"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '600px', height: 'auto' }"
+>
+  <div class="p-fluid">
+    <div class="flex align-items-center mb-3">
+      <p-avatar
+        size="large"
+        [image]="userAvatarUrl"
+        class="mr-2"
+        shape="circle"
+      ></p-avatar>
+      <div>
+        <p class="m-0">{{ userName }}</p>
+        <small class="text-secondary">Chỉ mình tôi</small>
+      </div>
+    </div>
+
+    <!-- Title Input -->
+    <input
+      pInputText
+      [(ngModel)]="postTitle"
+      placeholder="Nhập tiêu đề bài viết"
+      class="w-full p-3 mb-2 border-round-xl"
+    />
+
+    <!-- Content Textarea -->
+    <textarea
+      pInputTextarea
+      [(ngModel)]="postContent"
+      placeholder="{{ userName }}, bạn đang nghĩ gì thế?"
+      rows="5"
+      class="w-full p-3 border-round-xl"
+    ></textarea>
+
+    <!-- Custom File Upload Component -->
+    <div class="mt-3">
+      <p-toast></p-toast>
+      <p-fileUpload
+        name="myfile[]"
+        url="https://www.primefaces.org/cdn/api/upload.php"
+        [multiple]="true"
+        accept="image/*"
+        maxFileSize="1000000"
+        (onUpload)="onTemplatedUpload()"
+        (onSelect)="onSelectedFiles($event)"
+      >
+        <ng-template
+          pTemplate="header"
+          let-files
+          let-chooseCallback="chooseCallback"
+          let-clearCallback="clearCallback"
+          let-uploadCallback="uploadCallback"
+        >
+          <div
+            class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2"
+          >
+            <div class="flex gap-2">
+              <p-button
+                (onClick)="choose($event, chooseCallback)"
+                icon="pi pi-images"
+                [rounded]="true"
+                [outlined]="true"
+              ></p-button>
+              <p-button
+                (onClick)="uploadEvent(uploadCallback)"
+                icon="pi pi-cloud-upload"
+                [rounded]="true"
+                [outlined]="true"
+                severity="success"
+                [disabled]="!files || files.length === 0"
+              ></p-button>
+              <p-button
+                (onClick)="clearCallback()"
+                icon="pi pi-times"
+                [rounded]="true"
+                [outlined]="true"
+                severity="danger"
+                [disabled]="!files || files.length === 0"
+              ></p-button>
+            </div>
+            <p-progressBar
+              [value]="totalSizePercent"
+              [showValue]="false"
+              styleClass="md:w-20rem h-1rem w-full md:ml-auto"
+              [ngClass]="{ 'exceeded-progress-bar': totalSizePercent > 100 }"
+            >
+              <span class="white-space-nowrap">{{ totalSize }}B / 1Mb</span>
+            </p-progressBar>
+          </div>
+        </ng-template>
+        <ng-template
+          pTemplate="content"
+          let-files
+          let-uploadedFiles="uploadedFiles"
+          let-removeFileCallback="removeFileCallback"
+          let-removeUploadedFileCallback="removeUploadedFileCallback"
+        >
+          <div *ngIf="files?.length > 0">
+            <h5>Pending</h5>
+            <div class="flex flex-wrap p-0 sm:p-5 gap-5">
+              <div
+                *ngFor="let file of files; let i = index"
+                class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3"
+              >
+                <div>
+                  <img
+                    role="presentation"
+                    [alt]="file.name"
+                    [src]="file.objectURL"
+                    width="100"
+                    height="50"
+                  />
+                </div>
+                <span class="font-semibold">{{ file.name }}</span>
+                <div>{{ formatSize(file.size) }}</div>
+                <p-badge value="Pending" severity="warning"></p-badge>
+                <p-button
+                  icon="pi pi-times"
+                  (onClick)="
+                    onRemoveTemplatingFile($event, file, removeFileCallback, i)
+                  "
+                  [outlined]="true"
+                  [rounded]="true"
+                  severity="danger"
+                ></p-button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="uploadedFiles?.length > 0">
+            <h5>Completed</h5>
+            <div class="flex flex-wrap p-0 sm:p-5 gap-5">
+              <div
+                *ngFor="let file of uploadedFiles; let j = index"
+                class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3"
+              >
+                <div>
+                  <img
+                    role="presentation"
+                    [alt]="file.name"
+                    [src]="file.objectURL"
+                    width="100"
+                    height="50"
+                  />
+                </div>
+                <span class="font-semibold">{{ file.name }}</span>
+                <div>{{ formatSize(file.size) }}</div>
+                <p-badge
+                  value="Completed"
+                  class="mt-3"
+                  severity="success"
+                ></p-badge>
+                <p-button
+                  icon="pi pi-times"
+                  (onClick)="removeUploadedFileCallback(j)"
+                  [outlined]="true"
+                  [rounded]="true"
+                  severity="danger"
+                ></p-button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="empty">
+          <div
+            class="flex align-items-center justify-content-center flex-column"
+          >
+            <i
+              class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400"
+            ></i>
+            <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+          </div>
+        </ng-template>
+      </p-fileUpload>
+    </div>
+
+    <div class="flex justify-content-end mt-3">
+      <button
+        pButton
+        label="Đăng"
+        class="p-button-success"
+        [disabled]="!postTitle || !postContent"
+        (click)="createPost()"
+      ></button>
+    </div>
+  </div>
+</p-dialog>
+
+<div class="flex justify-content-center pb-6">
+  <!-- Post Feed -->
+  <div class="w-full shadow-6 border-round" style="max-width: 800px">
+    <div class="p-card p-p-3 p-mb-3">
+      <div class="flex align-items-center">
+        <p-avatar
+          size="large"
+          [image]="userAvatarUrl"
+          class="mr-2 p-2"
+          shape="circle"
+        ></p-avatar>
+        <div>
+          <p class="m-0 font-bold font-italic">{{ userName }}</p>
+          <small class="text-secondary">{{ time }}</small>
+        </div>
+      </div>
+      <h3 class="mt-3 pl-2">{{ title }}</h3>
+      <p class="pl-2">{{ description }}</p>
+
+      <!-- Image Preview Section -->
+      <div class="flex gap-2 mt-3">
+        <div
+          *ngFor="let image of images.slice(0, 3); let i = index"
+          class="relative"
+          (click)="showGalleria(i)"
+        >
+          <img
+            [src]="image.itemImageSrc"
+            class="w-16rem h-16rem object-cover cursor-pointer"
+            alt="Image"
+          />
+          <div
+            *ngIf="i === 2 && images.length > 3"
+            class="absolute top-0 left-0 w-full h-full flex align-items-center justify-content-center text-white bg-black-alpha-70"
+          >
+            +{{ images.length - 3 }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Horizontal Line -->
+      <div style="border-top: 1px solid #9b9b9b; margin-top: 10px"></div>
+
+      <!-- Comment Button Section -->
+      <div class="flex justify-content-between align-items-center mt-3">
+        <button
+          pButton
+          label="Comment"
+          icon="pi pi-comments"
+          class="p-button-text"
+          (click)="toggleComments()"
+        ></button>
+      </div>
+
+      <!-- Comments Section -->
+      <div *ngIf="showComments" class="mt-3">
+        <div *ngFor="let comment of comments" class="comment-section mb-3">
+          <div class="flex align-items-center">
+            <p-avatar
+              size="large"
+              [image]="comment.userAvatar"
+              class="mr-2"
+              shape="circle"
+            ></p-avatar>
+            <p class="m-0 font-bold">{{ comment.userName }}</p>
+            <small class="text-secondary ml-2">{{ comment.time }}</small>
+          </div>
+          <p class="ml-10">{{ comment.content }}</p>
+
+          <!-- Reply Button -->
+          <div class="flex align-items-center ml-10">
+            <button
+              pButton
+              label="Reply"
+              icon="pi pi-reply"
+              class="p-button-text"
+              (click)="toggleReply(comment.id)"
+            ></button>
+          </div>
+
+          <!-- Reply Input -->
+          <div
+            *ngIf="comment.id === replyToCommentId"
+            class="flex align-items-center mt-2 ml-10"
+          >
+            <p-avatar
+              size="large"
+              [image]="userAvatarUrl"
+              class="mr-2"
+              shape="circle"
+            ></p-avatar>
+            <input
+              pInputText
+              [(ngModel)]="replyContent"
+              placeholder="Reply..."
+              class="p-inputtext-sm w-full"
+            />
+            <button
+              pButton
+              icon="pi pi-send"
+              (click)="sendReply(comment.id)"
+              class="p-button-sm ml-2"
+            ></button>
+          </div>
+
+          <!-- Galleria Component -->
+          <p-galleria
+            [value]="images"
+            [(visible)]="displayBasic"
+            [responsiveOptions]="responsiveOptions"
+            [containerStyle]="{ 'max-width': '50%' }"
+            [numVisible]="9"
+            [circular]="true"
+            [fullScreen]="true"
+            [showItemNavigators]="true"
+            [activeIndex]="activeIndex"
+          >
+            <ng-template pTemplate="item" let-item>
+              <img
+                [src]="item.itemImageSrc"
+                style="width: 100%; display: block"
+                alt="Image"
+              />
+            </ng-template>
+            <ng-template pTemplate="thumbnail" let-item>
+              <div class="grid grid-nogutter justify-content-center">
+                <img
+                  [src]="item.thumbnailImageSrc"
+                  style="display: block"
+                  alt="Thumbnail"
+                />
+              </div>
+            </ng-template>
+          </p-galleria>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

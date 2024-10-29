@@ -35,14 +35,26 @@ import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { fakeBackendProvider } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
+import { GalleriaModule } from 'primeng/galleria';
+import { AvatarModule } from 'primeng/avatar';
 import { LoginComponent } from './core/components/login/login.component';
 import { MapApiService } from './services/map-api.service';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
+import { SharingPostComponent } from './core/components/sharing-post/sharing-post.component';
+import { DialogModule } from 'primeng/dialog';
+import { FileUploadModule } from 'primeng/fileupload';
+import { BadgeModule } from 'primeng/badge';
 
 // Third-party imports
 
 @NgModule({
-  declarations: [AppComponent, NotfoundComponent, LoginComponent, VerifyEmailComponent],
+  declarations: [
+    AppComponent,
+    NotfoundComponent,
+    LoginComponent,
+    VerifyEmailComponent,
+    SharingPostComponent,
+  ],
   imports: [
     AppRoutingModule,
     HttpClientModule,
@@ -63,6 +75,11 @@ import { VerifyEmailComponent } from './core/components/verify-email/verify-emai
     ReactiveFormsModule,
     ToastModule,
     GoogleSigninButtonModule,
+    GalleriaModule,
+    AvatarModule,
+    DialogModule,
+    FileUploadModule,
+    BadgeModule,
   ],
   exports: [
     SocialLoginModule,
@@ -106,7 +123,7 @@ import { VerifyEmailComponent } from './core/components/verify-email/verify-emai
     NodeService,
     PhotoService,
     ProductService,
-    MapApiService
+    MapApiService,
   ],
   bootstrap: [AppComponent],
 })
