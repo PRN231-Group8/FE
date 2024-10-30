@@ -208,17 +208,6 @@
           </div>
 
           <div class="p-field">
-            <label for="code">Tour Code</label>
-            <input
-              id="code"
-              type="text"
-              pInputText
-              [(ngModel)]="tour.code"
-              required
-            />
-          </div>
-
-          <div class="p-field">
             <label for="description">Description</label>
             <textarea
               id="description"
@@ -228,55 +217,58 @@
               required
             ></textarea>
           </div>
-
-          <div class="p-field">
-            <label for="startDate">Start Date</label>
-            <p-calendar
-              [defaultDate]="defaultTime"
-              id="startDate"
-              [(ngModel)]="tour.startDate"
-              [showTime]="true"
-              [hourFormat]="'24'"
-              appendTo="body"
-              [stepMinute]="15"
-              required
-            ></p-calendar>
+          <div class="grid">
+            <div class="col p-field">
+              <label for="startDate">Start Date</label>
+              <p-calendar
+                [defaultDate]="defaultTime"
+                id="startDate"
+                [(ngModel)]="tour.startDate"
+                [showTime]="true"
+                [hourFormat]="'24'"
+                appendTo="body"
+                [stepMinute]="15"
+                required
+              ></p-calendar>
+            </div>
+  
+            <div class="col p-field">
+              <label for="endDate">End Date</label>
+              <p-calendar
+                [defaultDate]="defaultTime"
+                id="endDate"
+                [(ngModel)]="tour.endDate"
+                [showTime]="true"
+                [hourFormat]="'24'"
+                appendTo="body"
+                [stepMinute]="15"
+                required
+              ></p-calendar>
+            </div>
           </div>
-
-          <div class="p-field">
-            <label for="endDate">End Date</label>
-            <p-calendar
-              [defaultDate]="defaultTime"
-              id="endDate"
-              [(ngModel)]="tour.endDate"
-              [showTime]="true"
-              [hourFormat]="'24'"
-              appendTo="body"
-              [stepMinute]="15"
-              required
-            ></p-calendar>
-          </div>
-
-          <div class="p-field">
-            <label for="totalPrice">Total Price</label>
-            <input
-              id="totalPrice"
-              type="number"
-              pInputText
-              [(ngModel)]="tour.totalPrice"
-              required
-            />
-          </div>
-
-          <div class="p-field">
-            <label for="status">Status</label>
-            <p-dropdown
-              [options]="statusOptions"
-              [(ngModel)]="selectedStatus"
-              placeholder="Select Status"
-              appendTo="body"
-              required
-            ></p-dropdown>
+          
+          <div class="grid">
+            <div class="col p-field">
+              <label for="totalPrice">Total Price</label>
+              <input
+                id="totalPrice"
+                type="number"
+                pInputText
+                [(ngModel)]="tour.totalPrice"
+                required
+              />
+            </div>
+  
+            <div class="col p-field">
+              <label for="status">Status</label>
+              <p-dropdown
+                [options]="statusOptions"
+                [(ngModel)]="selectedStatus"
+                placeholder="Select Status"
+                appendTo="body"
+                required
+              ></p-dropdown>
+            </div>
           </div>
         </form>
       </ng-template>

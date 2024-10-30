@@ -6,6 +6,11 @@ import { CommonService } from '../../../../services/common.service';
 import { ProductService } from '../../../../services/product.service';
 import { HttpClient } from '@angular/common/http';
 import { MapApiService } from '../../../../services/map-api.service';
+import { MoodService } from '../../../../services/mood.service';
+import { Mood } from '../../../../interfaces/models/mood';
+import { BaseResponse } from '../../../../interfaces/models/base-response';
+import { LocationService } from '../../../../services/location.service';
+import { Location } from '../../../../interfaces/models/location';
 
 @Component({
   selector: 'app-home',
@@ -35,8 +40,8 @@ export class LandingComponent implements OnInit {
   selectedFrom: any;
   selectedTo: any;
 
-  moods!: any[];
-  locations!: any[];
+  moods!: Mood[];
+  locations!: Location[];
   transportOptions!: any[];
 
   address: string = '';
@@ -52,6 +57,8 @@ export class LandingComponent implements OnInit {
     private primengConfig: PrimeNGConfig,
     private router: Router,
     private mapApiService: MapApiService,
+    private moodService: MoodService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
@@ -63,56 +70,8 @@ export class LandingComponent implements OnInit {
       tooltip: 1100,
       body: 100,
     };
-    // fetch api here
-    this.moods = [
-      {
-        title: 'Happy',
-        icon: 'pi pi-face-smile',
-        description: 'Feeling joyous and content',
-      },
-      {
-        title: 'Angry',
-        icon: 'pi pi-bolt',
-        description: 'Feeling frustration or anger',
-      },
-      {
-        title: 'Sad',
-        icon: 'pi pi-thumbs-down',
-        description: 'Feeling down or upset',
-      },
-      {
-        title: 'Confident',
-        icon: 'pi pi-star',
-        description: 'Feeling sure and determined',
-      },
-      {
-        title: 'Excited',
-        icon: 'pi pi-sparkles',
-        description: 'Feeling full of energy',
-      },
-      {
-        title: 'Shy',
-        icon: 'pi pi-question',
-        description: 'Feeling reserved or nervous',
-      },
-      {
-        title: 'Bored',
-        icon: 'pi pi-circle-off',
-        description: 'Feeling uninterested or weary',
-      },
-      {
-        title: 'Stressed',
-        icon: 'pi pi-exclamation-triangle',
-        description: 'Feeling overwhelmed or tense',
-      },
-    ];
-
-    this.locations = [
-      { name: 'Hanoi' },
-      { name: 'Ho Chi Minh City' },
-      { name: 'Da Nang' },
-      { name: 'Hue' },
-    ];
+    this.getAllMoods();
+    this.getAllLocations();
 
     this.transportOptions = [
       { label: 'Car (4 seats)', value: 'Car (4 seats)' },
@@ -138,7 +97,10 @@ export class LandingComponent implements OnInit {
             this.reverseGeocode();
           }
         },
-        (error: GeolocationPositionError) => console.log(error),
+        (error: GeolocationPositionError) => {
+          console.log(error);
+          alert('You should provide us your location to have better experience.');
+        },
       );
     } else {
       alert('You should provide us your location to have better experience.');
@@ -157,7 +119,7 @@ export class LandingComponent implements OnInit {
         // fetch map API to get cities list
         this.mapApiService.getCities().subscribe((mapData: any) => {
           mapData.forEach((map: any) => {
-            if (this.address.includes(map.admin_name)) {
+            if (this.address.includes(map.city)) {
               this.selectedFrom = map.city;
             }
           });
@@ -173,7 +135,7 @@ export class LandingComponent implements OnInit {
 
   searchTours(): void {
     this.commonService.setSearchCriteria({
-      mood: this.moods[this.activeIndex].title,
+      mood: this.moods[this.activeIndex].moodTag,
       from: this.selectedFrom,
       to: this.selectedTo,
       priceRange: this.priceRange,
@@ -181,5 +143,25 @@ export class LandingComponent implements OnInit {
     });
 
     this.router.navigate(['/explore']);
+  }
+
+  getAllMoods(): void {
+    this.moodService.getMoods(1, 20).subscribe(
+      (data: BaseResponse<Mood>) => {
+        if (data.isSucceed) {
+          this.moods = data.results as Mood[];
+        }
+      }
+    );
+  }
+
+  getAllLocations(): void {
+    this.locationService.getLocations(1, 20).subscribe(
+      (data: BaseResponse<Location>) => {
+        if (data.isSucceed) {
+          this.locations = data.results as Location[];
+        }
+      }
+    );
   }
 }

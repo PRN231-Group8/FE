@@ -8,6 +8,7 @@ import { LandingComponent } from './core/components/home/landing/landing.compone
 import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 import { ProfileComponent } from './core/components/profile/profile.component';
+import { AuthGuard } from './_helper/auth.guard';
 
 @NgModule({
   imports: [
@@ -48,6 +49,7 @@ import { ProfileComponent } from './core/components/profile/profile.component';
                 ),
             },
           ],
+          providers: [AuthGuard]
         },
         {
           path: 'login',
