@@ -1,4 +1,5 @@
 import { Guid } from 'guid-typescript';
+import { Photo } from './photo';
 
 export interface Location {
     id?: Guid;
@@ -7,4 +8,5 @@ export interface Location {
     address?: string;
     status?: string;
     temperature?: number;
+    photos: Photo[];
 }

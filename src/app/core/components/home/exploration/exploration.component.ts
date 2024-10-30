@@ -3,6 +3,11 @@ import { CommonService } from '../../../../services/common.service';
 import { Product } from '../../../../interfaces/models/product';
 import { ProductService } from '../../../../services/product.service';
 import { SelectItem } from 'primeng/api';
+import { Tour } from '../../../../interfaces/models/tour';
+import { TourService } from '../../../../services/tour.service';
+import { MoodService } from '../../../../services/mood.service';
+import { LocationService } from '../../../../services/location.service';
+import { MapApiService } from '../../../../services/map-api.service';
 
 @Component({
   selector: 'app-exploration',
@@ -22,14 +27,18 @@ export class ExplorationComponent implements OnInit {
   loading: boolean = true;
 
   products!: Product[];
+  toursList!: Tour[];
 
   constructor(
     private commonService: CommonService,
     private productService: ProductService,
+    private tourService: TourService,
+    private moodService: MoodService,
+    private locationService: LocationService,
+    private mapApiService: MapApiService
   ) {}
 
   ngOnInit(): void {
-    // Fetch the products and simulate a delay for loading state
     this.productService.getProducts().then((data: Product[]) => {
       setTimeout(() => {
         this.products = data.slice(0, 12);
@@ -41,11 +50,9 @@ export class ExplorationComponent implements OnInit {
       { label: 'Price High to Low', value: '!price' },
       { label: 'Price Low to High', value: 'price' },
     ];
-    // Retrieve filters from the shaxred service
     this.filters = this.commonService.getSearchCriteria();
     console.log('Retrieved filters:', this.filters);
 
-    // Use these filters to fetch filtered tours (mock or API call)
     this.fetchFilteredTours();
   }
 
@@ -62,11 +69,13 @@ export class ExplorationComponent implements OnInit {
   }
 
   fetchFilteredTours(): void {
-    this.tours = [
-      { name: 'Tour 1', price: 1000000, transport: 'Car (4 seats)' },
-      { name: 'Tour 2', price: 1500000, transport: 'Bus' },
-    ];
-    console.log('Displaying filtered tours:', this.tours);
+    this.loading = true;
+    this.tourService.getTours(1, 10, this.sortField).subscribe(
+      (data) => {
+        this.tours = data?.results || [];
+        this.loading = false;
+      }
+    );
   }
 
   getSeverity(product: Product): any {

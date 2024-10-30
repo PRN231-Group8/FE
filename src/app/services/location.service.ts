@@ -20,22 +20,22 @@ export class LocationService {
     if (searchTerm && searchTerm !== '') {
       params = params.set('searchTerm', searchTerm);
     }
-    return this.http.get<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations`, { params });
+    return this.http.get<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/location`, { params });
   }
 
   getLocationById(id: Guid): Observable<BaseResponse<Location>> {
-    return this.http.get<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${id}`);
+    return this.http.get<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/location/${id}`);
   }
 
   createMood(locationToCreate: Location): Observable<BaseResponse<Location>> {
-    return this.http.post<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations`, locationToCreate);
+    return this.http.post<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/location`, locationToCreate);
   }
 
   updateLocations(locationToUpdate: Location): Observable<BaseResponse<Location>> {
-    return this.http.put<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${locationToUpdate.id}`, locationToUpdate);
+    return this.http.put<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/location/${locationToUpdate.id}`, locationToUpdate);
   }
 
   deleteMood(id: Guid): Observable<BaseResponse<Location>> {
-    return this.http.delete<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${id}`);
+    return this.http.delete<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/location/${id}`);
   }
 }
