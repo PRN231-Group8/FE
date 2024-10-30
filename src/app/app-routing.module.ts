@@ -8,6 +8,7 @@ import { LandingComponent } from './core/components/home/landing/landing.compone
 import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 import { SharingPostComponent } from './core/components/sharing-post/sharing-post.component';
+import { ProfileComponent } from './core/components/profile/profile.component';
 
 @NgModule({
   imports: [
@@ -61,6 +62,14 @@ import { SharingPostComponent } from './core/components/sharing-post/sharing-pos
           path: 'sharing-post',
           component: SharingPostComponent,
         },
+        {
+          path: 'profile',
+          component: ProfileComponent,
+          loadChildren: () =>
+            import('./core/components/profile/profile.module').then(
+              m => m.ProfileModule,
+            ),
+        },
         { path: 'notfound', component: NotfoundComponent },
         { path: '**', redirectTo: '/notfound' },
       ],
@@ -68,6 +77,7 @@ import { SharingPostComponent } from './core/components/sharing-post/sharing-pos
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
         onSameUrlNavigation: 'reload',
+        useHash: true,
       },
     ),
   ],

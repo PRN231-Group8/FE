@@ -44,7 +44,17 @@ import { SharingPostComponent } from './core/components/sharing-post/sharing-pos
 import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { BadgeModule } from 'primeng/badge';
-
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextModule } from 'primeng/inputtext';
+import { TabMenuModule } from 'primeng/tabmenu';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
+import { PanelMenuModule } from 'primeng/panelmenu';
+import { ScrollTopModule } from 'primeng/scrolltop';
+import { CarouselModule } from 'primeng/carousel';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { sharedModule } from './layout/shared/shared.module';
 // Third-party imports
 
 @NgModule({
@@ -80,6 +90,19 @@ import { BadgeModule } from 'primeng/badge';
     DialogModule,
     FileUploadModule,
     BadgeModule,
+    InputTextareaModule,
+    InputTextModule,
+    MenuModule,
+    DropdownModule,
+    CalendarModule,
+    FloatLabelModule,
+    PanelMenuModule,
+    ScrollTopModule,
+    CarouselModule,
+    ContextMenuModule,
+    TabMenuModule,
+    sharedModule,
+    FileUploadModule,
   ],
   exports: [
     SocialLoginModule,

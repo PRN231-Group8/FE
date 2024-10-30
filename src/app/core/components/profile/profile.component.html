@@ -1,0 +1,232 @@
+<div class="layout-wrapper">
+  <p-toast></p-toast>
+  <!-- Spinner to indicate loading when the profile data is being fetched -->
+
+  <p-scrollTop></p-scrollTop>
+  <app-navbar class="sticky top-0 z-1"></app-navbar>
+
+  <div class="layout-main-container" *ngIf="!profileLoading">
+    <div class="layout-main overflow-hidden z-0">
+      <div class="pb-5 grid gap-4" style="max-width: 1400px; margin: auto">
+        <!-- Profile sidebar -->
+        <div class="px-6 border-round-sm shadow-6 card md:col-4 col-12 m-auto">
+          <div
+            class="flex flex-column align-items-center justify-content-center border-bottom-2 pb-4"
+          >
+            <img
+              [src]="avatarUrl"
+              alt="User Avatar"
+              class="profile-avatar"
+              (click)="triggerFileUpload()"
+              (keyup.enter)="triggerFileUpload()"
+              (keydown.space)="triggerFileUpload()"
+              tabindex="0"
+            />
+            <p class="text-3xl font-bold">{{ email }}</p>
+
+            <p-fileUpload
+              #fileUploader
+              name="file"
+              [url]="uploadUrl"
+              accept="image/*"
+              maxFileSize="5000000"
+              [auto]="true"
+              (onUpload)="onAvatarUpload($event)"
+              (onError)="onUploadError($event)"
+              chooseLabel="Upload New Avatar"
+            >
+              <ng-template pTemplate="content">
+                <ul *ngIf="uploadedFiles.length">
+                  <li *ngFor="let file of uploadedFiles">
+                    {{ file.name }} - {{ file.size }} bytes
+                  </li>
+                </ul>
+              </ng-template>
+            </p-fileUpload>
+          </div>
+
+          <!-- Menu: Render the items here directly -->
+          <div class="pt-6 flex flex-column align-items-center">
+            <div *ngFor="let item of items" class="mb-3 w-15rem">
+              <button
+                pButton
+                type="button"
+                [label]="item.label || ''"
+                [icon]="item.icon || ''"
+                (click)="item.command?.({ originalEvent: $event, item: item })"
+                class="w-full p-button p-shadow-6 custom-hover-button"
+                [disabled]="loading"
+              > </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile content -->
+        <div class="px-6 border-round-sm shadow-6 card col-12 md:col-7">
+          <div *ngIf="activeItem && activeItem.label === 'Account'">
+            <h2
+              class="flex justify-content-center align-content-center pt-4 pb-6 font-bold underline"
+            >
+              Account Settings
+            </h2>
+            <form
+              [formGroup]="profileForm"
+              class="p-fluid"
+              (ngSubmit)="updateProfile()"
+            >
+              <div class="grid formgrid mb-4">
+                <div class="col-12 md:col-6">
+                  <div class="field pb-6">
+                    <p-floatLabel>
+                      <input
+                        pInputText
+                        id="firstName"
+                        formControlName="firstName"
+                        [disabled]="loading"
+                      />
+                      <label for="firstName">First Name</label>
+                    </p-floatLabel>
+                  </div>
+                  <div class="field pb-6">
+                    <p-floatLabel>
+                      <p-calendar
+                        [(ngModel)]="date"
+                        inputId="birth_date"
+                        formControlName="dob"
+                        dateFormat="dd/mm/yy"
+                        showIcon="true"
+                        [disabled]="loading"
+                        appendTo="body"
+                      ></p-calendar>
+                      <label for="birth_date">Date of Birth</label>
+                    </p-floatLabel>
+                  </div>
+                </div>
+                <div class="col-12 md:col-6">
+                  <div class="field pb-6">
+                    <p-floatLabel>
+                      <input
+                        pInputText
+                        id="lastName"
+                        formControlName="lastName"
+                        [disabled]="loading"
+                      />
+                      <label for="lastName">Last Name</label>
+                    </p-floatLabel>
+                  </div>
+                  <div class="field">
+                    <p-floatLabel>
+                      <p-dropdown
+                        id="gender"
+                        [options]="genderOptions"
+                        formControlName="gender"
+                        placeholder="Select Gender"
+                        [disabled]="loading"
+                        appendTo="body"
+                      ></p-dropdown>
+                      <label for="gender">Gender</label>
+                    </p-floatLabel>
+                  </div>
+                </div>
+              </div>
+              <div class="flex justify-content-center align-items-center mt-3">
+                <button
+                  pButton
+                  type="submit"
+                  label="Update"
+                  class="mr-2 custom-hover-button w-10rem"
+                  [loading]="loading"
+                > </button>
+                <button
+                  pButton
+                  type="button"
+                  label="Cancel"
+                  (click)="resetProfileForm()"
+                  class="p-button-secondary custom-hover-button w-10rem"
+                  [disabled]="loading"
+                > </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Change Password Form -->
+          <div *ngIf="activeItem && activeItem.label === 'Password'">
+            <h2
+              class="flex justify-content-center align-content-center pt-4 pb-6 font-bold underline"
+            >
+              Change Password
+            </h2>
+            <form
+              [formGroup]="passwordForm"
+              class="p-fluid"
+              (ngSubmit)="changePassword()"
+            >
+              <div class="grid formgrid mb-4">
+                <div class="col-12 flex flex-column align-items-center">
+                  <div class="field pb-4 w-20rem">
+                    <p-floatLabel>
+                      <input
+                        pInputText
+                        type="password"
+                        id="oldPassword"
+                        formControlName="oldPassword"
+                        [disabled]="loading"
+                      />
+                      <label for="oldPassword">Old Password</label>
+                    </p-floatLabel>
+                  </div>
+                </div>
+                <div class="col-12 flex flex-column align-items-center">
+                  <div class="field pb-4 w-20rem">
+                    <p-floatLabel>
+                      <input
+                        pInputText
+                        type="password"
+                        id="newPassword"
+                        formControlName="newPassword"
+                        [disabled]="loading"
+                      />
+                      <label for="newPassword">New Password</label>
+                    </p-floatLabel>
+                  </div>
+                </div>
+                <div class="col-12 flex flex-column align-items-center">
+                  <div class="field w-20rem">
+                    <p-floatLabel>
+                      <input
+                        pInputText
+                        type="password"
+                        id="confirmPassword"
+                        formControlName="confirmPassword"
+                        [disabled]="loading"
+                      />
+                      <label for="confirmPassword">Confirm Password</label>
+                    </p-floatLabel>
+                  </div>
+                </div>
+              </div>
+              <div class="flex justify-content-center align-items-center mt-3">
+                <button
+                  pButton
+                  type="submit"
+                  label="Save"
+                  class="mr-2 custom-hover-button w-10rem"
+                  [loading]="loading"
+                > </button>
+                <button
+                  pButton
+                  type="button"
+                  label="Cancel"
+                  (click)="resetPasswordForm()"
+                  class="p-button-secondary custom-hover-button w-10rem"
+                  [disabled]="loading"
+                > </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-shared-footer class="pt-8"></app-shared-footer>
+</div>

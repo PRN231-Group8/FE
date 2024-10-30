@@ -90,4 +90,12 @@ export class AuthenticationService {
     this.socialAuthService.signOut();
     this.router.navigate(['/login']);
   }
+  public getEmailFromToken(): string | null {
+    const user = this.userSubject.value;
+    if (user && user.token) {
+      const decodedToken: any = jwtDecode(user.token);
+      return decodedToken.email;
+    }
+    return null;
+  }
 }
