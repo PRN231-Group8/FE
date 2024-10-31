@@ -86,12 +86,6 @@ export class LandingComponent implements OnInit {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
           if (position) {
-            console.log(
-              'Latitude: ' +
-                position.coords.latitude +
-                'Longitude: ' +
-                position.coords.longitude,
-            );
             this.lat = position.coords.latitude;
             this.lng = position.coords.longitude;
             this.reverseGeocode();
@@ -112,9 +106,7 @@ export class LandingComponent implements OnInit {
 
     this.http.get<any>(url).subscribe(
       data => {
-        console.log(data);
         this.address = data.display_name;
-        console.log('Current city:', this.address);
 
         // fetch map API to get cities list
         this.mapApiService.getCities().subscribe((mapData: any) => {
@@ -125,17 +117,13 @@ export class LandingComponent implements OnInit {
           });
           this.locationLoading = false;
         });
-      },
-      error => {
-        console.error('Error fetching location data:', error);
-        this.locationLoading = false;
-      },
+      }
     );
   }
 
   searchTours(): void {
     this.commonService.setSearchCriteria({
-      mood: this.moods[this.activeIndex].moodTag,
+      mood: this.moods[this.activeIndex],
       from: this.selectedFrom,
       to: this.selectedTo,
       priceRange: this.priceRange,

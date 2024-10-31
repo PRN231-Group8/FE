@@ -20,6 +20,9 @@ export class TourService {
     if (searchTerm && searchTerm !== '') {
       params = params.set('searchTerm', searchTerm);
     }
+    if (sortByStatus && sortByStatus !== '') {
+      params = params.set('sortByStatus', sortByStatus);
+    }
     return this.http.get<BaseResponse<Tour>>(`${environment.BACKEND_API_URL}/api/tours`, { params });
   }
 

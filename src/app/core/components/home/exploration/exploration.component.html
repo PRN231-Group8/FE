@@ -15,12 +15,7 @@
         <!-- Display filtered tours -->
         <div class="tour-list">
           <div class="card">
-            <p-dataView
-              #dv
-              *ngIf="loading"
-              [value]="products"
-              [layout]="layout"
-            >
+            <p-dataView #dv *ngIf="loading" [layout]="layout">
               <ng-template pTemplate="header">
                 <div class="flex justify-content-end">
                   <p-dataViewLayoutOptions />
@@ -28,45 +23,25 @@
               </ng-template>
 
               <!-- Skeleton list layout -->
-              <ng-template pTemplate="list" let-products>
+              <ng-template pTemplate="list" let-tours>
                 <div class="grid grid-nogutter">
-                  <div
-                    class="col-12"
-                    *ngFor="let i of counterArray(6); let first = first"
-                    class="col-12"
-                  >
-                    <div
-                      class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
-                      [ngClass]="{ 'border-top-1 surface-border': !first }"
-                    >
-                      <p-skeleton
-                        styleClass="w-9 sm:w-16rem xl:w-10rem h-6rem block xl:block mx-auto border-round"
-                      />
+                  <div class="col-12">
+                    <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
+                      [ngClass]="'border-top-1 surface-border'">
+                      <p-skeleton styleClass="w-9 sm:w-16rem xl:w-10rem h-6rem block xl:block mx-auto border-round" />
                       <div
-                        class="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4"
-                      >
-                        <div
-                          class="flex flex-column align-items-center sm:align-items-start gap-3"
-                        >
+                        class="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                        <div class="flex flex-column align-items-center sm:align-items-start gap-3">
                           <p-skeleton styleClass="w-8rem border-round h-2rem" />
                           <p-skeleton styleClass="w-6rem border-round h-1rem" />
                           <div class="flex align-items-center gap-3">
-                            <p-skeleton
-                              styleClass="w-6rem border-round h-1rem"
-                            />
-                            <p-skeleton
-                              styleClass="w-3rem border-round h-1rem"
-                            />
+                            <p-skeleton styleClass="w-6rem border-round h-1rem" />
+                            <p-skeleton styleClass="w-3rem border-round h-1rem" />
                           </div>
                         </div>
-                        <div
-                          class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2"
-                        >
+                        <div class="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
                           <p-skeleton styleClass="w-4rem border-round h-2rem" />
-                          <p-skeleton
-                            shape="circle"
-                            styleClass="w-3rem h-3rem"
-                          />
+                          <p-skeleton shape="circle" styleClass="w-3rem h-3rem" />
                         </div>
                       </div>
                     </div>
@@ -75,31 +50,20 @@
               </ng-template>
 
               <!-- Skeleton grid layout -->
-              <ng-template pTemplate="grid" let-products>
+              <ng-template pTemplate="grid" let-tours>
                 <div class="grid grid-nogutter">
-                  <div
-                    class="col-12 sm:col-6 md:col-4 xl:col-6 p-2"
-                    *ngFor="let i of counterArray(6)"
-                  >
-                    <div
-                      class="p-4 border-1 surface-border surface-card border-round"
-                    >
-                      <div
-                        class="flex flex-wrap align-items-center justify-content-between gap-2"
-                      >
+                  <div class="col-12 sm:col-6 md:col-4 xl:col-6 p-2">
+                    <div class="p-4 border-1 surface-border surface-card border-round">
+                      <div class="flex flex-wrap align-items-center justify-content-between gap-2">
                         <p-skeleton styleClass="w-6rem border-round h-2rem" />
                         <p-skeleton styleClass="w-3rem border-round h-1rem" />
                       </div>
-                      <div
-                        class="flex flex-column align-items-center gap-3 py-5"
-                      >
+                      <div class="flex flex-column align-items-center gap-3 py-5">
                         <p-skeleton styleClass="w-9 border-round h-10rem" />
                         <p-skeleton styleClass="w-8rem border-round h-2rem" />
                         <p-skeleton styleClass="w-6rem border-round h-1rem" />
                       </div>
-                      <div
-                        class="flex align-items-center justify-content-between"
-                      >
+                      <div class="flex align-items-center justify-content-between">
                         <p-skeleton styleClass="w-4rem border-round h-2rem" />
                         <p-skeleton shape="circle" styleClass="w-3rem h-3rem" />
                       </div>
@@ -109,54 +73,92 @@
               </ng-template>
             </p-dataView>
 
-            <p-dataView *ngIf="!loading" [value]="tours" [layout]="layout" [rows]="5" [paginator]="true" [sortField]="sortField" [sortOrder]="sortOrder">
+            <p-dataView *ngIf="!loading" [value]="tours" [layout]="layout" [rows]="5" [paginator]="true"
+              [sortField]="sortField" [sortOrder]="sortOrder">
               <ng-template pTemplate="header">
                 <div class="flex flex-column md:flex-row md:justify-content-between">
-                  <p-dropdown [options]="sortOptions" placeholder="Sort By" (onChange)="onSortChange($event)" styleClass="mb-2 md:mb-0" />
+                  <p-dropdown [options]="locations" optionLabel="name" [(ngModel)]="selectedFrom"
+                    placeholder="{{ selectedFrom ? selectedFrom : 'Finding your nearby city' }}" [disabled]="true"
+                    styleClass="mb-2 md:mb-0" (onChange)="fetchFilteredTours()" [loading]="locationLoading" />
+                  <p-dropdown [options]="locations" optionLabel="name" [(ngModel)]="selectedTo" placeholder="To"
+                    styleClass="mb-2 md:mb-0" (onChange)="fetchFilteredTours()" [loading]="locationLoading" />
+                  <p-dropdown [options]="moods" optionLabel="moodTag" [(ngModel)]="selectedMood" placeholder="Moods"
+                    styleClass="mb-2 md:mb-0" (onChange)="fetchFilteredTours()" />
+                  <p-inputNumber [(ngModel)]="priceRange" mode="currency" currency="VND" placeholder="Price"
+                    (onInput)="fetchFilteredTours()" styleClass="mb-2 md:mb-0" />
+                  <p-dropdown [options]="transportOptions" [(ngModel)]="selectedTransport" placeholder="Transportation"
+                    styleClass="mb-2 md:mb-0" />
+                  <p-dropdown [options]="sortOptions" placeholder="Sort By" (onChange)="onSortChange($event)"
+                    styleClass="mb-2 md:mb-0" />
+                  <p-button icon="pi pi-filter-slash" (click)="removeFilter()" label="Clear" />
                   <p-dataViewLayoutOptions />
                 </div>
               </ng-template>
-            
+
               <ng-template pTemplate="list" let-tour>
                 <div class="grid grid-nogutter">
                   <div class="col-12" *ngFor="let item of tours">
                     <div class="flex flex-column sm:flex-row p-4 gap-3">
-                      <!-- <div class="md:w-10rem">
-                        <img src="{{ item.locationInTours[0].photos[0].url }}" alt="{{ item.title }}" class="block border-round w-full" />
-                      </div> -->
+                      <div class="md:w-24rem">
+                        <img *ngIf="item.locationInTours" src="{{ item.locationInTours[0].photos[0].url }}"
+                          alt="{{ item.title }}" class="block w-full border-round" />
+                        <img *ngIf="!item.locationInTours"
+                          src="https://www.shoreexcursionsgroup.com/img/tour/EUMRCASBAN-2.jpg" alt="{{ item.title }}"
+                          class="block w-full border-round" />
+                      </div>
                       <div class="flex flex-column md:flex-row justify-content-between flex-1 gap-4">
-                        <div>
-                          <span class="font-medium text-lg">{{ item.title }}</span>
-                          <p>{{ item.description }}</p>
-                          <span>Start Date: {{ item.startDate | date }}</span>
-                          <span>End Date: {{ item.endDate | date }}</span>
+                        <div class="flex flex-row justify-content-between align-items-start gap-2">
+                          <div>
+                            <span class="text-2xl font-medium text-secondary text-sm">{{ item.title }}</span>
+                            <div class="text-lg text-900 mt-1">{{ item.description }}</div>
+                            <div class="pt-4">
+                              <span class="text-900 text-lg">Start Date: {{ item.startDate }}</span>
+                              <div class="text-900 text-lg">End Date: {{ item.endDate }}</div>
+                            </div>
+                          </div>
                         </div>
-                        <div class="text-end">
-                          <span class="text-xl font-semibold">{{ '$' + item.totalPrice }}</span>
+                        <div class="flex flex-column gap-4 mt-4">
+                          <span class="text-2xl font-semibold">{{ item.totalPrice + ' VND' }}</span>
+                          <div class="flex gap-2">
+                            <p-button icon="pi pi-shopping-cart" class="flex-auto md:flex-initial white-space-nowrap"
+                              label="Book Now" />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </ng-template>
-            
+
               <ng-template pTemplate="grid" let-tour>
                 <div class="col-12 sm:col-6 md:col-4 xl:col-3 p-2" *ngFor="let item of tours">
                   <div class="border-1 surface-border surface-card border-round flex flex-column p-4">
-                    <img src="https://example.com/image/{{ item.id }}" alt="{{ item.title }}" class="block w-full border-round" />
+                    <img *ngIf="item.locationInTours" src="{{ item.locationInTours[0].photos[0].url }}"
+                      alt="{{ item.title }}" class="block w-full border-round" />
+                    <img *ngIf="!item.locationInTours"
+                      src="https://www.shoreexcursionsgroup.com/img/tour/EUMRCASBAN-2.jpg" alt="{{ item.title }}"
+                      class="block w-full border-round" />
                     <div class="mt-3">
-                      <span class="text-lg font-medium">{{ item.title }}</span>
-                      <p>{{ item.description }}</p>
-                      <span>Start Date: {{ item.startDate | date }}</span>
-                      <span>End Date: {{ item.endDate | date }}</span>
-                      <div class="mt-2">
-                        <span class="text-2xl font-semibold">{{ '$' + item.totalPrice }}</span>
+                      <div>
+                        <span class="text-2xl font-medium text-secondary text-sm">{{ item.title }}</span>
+                        <div class="text-lg text-900 mt-1">{{ item.description }}</div>
+                        <div class="pt-4">
+                          <span class="text-900 text-lg">Start Date: {{ item.startDate }}</span>
+                          <div class="text-900 text-lg">End Date: {{ item.endDate }}</div>
+                        </div>
+                      </div>
+                      <div class="flex flex-column gap-4 mt-4">
+                        <span class="text-2xl font-semibold">{{ item.totalPrice + ' VND' }}</span>
+                        <div class="flex gap-2">
+                          <p-button icon="pi pi-shopping-cart" class="flex-auto md:flex-initial white-space-nowrap"
+                            label="Book Now" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </ng-template>
-            </p-dataView>            
+            </p-dataView>
           </div>
         </div>
       </div>

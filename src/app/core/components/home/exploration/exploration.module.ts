@@ -22,6 +22,8 @@ import { TagModule } from 'primeng/tag';
 import { DataViewModule } from 'primeng/dataview';
 import { ProductService } from '../../../../services/product.service';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ExplorationRoutingModule } from './exploration-routing.module';
+import { InputMaskModule } from 'primeng/inputmask';
 
 @NgModule({
   declarations: [ExplorationComponent],
@@ -46,7 +48,9 @@ import { SkeletonModule } from 'primeng/skeleton';
     sharedModule,
     TagModule,
     DataViewModule,
-    SkeletonModule
+    SkeletonModule,
+    ExplorationRoutingModule,
+    InputMaskModule
   ],
   exports: [ExplorationComponent],
   providers: [ProductService]
