@@ -172,10 +172,12 @@
                     </div>
                 
                     <div class="p-col flex align-items-center mt-2 w-full justify-content-center">
-                      <span class="font-bold">Price (≥): </span>
+                      <span class="font-bold">Price: </span>
                       <p-inputNumber
                         [(ngModel)]="priceRange"
                         mode="currency"
+                        prefix="≥"
+                        inputId="withoutgrouping"
                         currency="VND"
                         class="p-mt-4 ml-2"
                       ></p-inputNumber>
@@ -185,6 +187,7 @@
                       <span class="font-bold">Transportation: </span>
                       <p-dropdown
                         [options]="transportOptions"
+                        optionLabel="type"
                         [(ngModel)]="selectedTransport"
                         placeholder="Select Transportation"
                         class="p-mt-4 ml-2 w-auto"

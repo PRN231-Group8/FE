@@ -11,6 +11,8 @@ import { Location } from '../../../../interfaces/models/location';
 import { HttpClient } from '@angular/common/http';
 import { MapApiService } from '../../../../services/map-api.service';
 import { Tour } from '../../../../interfaces/models/tour';
+import { Transportation } from '../../../../interfaces/models/transportation';
+import { TransportationService } from '../../../../services/transportation.service';
 
 @Component({
   selector: 'app-exploration',
@@ -33,12 +35,13 @@ export class ExplorationComponent implements OnInit {
   // Filter data for dropdowns
   locations!: Location[];
   moods!: Mood[];
-  selectedFrom: string | null = null;
-  selectedTo: string | null = null;
-  priceRange: number | null = null;
-  transportOptions: SelectItem[] = [];
-  selectedTransport: string | null = null;
-  selectedMood: string | null = null;
+  selectedFrom!: string;
+  selectedTo!: string;
+  priceRange: number = 0;
+  transports!: Transportation[];
+  selectedTransport!: string;
+  selectedMood!: string;
+  fromPlaceholder = this.selectedFrom ? this.selectedFrom : 'Finding your nearby city';
 
   constructor(
     private commonService: CommonService,
@@ -46,18 +49,13 @@ export class ExplorationComponent implements OnInit {
     private moodService: MoodService,
     private locationService: LocationService,
     private mapApiService: MapApiService,
+    private transportationService: TransportationService,
     private http: HttpClient,
   ) {}
 
   ngOnInit(): void {
-    this.selectedFrom = null;
-    this.selectedTo = null;
-    this.priceRange = null;
-    this.selectedTransport = null;
-    this.selectedMood = null;
     // Retrieve saved filters from CommonService if they exist
     this.filters = this.commonService.getSearchCriteria() || {};
-    console.log(this.filters);
     if (this.filters.from) {
       this.selectedFrom = this.filters.from;
     } else {
@@ -72,32 +70,36 @@ export class ExplorationComponent implements OnInit {
       { label: 'Price High to Low', value: '!price' },
       { label: 'Price Low to High', value: 'price' },
     ];
-    this.transportOptions = [
-      { label: 'Car (4 seats)', value: 'Car (4 seats)' },
-      { label: 'Bus', value: 'Bus' },
-      { label: 'Motorbike', value: 'Motorbike' },
-    ];
 
     this.sortField = this.sortOptions[0]?.value.replace('!', '') || 'price';
 
     this.initializeMoods();
     this.initializeLocations();
+    this.initializeTransportations();
 
     this.fetchFilteredTours();
   }
 
   initializeMoods(): void {
     if (this.filters.moods) {
-      // Use the filtered moods from CommonService
       this.moods = this.filters.moods;
     } else {
-      // Fetch all moods if not filtered
       this.moodService.getMoods(1, 20).subscribe((data: BaseResponse<Mood>) => {
         if (data.isSucceed) {
           this.moods = data.results as Mood[];
         }
       });
     }
+  }
+
+  initializeTransportations(): void {
+    this.transportationService.getTransportations(1, 20).subscribe(
+      (data: BaseResponse<Transportation>) => {
+        if (data.isSucceed) {
+          this.transports = data.results as Transportation[];
+        }
+      }
+    );
   }
 
   initializeLocations(): void {
@@ -125,7 +127,7 @@ export class ExplorationComponent implements OnInit {
       transport: this.selectedTransport,
     });
 
-    this.tourService.getTours(1, 10).subscribe((data: BaseResponse<Tour>) => {
+    this.tourService.getTours(1, 100).subscribe((data: BaseResponse<Tour>) => {
       this.tours = data?.results as Tour[];
       this.loading = false;
 
@@ -192,22 +194,19 @@ export class ExplorationComponent implements OnInit {
       //   return false;
       // }
 
-      // if (
-      //   filters.transport &&
-      //   (!tour.transportations ||
-      //     !tour.transportations.some(
-      //       (transport: Transportation) => transport.type === filters.transport,
-      //     ))
-      // ) {
-      //   return false;
-      // }
+      if (filters.transport) {
+        const transportTypes =
+          tour.transportations?.map((transportation: Transportation) => transportation.type) || [];
 
+          if (!transportTypes.includes(filters.transport.type)) {
+            return false;
+          }
+      }
       if (filters.mood) {
         const tourMoodTags =
           tour.tourMoods?.map((mood: Mood) => mood.moodTag) || [];
 
         if (!tourMoodTags.includes(filters.mood.moodTag)) {
-          console.log('mood: false');
           return false;
         }
       }
@@ -221,19 +220,12 @@ export class ExplorationComponent implements OnInit {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
           if (position) {
-            console.log(
-              'Latitude: ' +
-                position.coords.latitude +
-                'Longitude: ' +
-                position.coords.longitude,
-            );
             this.lat = position.coords.latitude;
             this.lng = position.coords.longitude;
             this.reverseGeocode();
           }
         },
-        (error: GeolocationPositionError) => {
-          console.log(error);
+        () => {
           alert(
             'You should provide us your location to have better experience.',
           );
@@ -249,9 +241,7 @@ export class ExplorationComponent implements OnInit {
 
     this.http.get<any>(url).subscribe(
       data => {
-        console.log(data);
         this.address = data.display_name;
-        console.log('Current city:', this.address);
 
         // fetch map API to get cities list
         this.mapApiService.getCities().subscribe((mapData: any) => {

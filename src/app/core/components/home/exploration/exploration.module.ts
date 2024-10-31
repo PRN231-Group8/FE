@@ -24,6 +24,7 @@ import { ProductService } from '../../../../services/product.service';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ExplorationRoutingModule } from './exploration-routing.module';
 import { InputMaskModule } from 'primeng/inputmask';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 @NgModule({
   declarations: [ExplorationComponent],
@@ -50,7 +51,8 @@ import { InputMaskModule } from 'primeng/inputmask';
     DataViewModule,
     SkeletonModule,
     ExplorationRoutingModule,
-    InputMaskModule
+    InputMaskModule,
+    InputNumberModule
   ],
   exports: [ExplorationComponent],
   providers: [ProductService]

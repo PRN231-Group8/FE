@@ -21,7 +21,6 @@ interface PageEvent {
 @Component({
   selector: 'app-tour-management',
   templateUrl: './tour-management.component.html',
-  styleUrl: './tour-management.component.scss',
   providers: [MessageService],
 })
 export class TourManagementComponent implements OnInit {

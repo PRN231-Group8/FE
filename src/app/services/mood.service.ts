@@ -28,14 +28,14 @@ export class MoodService {
   }
 
   createMood(moodToCreate: Mood): Observable<BaseResponse<Mood>> {
-    return this.http.post<BaseResponse<Mood>>(`${environment.BACKEND_API_URL}/api/tours`, moodToCreate);
+    return this.http.post<BaseResponse<Mood>>(`${environment.BACKEND_API_URL}/api/moods`, moodToCreate);
   }
 
   updateMood(moodToUpdate: Mood): Observable<BaseResponse<Mood>> {
-    return this.http.put<BaseResponse<Mood>>(`${environment.BACKEND_API_URL}/api/tours/${moodToUpdate.id}`, moodToUpdate);
+    return this.http.put<BaseResponse<Mood>>(`${environment.BACKEND_API_URL}/api/moods/${moodToUpdate.id}`, moodToUpdate);
   }
 
   deleteMood(id: Guid): Observable<BaseResponse<Mood>> {
-    return this.http.delete<BaseResponse<Mood>>(`${environment.BACKEND_API_URL}/api/tours/${id}`);
+    return this.http.delete<BaseResponse<Mood>>(`${environment.BACKEND_API_URL}/api/moods/${id}`);
   }
 }

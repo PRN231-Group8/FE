@@ -11,6 +11,8 @@ import { Mood } from '../../../../interfaces/models/mood';
 import { BaseResponse } from '../../../../interfaces/models/base-response';
 import { LocationService } from '../../../../services/location.service';
 import { Location } from '../../../../interfaces/models/location';
+import { Transportation } from '../../../../interfaces/models/transportation';
+import { TransportationService } from '../../../../services/transportation.service';
 
 @Component({
   selector: 'app-home',
@@ -42,10 +44,10 @@ export class LandingComponent implements OnInit {
 
   moods!: Mood[];
   locations!: Location[];
-  transportOptions!: any[];
+  transportOptions!: Transportation[];
 
   address: string = '';
-  selectedTransport: string = 'Car (4 seats)';
+  selectedTransport!: string;
   citySuggestion: any[] | undefined;
 
   locationLoading: boolean = true;
@@ -58,7 +60,8 @@ export class LandingComponent implements OnInit {
     private router: Router,
     private mapApiService: MapApiService,
     private moodService: MoodService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private transportationService: TransportationService
   ) {}
 
   ngOnInit(): void {
@@ -72,12 +75,8 @@ export class LandingComponent implements OnInit {
     };
     this.getAllMoods();
     this.getAllLocations();
+    this.getAllTransportations();
 
-    this.transportOptions = [
-      { label: 'Car (4 seats)', value: 'Car (4 seats)' },
-      { label: 'Bus', value: 'Bus' },
-      { label: 'Motorbike', value: 'Motorbike' },
-    ];
     this.transportationLoading = false;
   }
 
@@ -91,8 +90,7 @@ export class LandingComponent implements OnInit {
             this.reverseGeocode();
           }
         },
-        (error: GeolocationPositionError) => {
-          console.log(error);
+        () => {
           alert('You should provide us your location to have better experience.');
         },
       );
@@ -148,6 +146,16 @@ export class LandingComponent implements OnInit {
       (data: BaseResponse<Location>) => {
         if (data.isSucceed) {
           this.locations = data.results as Location[];
+        }
+      }
+    );
+  }
+
+  getAllTransportations(): void {
+    this.transportationService.getTransportations(1, 20).subscribe(
+      (data: BaseResponse<Transportation>) => {
+        if (data.isSucceed) {
+          this.transportOptions = data.results as Transportation[];
         }
       }
     );
