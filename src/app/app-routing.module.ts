@@ -49,7 +49,7 @@ import { AuthGuard } from './_helper/auth.guard';
                 ),
             },
           ],
-          providers: [AuthGuard]
+          canActivate: [AuthGuard]
         },
         {
           path: 'login',

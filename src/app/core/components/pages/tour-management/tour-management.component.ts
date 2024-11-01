@@ -1,22 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { Table } from 'primeng/table';
-import { Tour } from '../../../../interfaces/models/tour';
 import { TourService } from '../../../../services/tour.service';
-import { format } from 'date-fns';
-import { catchError, throwError } from 'rxjs';
-import { BaseResponse } from '../../../../interfaces/models/base-response';
-
-interface ExpandedRows {
-  [key: string]: boolean;
-}
-
-interface PageEvent {
-  first?: number;
-  rows?: number;
-  page?: number;
-  pageCount?: number;
-}
+import { LocationService } from '../../../../services/location.service';
+import { MoodService } from '../../../../services/mood.service';
+import { Mood } from '../../../../interfaces/models/mood';
+import { Location } from '../../../../interfaces/models/location';
+import { Tour } from '../../../../interfaces/models/tour';
 
 @Component({
   selector: 'app-tour-management',
@@ -24,264 +14,231 @@ interface PageEvent {
   providers: [MessageService],
 })
 export class TourManagementComponent implements OnInit {
-  isCreating: boolean = false;
-  isEdit: boolean = false;
-  tourDialog: boolean = false;
+  tours: any[] = [];
+  tourForm!: FormGroup;
+  tour: any = {}; // Selected tour for editing or deletion
+  loading: boolean = true;
   createTourDialog: boolean = false;
   deleteTourDialog: boolean = false;
-  submitted: boolean = false;
-  loading: boolean = true;
-  tours: Tour[] = [];
-  tour: Tour = {};
-  expandedRows: ExpandedRows = {};
-  cols: any[] = [];
-  first: number = 0;
+  isEdit: boolean = false;
   rows: number = 10;
+  first: number = 0;
   totalRecords: number = 0;
-  totalPages: number = 0;
   rowsPerPageOptions = [5, 10, 20];
-  searchTerm?: string;
   statusOptions = ['ACTIVE', 'INACTIVE', 'CANCELLED'];
-  defaultTime!: Date;
-  selectedStatus: string | undefined;
-  dateRange: Date[] = [];
+  moodOptions: any[] = [];
+  locationOptions: any[] = [];
+  defaultTime = new Date();
+  cols: any[] = [];
+  sortByStatus: string = '';
+  searchTerm: string = '';
+
   @ViewChild('filter') filter!: ElementRef;
 
   constructor(
+    private fb: FormBuilder,
     private tourService: TourService,
     private messageService: MessageService,
+    private moodService: MoodService,
+    private locationService: LocationService,
   ) {}
 
   ngOnInit(): void {
-    this.defaultTime = new Date();
-    this.defaultTime.setHours(6, 0, 0);
-    this.loadTours(1, this.rows, this.searchTerm);
     this.cols = [
-      { field: 'id', header: 'Tour ID' },
+      { field: 'code', header: 'Code' },
       { field: 'title', header: 'Title' },
       { field: 'startDate', header: 'Start Date' },
       { field: 'endDate', header: 'End Date' },
       { field: 'totalPrice', header: 'Total Price' },
       { field: 'status', header: 'Status' },
     ];
+    this.loadMoods();
+    this.loadLocations();
+    this.initializeForm();
+    this.loadTours();
   }
 
-  private loadTours(
-    pageNumber: number,
-    pageSize: number,
-    searchTerm?: string,
-  ): void {
+  initializeForm(): void {
+    this.tourForm = this.fb.group({
+      id: [null],
+      title: ['', Validators.required],
+      description: ['', Validators.required],
+      startDate: [null, Validators.required],
+      endDate: [null, Validators.required],
+      totalPrice: [null, [Validators.required, Validators.min(0)]],
+      status: ['', Validators.required],
+      tourMoods: [[], Validators.required],
+      locationInTours: [[], Validators.required],
+    });
+  }
+
+  get tourMoods(): FormArray {
+    return this.tourForm.get('tourMoods') as FormArray;
+  }
+
+  get locationInTours(): FormArray {
+    return this.tourForm.get('locationInTours') as FormArray;
+  }
+
+  loadTours(pageNumber: number = this.first / this.rows + 1): void {
     this.loading = true;
-    this.tourService.getTours(pageNumber, pageSize, searchTerm).subscribe({
-      next: data => {
-        this.tours = data.results as Tour[];
-        this.loading = false;
-        this.totalRecords = data.totalRecords;
-        this.totalPages = data.totalPages;
-      },
-      error: error => {
-        console.error('There was an error!', error);
-      },
+    this.tourService
+      .getTours(pageNumber, this.rows, this.sortByStatus, this.searchTerm)
+      .subscribe({
+        next: data => {
+          this.tours = data.results as Tour[];
+          this.totalRecords = data.totalElements as number;
+          this.loading = false;
+        },
+        error: error => {
+          console.error('Error loading tours!', error);
+          this.loading = false;
+        },
+      });
+  }
+
+  onSortByStatusChange(status: string): void {
+    this.sortByStatus = status;
+    this.loadTours(); // Reload tours with the updated sort status
+  }
+
+  loadMoods(): void {
+    this.moodService.getMoods(1, 100).subscribe(response => {
+      this.moodOptions = response.results as Mood[];
+    });
+  }
+
+  loadLocations(): void {
+    this.locationService.getLocations(1, 100).subscribe(response => {
+      this.locationOptions = response.results as Location[];
     });
   }
 
   openNew(): void {
-    this.tour = {};
-    this.submitted = false;
+    this.initializeForm();
     this.createTourDialog = true;
-    this.selectedStatus = undefined;
-    this.isCreating = true;
     this.isEdit = false;
   }
 
-  editTour(tour: Tour): void {
-    this.tour = { ...tour };
-    this.isCreating = false;
-    this.isEdit = true;
+  editTour(tour: any): void {
+    this.tour = tour; // Save the current tour to edit or delete
+    this.tourForm.patchValue({
+      id: tour.id,
+      title: tour.title,
+      description: tour.description,
+      startDate: new Date(tour.startDate),
+      endDate: new Date(tour.endDate),
+      totalPrice: tour.totalPrice,
+      status: tour.status,
+      tourMoods: tour.tourMoods || [],
+      locationInTours: tour.locationInTours || [],
+    });
+
     this.createTourDialog = true;
-    this.selectedStatus = tour.status;
+    this.isEdit = true;
   }
 
-  hideDialog(): void {
-    this.tourDialog = false;
-    this.submitted = false;
-    this.createTourDialog = false;
+  populateFormArray(formArray: FormArray, values: any[]): void {
+    formArray.clear();
+    values.forEach(value => formArray.push(this.fb.control(value)));
   }
 
-  deleteTour(tour: Tour): void {
+  clear(table: any): void {
+    table.clear();
+    this.filter.nativeElement.value = '';
+    this.searchTerm = '';
+    this.sortByStatus = '';
+    this.loadTours();
+  }
+
+  onRowsChange(event: any): void {
+    this.rows = event;
+    this.loadTours();
+  }
+
+  onGlobalFilter(table: any, event: Event): void {
+    this.searchTerm = (event.target as HTMLInputElement).value;
+    this.loadTours(); // Reload tours with the updated search term
+  }
+
+  deleteTour(tour: any): void {
+    this.tour = tour; // Set the selected tour to delete
     this.deleteTourDialog = true;
-    this.tour = { ...tour };
   }
 
   confirmDelete(): void {
-    this.deleteTourDialog = false;
-    if (this.tour.id !== undefined) {
-      this.tourService
-        .deleteTour(this.tour.id)
-        .subscribe((data: BaseResponse<Tour>) => {
-          if (data.isSucceed) {
-            this.tours = this.tours.filter(val => val.id !== this.tour.id);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Tour Deleted',
-              life: 3000,
-            });
-            this.loadTours(
-              this.first / this.rows + 1,
-              this.rows,
-              this.searchTerm,
-            );
-          } else {
-            this.handleError(data);
-          }
-        });
-    } else {
-      console.error('Tour ID is undefined');
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Tour ID is undefined.',
-        life: 3000,
+    if (this.tour.id) {
+      this.tourService.deleteTour(this.tour.id).subscribe(data => {
+        if (data.isSucceed) {
+          this.loadTours();
+          this.deleteTourDialog = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Tour deleted successfully',
+          });
+        } else {
+          this.sendErrorToast(data.message);
+        }
       });
     }
   }
 
   saveTour(): void {
-    this.tour.status = this.selectedStatus;
-    this.submitted = true;
-    if (this.isCreating || this.isEdit) {
-      const formattedStartDate = format(
-        this.tour.startDate as Date,
-        "yyyy-MM-dd'T'HH:mm",
-      );
-      const formattedEndDate = format(
-        this.tour.endDate as Date,
-        "yyyy-MM-dd'T'HH:mm",
-      );
-
-      const tourPayload = {
-        ...this.tour,
-        startDate: new Date(formattedStartDate),
-        endDate: new Date(formattedEndDate),
-      };
-
-      if (this.tour.id !== undefined) {
-        this.tourService
-          .updateTour(tourPayload)
-          .pipe(
-            catchError(error => {
-              this.handleError(error);
-              return throwError(() => error);
-            }),
-          )
-          .subscribe({
-            next: data => {
-              if (data.isSucceed) {
-                this.messageService.add({
-                  severity: 'success',
-                  summary: 'Successful',
-                  detail: data.message,
-                  life: 3000,
-                });
-                this.loadTours(
-                  this.first / this.rows + 1,
-                  this.rows,
-                  this.searchTerm,
-                );
-                this.isEdit = false;
-                this.createTourDialog = false;
-                this.tourDialog = false;
-              }
-            },
-          });
-      } else {
-        this.tourService
-          .createTour(tourPayload)
-          .pipe(
-            catchError(error => {
-              this.handleError(error);
-              return throwError(() => error);
-            }),
-          )
-          .subscribe({
-            next: data => {
-              if (data.isSucceed) {
-                this.messageService.add({
-                  severity: 'success',
-                  summary: 'Successful',
-                  detail: data.message,
-                  life: 3000,
-                });
-                this.loadTours(
-                  this.first / this.rows + 1,
-                  this.rows,
-                  this.searchTerm,
-                );
-                this.isEdit = false;
-                this.createTourDialog = false;
-                this.tourDialog = false;
-              }
-            }
-          });
-      }
+    if (this.tourForm.invalid) {
+      return;
     }
-  }
 
-  onGlobalFilter(dt1: any, event: Event): void {
-    this.searchTerm = (event.target as HTMLInputElement).value;
-    this.loadTours(1, this.rows, this.searchTerm);
-  }
-
-  clear(table: Table): void {
-    table.clear();
-    this.filter.nativeElement.value = '';
-    this.searchTerm = undefined;
-    this.loadTours(1, this.rows, this.searchTerm);
-  }
-
-  onPageChange(event: PageEvent): void {
-    this.first = event.first || 0;
-    this.rows = event.rows || 10;
-    const pageNumber = this.first / this.rows + 1;
-    this.loadTours(pageNumber, this.rows, this.searchTerm);
-  }
-
-  onRowsChange(newRows: number): void {
-    this.first = 0;
-    this.rows = newRows;
-    this.loadTours(1, this.rows, this.searchTerm);
-  }
-
-  isFormValid(): boolean {
-    return (
-      !!this.tour.title &&
-      !!this.tour.description &&
-      !!this.tour.startDate &&
-      !!this.tour.endDate &&
-      this.tour.totalPrice !== undefined &&
-      !!this.selectedStatus
-    );
-  }
-
-  // Helper function to handle errors
-  private handleError(error: any): void {
-    if (error.results) {
-      error.results.forEach((err: any) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: `Error on ${err.propertyName}`,
-          detail: err.errorMessage,
-          life: 3000,
-        });
+    const tourData = this.tourForm.value;
+    if (this.isEdit) {
+      this.tourService.updateTour(tourData).subscribe(data => {
+        if (data.isSucceed) {
+          this.loadTours();
+          this.createTourDialog = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Tour updated successfully',
+          });
+        } else {
+          this.sendErrorToast(data.message);
+        }
       });
     } else {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'An error occurred while processing the request.',
-        life: 3000,
+      this.tourService.createTour(tourData).subscribe(data => {
+        if (data.isSucceed) {
+          this.loadTours();
+          this.createTourDialog = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Tour created successfully',
+          });
+        } else {
+          this.sendErrorToast(data.message);
+        }
       });
     }
+  }
+
+  sendErrorToast(message: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: message,
+    });
+  }
+
+  hideDialog(): void {
+    this.createTourDialog = false;
+    this.deleteTourDialog = false;
+    this.tourForm.reset();
+  }
+
+  onPageChange(event: any): void {
+    this.first = event.first;
+    this.rows = event.rows;
+    const pageNumber = this.first / this.rows + 1;
+    this.loadTours(pageNumber); // Pass the calculated page number
   }
 }

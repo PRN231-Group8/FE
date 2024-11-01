@@ -38,7 +38,7 @@ export class TransportationService {
     return this.http.put<BaseResponse<Transportation>>(`${environment.BACKEND_API_URL}/api/transportations/${transportationToUpdate.id}`, transportationToUpdate);
   }
 
-  deleteMood(id: Guid): Observable<BaseResponse<Transportation>> {
+  deleteTransportation(id: Guid): Observable<BaseResponse<Transportation>> {
     return this.http.delete<BaseResponse<Transportation>>(`${environment.BACKEND_API_URL}/api/transportations/${id}`);
   }
 }

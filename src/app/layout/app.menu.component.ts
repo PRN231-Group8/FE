@@ -27,6 +27,16 @@ export class AppMenuComponent implements OnInit {
                         label: 'Tour Management',
                         icon: 'pi pi-fw pi-pencil',
                         routerLink: ['admin/tour']
+                    },
+                    {
+                        label: 'Location Management',
+                        icon: 'pi pi-fw pi-map-marker',
+                        routerLink: ['admin/location']
+                    },
+                    {
+                        label: 'Transportation Management',
+                        icon: 'pi pi-fw pi-truck',
+                        routerLink: ['admin/transportation']
                     }
                 ]
             },

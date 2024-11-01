@@ -27,15 +27,15 @@ export class LocationService {
     return this.http.get<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${id}`);
   }
 
-  createMood(locationToCreate: Location): Observable<BaseResponse<Location>> {
+  createLocation(locationToCreate: Location): Observable<BaseResponse<Location>> {
     return this.http.post<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations`, locationToCreate);
   }
 
-  updateLocations(locationToUpdate: Location): Observable<BaseResponse<Location>> {
+  updateLocation(locationToUpdate: Location): Observable<BaseResponse<Location>> {
     return this.http.put<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${locationToUpdate.id}`, locationToUpdate);
   }
 
-  deleteMood(id: Guid): Observable<BaseResponse<Location>> {
+  deleteLocation(id: Guid): Observable<BaseResponse<Location>> {
     return this.http.delete<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${id}`);
   }
 }

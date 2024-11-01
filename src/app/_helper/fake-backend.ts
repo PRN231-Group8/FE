@@ -39,11 +39,11 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     function handleRoute() {
       switch (true) {
-        case url.endsWith('/auth/login') && method === 'POST':
+        case url.endsWith('api/login') && method === 'POST':
           return authenticate();
-        case url.endsWith('/users') && method === 'GET':
+        case url.endsWith('api/users') && method === 'GET':
           return getUsers();
-        case url.endsWith('/auth/register') && method === 'GET':
+        case url.endsWith('api/register') && method === 'POST':
           return register();
         case url.match(/\/users\/\d+$/) && method === 'GET':
             return getUserById();
@@ -57,19 +57,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     function authenticate() {
-      const { username, password } = body;
-      const user = users.find(
-        x => x.username === username && x.password === password,
-      );
-      if (!user) return error('Username or password is incorrect');
-      return ok({
-        id: user.id,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        token: 'fake-jwt-token',
-      });
-    }
+        const { username, password } = body;
+        const user = users.find(
+          x => x.username === username && x.password === password,
+        );
+        if (!user) return error('Username or password is incorrect');
+        return ok({
+          id: user.id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          token: 'fake-jwt-token',
+        });
+      }
 
     function getUsers() {
       if (!isLoggedIn()) return unauthorized();

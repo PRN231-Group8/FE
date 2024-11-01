@@ -1,29 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonService } from '../../../../services/common.service';
 import { ProductService } from '../../../../services/product.service';
 import { TourService } from '../../../../services/tour.service';
 import { MoodService } from '../../../../services/mood.service';
 import { LocationService } from '../../../../services/location.service';
-import { SelectItem } from 'primeng/api';
 import { BaseResponse } from '../../../../interfaces/models/base-response';
 import { Mood } from '../../../../interfaces/models/mood';
-import { Location } from '../../../../interfaces/models/location';
+import {
+  Location,
+  LocationInTour,
+} from '../../../../interfaces/models/location-in-tour';
 import { HttpClient } from '@angular/common/http';
 import { MapApiService } from '../../../../services/map-api.service';
 import { Tour } from '../../../../interfaces/models/tour';
 import { Transportation } from '../../../../interfaces/models/transportation';
 import { TransportationService } from '../../../../services/transportation.service';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-exploration',
   templateUrl: './exploration.component.html',
-  providers: [ProductService],
+  providers: [ProductService, DatePipe, DecimalPipe],
 })
-export class ExplorationComponent implements OnInit {
+export class ExplorationComponent implements OnInit, OnDestroy {
   filters: any = {};
   tours!: Tour[];
   layout: 'list' | 'grid' = 'list';
-  sortOptions!: SelectItem[];
   sortOrder: number = 1;
   sortField: string = 'price';
   loading: boolean = true;
@@ -41,7 +44,10 @@ export class ExplorationComponent implements OnInit {
   transports!: Transportation[];
   selectedTransport!: string;
   selectedMood!: string;
-  fromPlaceholder = this.selectedFrom ? this.selectedFrom : 'Finding your nearby city';
+  private toursSubscription: Subscription | null = null;
+  fromPlaceholder = this.selectedFrom
+    ? this.selectedFrom
+    : 'Finding your nearby city';
 
   constructor(
     private commonService: CommonService,
@@ -51,11 +57,13 @@ export class ExplorationComponent implements OnInit {
     private mapApiService: MapApiService,
     private transportationService: TransportationService,
     private http: HttpClient,
+    private datePipe: DatePipe,
+    private decimalPipe: DecimalPipe,
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // Retrieve saved filters from CommonService if they exist
-    this.filters = this.commonService.getSearchCriteria() || {};
+    this.filters = this.commonService.getSearchCriteria() || null;
     if (this.filters.from) {
       this.selectedFrom = this.filters.from;
     } else {
@@ -66,18 +74,28 @@ export class ExplorationComponent implements OnInit {
     this.selectedTransport = this.filters.transport || null;
     this.selectedMood = this.filters.mood || null;
 
-    this.sortOptions = [
-      { label: 'Price High to Low', value: '!price' },
-      { label: 'Price Low to High', value: 'price' },
-    ];
-
-    this.sortField = this.sortOptions[0]?.value.replace('!', '') || 'price';
-
     this.initializeMoods();
     this.initializeLocations();
     this.initializeTransportations();
+    await this.getTourSubscription();
+  }
 
-    this.fetchFilteredTours();
+  async getTourSubscription(): Promise<void> {
+    // Subscribe to tours from CommonService
+    this.toursSubscription = this.commonService
+      .getTours()
+      .subscribe(storedTours => {
+        if (storedTours) {
+          // If tours are already stored, use them
+          console.log(`get stored tours`);
+          this.tours = storedTours;
+        } else {
+          // Fetch tours if not stored
+          console.log(`fetch tours`);
+          this.fetchAndStoreTours();
+        }
+        this.loading = false;
+      });
   }
 
   initializeMoods(): void {
@@ -92,14 +110,29 @@ export class ExplorationComponent implements OnInit {
     }
   }
 
+  formatDate(date: Date | undefined): string {
+    if (!date) {
+      return ''; // Return an empty string if the date is undefined
+    }
+    const parsedDate = new Date(date);
+    const day = String(parsedDate.getDate()).padStart(2, '0');
+    const month = String(parsedDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = parsedDate.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  formatPrice(price: number | undefined): string {
+    return this.decimalPipe.transform(price, '1.0-0') || '';
+  }
+
   initializeTransportations(): void {
-    this.transportationService.getTransportations(1, 20).subscribe(
-      (data: BaseResponse<Transportation>) => {
+    this.transportationService
+      .getTransportations(1, 20)
+      .subscribe((data: BaseResponse<Transportation>) => {
         if (data.isSucceed) {
           this.transports = data.results as Transportation[];
         }
-      }
-    );
+      });
   }
 
   initializeLocations(): void {
@@ -114,29 +147,19 @@ export class ExplorationComponent implements OnInit {
             this.locations = data.results as Location[];
           }
         });
-        this.locationLoading = false;
+      this.locationLoading = false;
     }
   }
 
-  fetchFilteredTours(): void {
-    this.commonService.setSearchCriteria({
-      mood: this.selectedMood,
-      from: this.selectedFrom,
-      to: this.selectedTo,
-      priceRange: this.priceRange,
-      transport: this.selectedTransport,
-    });
-
-    this.tourService.getTours(1, 100).subscribe((data: BaseResponse<Tour>) => {
-      this.tours = data?.results as Tour[];
+  fetchAndStoreTours(): void {
+    this.tourService.getTours(1, 100).subscribe(data => {
+      if (data.isSucceed) {
+        this.tours = data.results as Tour[];
+        this.commonService.setTours(this.tours); // Store fetched tours
+      }
       this.loading = false;
-
-      // Apply filters after fetching tours
-      this.applyFilters();
-      this.sortTours();
     });
   }
-
   sortTours(): void {
     if (this.sortField) {
       this.tours.sort((a: any, b: any) => {
@@ -159,60 +182,64 @@ export class ExplorationComponent implements OnInit {
     this.sortTours();
   }
 
-  applyFilters(): void {
+  async applyFilters(): Promise<void> {
+    this.toursSubscription = this.commonService
+      .getTours()
+      .subscribe(storedTours => {
+        if (storedTours) {
+          this.tours = storedTours;
+        }
+      });
+    this.commonService.setSearchCriteria({
+      mood: this.selectedMood,
+      from: this.selectedFrom,
+      to: this.selectedTo,
+      priceRange: this.priceRange,
+      transport: this.selectedTransport,
+    });
     const filters = this.commonService.getSearchCriteria();
+    if (this.tours) {
+      this.tours = this.tours.filter(tour => {
+        if (
+          filters.priceRange &&
+          tour.totalPrice !== null &&
+          !tour.totalPrice >= filters.priceRange
+        ) {
+          return false;
+        }
 
-    this.tours = this.tours.filter(tour => {
-      if (
-        filters.priceRange &&
-        tour.totalPrice !== null &&
-        !tour.totalPrice <= filters.priceRange
-      ) {
-        return false;
-      }
+        if (
+          filters.to &&
+          (!tour.locationInTours ||
+            !tour.locationInTours.some((loc: LocationInTour) =>
+              loc.locations?.some(ls => ls.name?.includes(filters.to.name)),
+            ))
+        ) {
+          return false;
+        }
 
-      // if (
-      //   filters.from &&
-      //   (!tour.locationInTours ||
-      //     !tour.locationInTours.some((loc: Location) =>
-      //       loc.name?.includes(filters.from),
-      //     ))
-      // ) {
-      //   return false;
-      // }
-
-      // Filter by 'To' location
-      // FIXME: Null o tren tour json
-      // if (
-      //   filters.to &&
-      //   (!tour.locationInTours ||
-      //     !tour.locationInTours.some((loc: Location) =>
-      //       loc.name?.includes(filters.to.name),
-      //     ))
-      // ) {
-      //   console.log('to: false');
-      //   return false;
-      // }
-
-      if (filters.transport) {
-        const transportTypes =
-          tour.transportations?.map((transportation: Transportation) => transportation.type) || [];
+        if (filters.transport) {
+          const transportTypes =
+            tour.transportations?.map(
+              (transportation: Transportation) => transportation.type,
+            ) || [];
 
           if (!transportTypes.includes(filters.transport.type)) {
             return false;
           }
-      }
-      if (filters.mood) {
-        const tourMoodTags =
-          tour.tourMoods?.map((mood: Mood) => mood.moodTag) || [];
-
-        if (!tourMoodTags.includes(filters.mood.moodTag)) {
-          return false;
         }
-      }
+        if (filters.mood) {
+          const tourMoodTags =
+            tour.tourMoods?.map((mood: Mood) => mood.moodTag) || [];
 
-      return true;
-    });
+          if (!tourMoodTags.includes(filters.mood.moodTag)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
   }
 
   getLocation(): void {
@@ -262,6 +289,20 @@ export class ExplorationComponent implements OnInit {
 
   removeFilter(): void {
     this.commonService.setSearchCriteria({});
-    this.ngOnInit();
+    this.fetchAndStoreTours();
+  }
+
+  getLocationPhotoUrl(item: any): string {
+    return (
+      item.locationInTours?.[0]?.photos?.[0]?.url ||
+      'https://www.shoreexcursionsgroup.com/img/tour/EUMRCASBAN-2.jpg'
+    );
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe to prevent memory leaks
+    if (this.toursSubscription) {
+      this.toursSubscription.unsubscribe();
+    }
   }
 }

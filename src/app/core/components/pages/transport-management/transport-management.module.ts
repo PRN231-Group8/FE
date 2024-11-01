@@ -1,25 +1,25 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TourManagementRoutingModule } from './tour-management-routing.module';
-import { TourManagementComponent } from './tour-management.component';
-import { TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
-import { ButtonModule } from 'primeng/button';
-import { DropdownModule } from 'primeng/dropdown';
-import { PaginatorModule } from 'primeng/paginator';
+import { TransportManagementComponent } from './transport-management.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
+import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { PaginatorModule } from 'primeng/paginator';
+import { TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
+import { TransportManagementRoutingModule } from './transport-management-routing.module';
 
 
 @NgModule({
-  declarations: [TourManagementComponent],
+  declarations: [TransportManagementComponent],
   imports: [
     CommonModule,
-    TourManagementRoutingModule,
+    TransportManagementRoutingModule,
     TableModule,
     ToastModule,
     ButtonModule,
@@ -32,7 +32,6 @@ import { MultiSelectModule } from 'primeng/multiselect';
     InputTextareaModule,
     MultiSelectModule,
     ReactiveFormsModule
-  ],
-  bootstrap: [TourManagementComponent]
+  ]
 })
-export class TourManagementModule { }
+export class TransportManagementModule { }
