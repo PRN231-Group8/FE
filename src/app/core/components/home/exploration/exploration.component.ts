@@ -7,7 +7,6 @@ import { LocationService } from '../../../../services/location.service';
 import { BaseResponse } from '../../../../interfaces/models/base-response';
 import { Mood } from '../../../../interfaces/models/mood';
 import {
-  Location,
   LocationInTour,
 } from '../../../../interfaces/models/location-in-tour';
 import { HttpClient } from '@angular/common/http';
@@ -17,6 +16,7 @@ import { Transportation } from '../../../../interfaces/models/transportation';
 import { TransportationService } from '../../../../services/transportation.service';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { Location } from '../../../../interfaces/models/location';
 
 @Component({
   selector: 'app-exploration',

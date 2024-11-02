@@ -9,6 +9,7 @@ import { ExplorationComponent } from './core/components/home/exploration/explora
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 import { ProfileComponent } from './core/components/profile/profile.component';
 import { AuthGuard } from './_helper/auth.guard';
+import { TourDetailComponent } from './core/components/home/tour-detail/tour-detail.component';
 
 @NgModule({
   imports: [
@@ -65,6 +66,14 @@ import { AuthGuard } from './_helper/auth.guard';
           loadChildren: () =>
             import('./core/components/profile/profile.module').then(
               m => m.ProfileModule,
+            ),
+        },
+        {
+          path: 'details/:id',
+          component: TourDetailComponent,
+          loadChildren: () =>
+            import('./core/components/home/tour-detail/tour-detail.module').then(
+              m => m.TourDetailModule,
             ),
         },
         { path: 'notfound', component: NotfoundComponent },

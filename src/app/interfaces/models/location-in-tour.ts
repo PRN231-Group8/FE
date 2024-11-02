@@ -6,5 +6,3 @@ export interface LocationInTour {
     locations?: Location[];
     tourId?: Guid;
 }
-
-export { Location };

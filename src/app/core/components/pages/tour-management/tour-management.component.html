@@ -4,8 +4,11 @@
     <div class="card px-6 py-6">
       <p-toast></p-toast>
       <h5>Tour List</h5>
-      <p-table #dt1 [value]="tours" [columns]="cols" dataKey="tourId" [loading]="loading" [rowHover]="true"
-        styleClass="p-datatable-gridlines" [globalFilterFields]="['status', 'title', 'code']" responsiveLayout="scroll">
+      <p-table #dt1 [value]="tours" [columns]="cols" dataKey="id" [loading]="loading" [rowHover]="true"
+        styleClass="p-datatable-gridlines" [globalFilterFields]="['status', 'title', 'code']" responsiveLayout="scroll"
+        [expandedRowKeys]="expandedRowKeys" (onRowExpand)="onRowExpand($event)" (onRowCollapse)="onRowCollapse($event)">
+
+        <!-- Table Header -->
         <ng-template pTemplate="caption">
           <div class="flex justify-content-between flex-column sm:flex-row">
             <div class="flex">
@@ -21,8 +24,11 @@
             </span>
           </div>
         </ng-template>
+
+        <!-- Table Columns for Tour Details -->
         <ng-template pTemplate="header">
           <tr>
+            <th style="width: 5rem"></th>
             <th pSortableColumn="code" style="min-width: 8rem">
               <div class="flex justify-content-between align-items-center">
                 Code
@@ -55,7 +61,7 @@
               <div class="flex justify-content-between align-items-center">
                 Total Price
                 <p-sortIcon field="totalPrice"></p-sortIcon>
-                <p-columnFilter type="numeric" field="totalPrice" display="menu" currency="USD"></p-columnFilter>
+                <p-columnFilter type="numeric" field="totalPrice" display="menu" currency="VND"></p-columnFilter>
               </div>
             </th>
             <th pSortableColumn="status" style="min-width: 8rem">
@@ -69,8 +75,14 @@
             <th style="min-width: 10rem"></th>
           </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-tour>
+
+        <!-- Main Table Body for Tours -->
+        <ng-template pTemplate="body" let-tour let-expanded="expanded">
           <tr>
+            <td>
+              <p-button type="button" pRipple [pRowToggler]="tour" [text]="true" [rounded]="true" [plain]="true"
+                [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+            </td>
             <td>{{ tour.code }}</td>
             <td>{{ tour.title }}</td>
             <td>{{ tour.startDate | date: 'dd/MM/yyyy' }}</td>
@@ -87,101 +99,192 @@
             </td>
           </tr>
         </ng-template>
+
+        <!-- Row Expansion Content for Timestamps -->
+        <ng-template pTemplate="rowexpansion" let-tour>
+          <tr>
+            <td colspan="8">
+              <div class="p-3">
+                <h6>Timestamps for {{ tour.title }}</h6>
+
+                <!-- Nested Table for Timestamps -->
+                <p-table [value]="tour.tourTimestamps" dataKey="id" styleClass="p-datatable-sm"
+                  *ngIf="tour.tourTimestamps && tour.tourTimestamps.length">
+
+                  <!-- Timestamp Table Header -->
+                  <ng-template pTemplate="header">
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Location</th>
+            <th style="width: 5rem">Actions</th>
+          </tr>
+        </ng-template>
+
+        <!-- Timestamp Table Body -->
+        <ng-template pTemplate="body" let-timestamp>
+          <tr>
+            <td>{{ timestamp.title }}</td>
+            <td>{{ timestamp.description }}</td>
+            <td>{{ timestamp.preferredTimeSlot?.startTime }}</td>
+            <td>{{ timestamp.preferredTimeSlot?.endTime }}</td>
+            <td>{{ timestamp.location?.name }}</td>
+            <td>
+              <button pButton pRipple icon="pi pi-pencil" (click)="editTimestamp(tour, timestamp)"></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message for No Timestamps -->
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="7">No tours found.</td>
+            <td colspan="6">No timestamps found.</td>
           </tr>
         </ng-template>
-        <ng-template pTemplate="loadingbody">
-          <tr>
-            <td colspan="7">Loading tours data. Please wait.</td>
-          </tr>
-        </ng-template>
+
       </p-table>
-      <div class="flex align-items-center justify-content-end">
-        <span class="mx-1 text-color">Items per page: </span>
-        <p-dropdown appendTo="body" [options]="rowsPerPageOptions" [(ngModel)]="rows"
-          (ngModelChange)="onRowsChange($event)"></p-dropdown>
-        <p-paginator (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true" [first]="first" [rows]="rows"
-          [totalRecords]="totalRecords" currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showPageLinks]="false" [showFirstLastIcon]="false"></p-paginator>
-      </div>
+
+      <button pButton label="Add Timestamp" icon="pi pi-plus" (click)="addTimestamp(tour)"></button>
     </div>
+    </td>
+    </tr>
+    </ng-template>
 
-    <p-dialog [(visible)]="createTourDialog" [modal]="true" [header]="isEdit ? 'Edit Tour' : 'Create New Tour'"
-      [style]="{ width: '50vw' }" [closable]="false" [dismissableMask]="true" [blockScroll]="true">
-      <ng-template pTemplate="header">
-        <h2>{{ isEdit ? 'Edit Tour' : 'Create New Tour' }}</h2>
-      </ng-template>
-      <ng-template pTemplate="content">
-        <form [formGroup]="tourForm" class="p-fluid">
-          <div class="p-field">
-            <label for="title">Tour Title</label>
-            <input id="title" type="text" pInputText formControlName="title" />
-          </div>
+    <!-- Empty Message for No Tours -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8">No tours found.</td>
+      </tr>
+    </ng-template>
 
-          <div class="p-field">
-            <label for="description">Description</label>
-            <textarea id="description" rows="3" pInputTextarea formControlName="description"></textarea>
-          </div>
+    <!-- Loading State -->
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="8">Loading tours data. Please wait.</td>
+      </tr>
+    </ng-template>
+    </p-table>
 
-          <div class="grid">
-            <div class="col p-field">
-              <label for="startDate">Start Date</label>
-              <p-calendar formControlName="startDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
-                [stepMinute]="15"></p-calendar>
-            </div>
-
-            <div class="col p-field">
-              <label for="endDate">End Date</label>
-              <p-calendar formControlName="endDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
-                [stepMinute]="15"></p-calendar>
-            </div>
-          </div>
-
-          <div class="grid">
-            <div class="col p-field">
-              <label for="totalPrice">Total Price</label>
-              <input id="totalPrice" type="number" pInputText formControlName="totalPrice" />
-            </div>
-
-            <div class="col p-field">
-              <label for="status">Status</label>
-              <p-dropdown [options]="statusOptions" formControlName="status" placeholder="Select Status"
-                appendTo="body"></p-dropdown>
-            </div>
-          </div>
-
-          <div class="p-field">
-            <label for="moods">Moods</label>
-            <p-multiSelect [options]="moodOptions" formControlName="tourMoods" optionLabel="moodTag"
-              placeholder="Select Moods" display="chip" appendTo="body"></p-multiSelect>
-          </div>
-
-          <div class="p-field">
-            <label for="locations">Locations</label>
-            <p-multiSelect [options]="locationOptions" formControlName="locationInTours" optionLabel="name"
-              placeholder="Select Locations" display="chip" appendTo="body"></p-multiSelect>
-          </div>
-        </form>
-      </ng-template>
-      <ng-template pTemplate="footer">
-        <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-        <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTour()"
-          [disabled]="tourForm.invalid"></button>
-      </ng-template>
-    </p-dialog>
-
-    <!--Delete Room Dialog-->
-    <p-dialog [(visible)]="deleteTourDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
-      <div class="flex align-items-center justify-content-center">
-        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-        <span *ngIf="tour">Are you sure you want to delete Room Number <b>{{tour.title}}</b>?</span>
-      </div>
-      <ng-template pTemplate="footer">
-        <p-button icon="pi pi-times" severity="secondary" label="No" (click)="deleteTourDialog = false"></p-button>
-        <p-button icon="pi pi-check" label="Yes" (click)="confirmDelete()"></p-button>
-      </ng-template>
-    </p-dialog>
+    <div class="flex align-items-center justify-content-end">
+      <span class="mx-1 text-color">Items per page: </span>
+      <p-dropdown appendTo="body" [options]="rowsPerPageOptions" [(ngModel)]="rows"
+        (ngModelChange)="onRowsChange($event)"></p-dropdown>
+      <p-paginator (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true" [first]="first" [rows]="rows"
+        [totalRecords]="totalRecords" currentPageReportTemplate="{first} - {last} of {totalRecords}"
+        [showPageLinks]="false" [showFirstLastIcon]="false"></p-paginator>
+    </div>
   </div>
 </div>
+</div>
+
+
+<p-dialog [(visible)]="createTourDialog" [modal]="true" [header]="isEdit ? 'Edit Tour' : 'Create New Tour'"
+  [style]="{ width: '50vw' }" [closable]="false" [dismissableMask]="true" [blockScroll]="true">
+  <ng-template pTemplate="header">
+    <h2>{{ isEdit ? 'Edit Tour' : 'Create New Tour' }}</h2>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <form [formGroup]="tourForm" class="p-fluid">
+      <div class="p-field">
+        <label for="title">Tour Title</label>
+        <input id="title" type="text" pInputText formControlName="title" />
+      </div>
+
+      <div class="p-field">
+        <label for="description">Description</label>
+        <textarea id="description" rows="3" pInputTextarea formControlName="description"></textarea>
+      </div>
+
+      <div class="grid">
+        <div class="col p-field">
+          <label for="startDate">Start Date</label>
+          <p-calendar formControlName="startDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
+            [stepMinute]="15"></p-calendar>
+        </div>
+
+        <div class="col p-field">
+          <label for="endDate">End Date</label>
+          <p-calendar formControlName="endDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
+            [stepMinute]="15"></p-calendar>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="col p-field">
+          <label for="totalPrice">Total Price</label>
+          <input id="totalPrice" type="number" pInputText formControlName="totalPrice" />
+        </div>
+
+        <div class="col p-field">
+          <label for="status">Status</label>
+          <p-dropdown [options]="statusOptions" formControlName="status" placeholder="Select Status"
+            appendTo="body"></p-dropdown>
+        </div>
+      </div>
+
+      <div class="p-field">
+        <label for="moods">Moods</label>
+        <p-multiSelect [options]="moodOptions" formControlName="tourMoods" optionLabel="moodTag"
+          placeholder="Select Moods" display="chip" appendTo="body"></p-multiSelect>
+      </div>
+
+      <div class="p-field">
+        <label for="locations">Locations</label>
+        <p-multiSelect [options]="locationOptions" formControlName="locationInTours" optionLabel="name"
+          placeholder="Select Locations" display="chip" appendTo="body"></p-multiSelect>
+      </div>
+    </form>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+    <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTour()"
+      [disabled]="tourForm.invalid"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Timestamp Dialog -->
+<p-dialog [(visible)]="timestampDialog" [modal]="true" [header]="isTimestampEdit ? 'Edit Timestamp' : 'Add Timestamp'"
+  [style]="{ width: '40vw' }" [closable]="false" [dismissableMask]="true" [blockScroll]="true">
+  <ng-template pTemplate="header">
+    <h2>{{ isTimestampEdit ? 'Edit Timestamp' : 'Add New Timestamp' }}</h2>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <form [formGroup]="timestampForm" class="p-fluid">
+      <div class="p-field">
+        <label for="timestampTitle">Title</label>
+        <input id="timestampTitle" type="text" pInputText formControlName="title" />
+      </div>
+
+      <div class="p-field">
+        <label for="timestampDescription">Description</label>
+        <textarea id="timestampDescription" rows="3" pInputTextarea formControlName="description"></textarea>
+      </div>
+
+      <div class="grid">
+        <div class="col p-field">
+          <label for="startTime">Start Time</label>
+          <p-calendar formControlName="startTime" [timeOnly]="true" appendTo="body" [hourFormat]="'24'"
+            [stepMinute]="15"></p-calendar>
+        </div>
+        <div class="col p-field">
+          <label for="endTime">End Time</label>
+          <p-calendar formControlName="endTime" [timeOnly]="true" appendTo="body" [hourFormat]="'24'"
+            [stepMinute]="15"></p-calendar>
+        </div>
+      </div>
+
+      <div class="p-field">
+        <label for="locationId">Location</label>
+        <p-dropdown [options]="locationOptions" formControlName="locationId" optionLabel="name" optionValue="id"
+          placeholder="Select Location" appendTo="body"></p-dropdown>
+      </div>
+    </form>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+    <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTimestamp()"
+      [disabled]="timestampForm.invalid"></button>
+  </ng-template>
+</p-dialog>
