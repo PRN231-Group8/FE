@@ -105,7 +105,10 @@
           <tr>
             <td colspan="8">
               <div class="p-3">
-                <h6>Timestamps for {{ tour.title }}</h6>
+                <div class="flex gap-4 align-items-center">
+                  <h6>Timestamps for {{ tour.title }}</h6>
+                  <p-tag class="pb-4" *ngIf="newTimestamps.length > 0" severity="warning" value="Creation Mode"/>
+                </div>
 
                 <!-- Nested Table for Timestamps -->
                 <p-table [value]="tour.tourTimestamps" dataKey="id" styleClass="p-datatable-sm"
@@ -132,8 +135,10 @@
             <td>{{ timestamp.preferredTimeSlot?.endTime }}</td>
             <td>{{ timestamp.location?.name }}</td>
             <td>
-              <button pButton pRipple icon="pi pi-pencil" (click)="editTimestamp(tour, timestamp)"></button>
-              <button pButton icon="pi pi-trash" (click)="confirmDeleteTimestamp(timestamp)"></button>
+              <div [hidden]="isCreatingBatch && (newTimestamps.length !== 0)">
+                <button pButton pRipple icon="pi pi-pencil" (click)="editTimestamp(tour, timestamp)"></button>
+                <button pButton icon="pi pi-trash" (click)="confirmDeleteTimestamp(timestamp)"></button>
+              </div>
             </td>
           </tr>
         </ng-template>
@@ -151,6 +156,8 @@
       <!-- Conditionally Displayed Save All Timestamps Button -->
       <button *ngIf="newTimestamps.length > 0" pButton label="Save All Timestamps" icon="pi pi-save"
         class="p-button-success mt-2" (click)="saveAllTimestamps()"></button>
+      <button *ngIf="newTimestamps.length > 0" pButton label="Delete last timestamps" icon="pi pi-trash"
+        class="p-button-danger mt-2" (click)="clearLastTimestamps()"></button>
     </div>
     </td>
     </tr>

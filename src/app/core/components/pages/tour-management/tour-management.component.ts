@@ -11,6 +11,7 @@ import { LocationInTour } from '../../../../interfaces/models/location-in-tour';
 import { TourTimestamp } from '../../../../interfaces/models/tour-timestamp';
 import { TourTimestampService } from '../../../../services/tour-timestamp.service';
 import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
+import { Guid } from 'guid-typescript';
 
 @Component({
   selector: 'app-tour-management',
@@ -62,6 +63,7 @@ export class TourManagementComponent implements OnInit {
   durationMinutes: number = 1;
   timestampToDelete: TourTimestamp | null = null;
   deleteTimestampDialog: boolean = false;
+  isCreatingBatch: boolean = false;
 
   @ViewChild('filter') filter!: ElementRef;
 
@@ -179,7 +181,13 @@ export class TourManagementComponent implements OnInit {
       return;
     }
 
-    const tourData = this.tourForm.value;
+    const tourData = {
+      ...this.tourForm.value,
+      tourMoods: this.tourForm.value.tourMoods.map((mood: Mood) => mood.id),
+      locationInTours: this.tourForm.value.locationInTours.map(
+        (location: Location) => location.id,
+      ),
+    };
     const saveObservable = this.isEdit
       ? this.tourService.updateTour(tourData)
       : this.tourService.createTour(tourData);
@@ -214,8 +222,8 @@ export class TourManagementComponent implements OnInit {
   confirmDelete(): void {
     if (!this.tour?.id) return;
 
-    this.tourService.deleteTour(this.tour.id).subscribe({
-      next: data => {
+    this.tourService.deleteTour(this.tour.id).subscribe(
+      data => {
         if (data.isSucceed) {
           this.loadTours();
           this.deleteTourDialog = false;
@@ -227,10 +235,6 @@ export class TourManagementComponent implements OnInit {
         } else {
           this.sendErrorToast(data.message);
         }
-      },
-      error: () => {
-        this.sendErrorToast('Error deleting tour!');
-      },
     });
   }
 
@@ -248,11 +252,10 @@ export class TourManagementComponent implements OnInit {
     console.log(tour.tourTimestamps);
 
     if (this.expandedRowKeys[tourId] && !tour.tourTimestamps) {
-      this.timestampService.getAllTourTimestamps().subscribe({
+      this.timestampService.getTourTimestampById(Guid.parse(tourId)).subscribe({
         next: data => {
           tour.tourTimestamps = [
             ...(data.results || []),
-            ...this.newTimestamps,
           ] as TourTimestamp[];
         },
         error: () => {
@@ -294,7 +297,7 @@ export class TourManagementComponent implements OnInit {
       description: timestamp.description,
       startTime: startTime,
       endTime: endTime,
-      locationId: timestamp.locationId,
+      locationId: timestamp.location?.id,
       tourId: timestamp.tourId,
     });
     this.timestampDialog = true;
@@ -322,20 +325,34 @@ export class TourManagementComponent implements OnInit {
     };
 
     if (this.isTimestampEdit && this.selectedTimestamp) {
-      const index = this.tour!.tourTimestamps!.findIndex(
-        t => t.id === this.selectedTimestamp!.id,
-      );
-      this.tour!.tourTimestamps![index] = newTimestamp;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Timestamp updated locally',
-      });
+      // Call the update API if editing an existing timestamp
+      this.timestampService
+        .updateTourTimestamp(this.selectedTimestamp.id!, newTimestamp)
+        .subscribe({
+          next: data => {
+            if (data.isSucceed) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Timestamp updated successfully',
+              });
+              this.timestampDialog = false;
+            } else {
+              this.sendErrorToast(data.message);
+            }
+          },
+          error: () => {
+            this.sendErrorToast('Error updating timestamp!');
+          },
+        });
       return;
     }
 
     // Add new timestamp to the array for batch saving
     this.newTimestamps.push(newTimestamp);
+    this.isCreatingBatch = true;
+
+    console.log(this.newTimestamps);
 
     // Update the local tour's timestamps for immediate display
     this.tour!.tourTimestamps = [
@@ -350,6 +367,7 @@ export class TourManagementComponent implements OnInit {
     this.createTourDialog = false;
     this.deleteTourDialog = false;
     this.timestampDialog = false;
+    this.isCreatingBatch = false;
     this.tourForm.reset();
   }
 
@@ -411,16 +429,7 @@ export class TourManagementComponent implements OnInit {
 
   onRowExpand(event: TableRowExpandEvent): void {
     const tour = event.data;
-    if (!tour.timestamps || tour.timestamps.length === 0) {
-      this.timestampService
-        .getTourTimestampsByTourId(tour.id)
-        .subscribe(timestamps => {
-          tour.timestamps = timestamps;
-          this.expandedRowKeys[tour.id] = true;
-        });
-    } else {
-      this.expandedRowKeys[tour.id] = true;
-    }
+    this.expandedRowKeys[tour.id] = true;
   }
 
   onRowCollapse(event: TableRowCollapseEvent): void {
@@ -469,5 +478,16 @@ export class TourManagementComponent implements OnInit {
   cancelDeleteTimestamp(): void {
     this.deleteTimestampDialog = false;
     this.timestampToDelete = null;
+  }
+
+  clearLastTimestamps(): void {
+    this.newTimestamps.pop();
+    this.tour?.tourTimestamps?.pop();
+    // update after remove last timestamp
+    this.tour!.tourTimestamps = [
+      ...(this.tour!.tourTimestamps || []).filter(t => !this.newTimestamps.includes(t)),
+      ...this.newTimestamps
+    ];
+    console.log(this.tour);
   }
 }

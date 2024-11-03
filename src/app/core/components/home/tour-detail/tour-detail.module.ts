@@ -6,6 +6,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
+import { RouterModule } from '@angular/router';
+import { BadgeModule } from 'primeng/badge';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { ScrollTopModule } from 'primeng/scrolltop';
+import { sharedModule } from '../../../../layout/shared/shared.module';
+import { GalleriaModule } from 'primeng/galleria';
+import { FormsModule } from '@angular/forms';
+import { SkeletonModule } from 'primeng/skeleton';
 
 
 @NgModule({
@@ -16,7 +25,18 @@ import { RippleModule } from 'primeng/ripple';
     InputTextModule,
     TagModule,
     ButtonModule,
-    RippleModule
+    RippleModule,
+    BadgeModule,
+    RadioButtonModule,
+    InputSwitchModule,
+    RippleModule,
+    RouterModule,
+    ButtonModule,
+    ScrollTopModule,
+    sharedModule,
+    GalleriaModule,
+    FormsModule,
+    SkeletonModule
   ]
 })
 export class TourDetailModule { }

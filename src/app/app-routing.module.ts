@@ -69,7 +69,7 @@ import { TourDetailComponent } from './core/components/home/tour-detail/tour-det
             ),
         },
         {
-          path: 'details/:id',
+          path: 'tour-detail/:id',
           component: TourDetailComponent,
           loadChildren: () =>
             import('./core/components/home/tour-detail/tour-detail.module').then(

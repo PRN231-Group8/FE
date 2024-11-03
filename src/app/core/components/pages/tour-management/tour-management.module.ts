@@ -14,6 +14,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { HttpClientModule } from '@angular/common/http';
+import { TagModule } from 'primeng/tag';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { HttpClientModule } from '@angular/common/http';
     InputTextareaModule,
     MultiSelectModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    TagModule
   ],
   bootstrap: [TourManagementComponent]
 })

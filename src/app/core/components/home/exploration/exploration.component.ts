@@ -17,6 +17,8 @@ import { TransportationService } from '../../../../services/transportation.servi
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { Location } from '../../../../interfaces/models/location';
+import { Router } from '@angular/router';
+import { Guid } from 'guid-typescript';
 
 @Component({
   selector: 'app-exploration',
@@ -57,8 +59,8 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     private mapApiService: MapApiService,
     private transportationService: TransportationService,
     private http: HttpClient,
-    private datePipe: DatePipe,
     private decimalPipe: DecimalPipe,
+    private router: Router,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -304,5 +306,10 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     if (this.toursSubscription) {
       this.toursSubscription.unsubscribe();
     }
+  }
+
+  goToTourDetail(id: Guid): void {
+    console.log(id);
+    this.router.navigate([`tour-detail/${id}`]);
   }
 }

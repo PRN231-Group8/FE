@@ -25,6 +25,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ExplorationRoutingModule } from './exploration-routing.module';
 import { InputMaskModule } from 'primeng/inputmask';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { FullCalendarModule } from '@fullcalendar/angular';
 
 @NgModule({
   declarations: [ExplorationComponent],
@@ -52,7 +53,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
     SkeletonModule,
     ExplorationRoutingModule,
     InputMaskModule,
-    InputNumberModule
+    InputNumberModule,
+    FullCalendarModule,
   ],
   exports: [ExplorationComponent],
   providers: [ProductService]

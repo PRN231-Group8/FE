@@ -141,7 +141,7 @@
                           <span class="text-2xl font-semibold">{{ formatPrice(item.totalPrice) + ' VND' }}</span>
                           <div class="flex gap-2">
                             <p-button icon="pi pi-shopping-cart" class="flex-auto md:flex-initial white-space-nowrap"
-                              label="Book Now" />
+                              label="Book Now" (click)="goToTourDetail(item.id!)"/>
                           </div>
                         </div>
                       </div>
@@ -168,7 +168,7 @@
                         <span class="text-2xl font-semibold">{{ formatPrice(item.totalPrice) + ' VND' }}</span>
                         <div class="flex gap-2">
                           <p-button icon="pi pi-shopping-cart" class="flex-auto md:flex-initial white-space-nowrap"
-                            label="Book Now" />
+                            label="Book Now" (click)="goToTourDetail(item.id!)"/>
                         </div>
                       </div>
                     </div>

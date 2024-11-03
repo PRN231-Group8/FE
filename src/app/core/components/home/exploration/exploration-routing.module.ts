@@ -4,7 +4,7 @@ import { ExplorationComponent } from './exploration.component';
 
 @NgModule({
 	imports: [RouterModule.forChild([
-		{ path: '', component: ExplorationComponent }
+		{ path: '', component: ExplorationComponent },
 	])],
 	exports: [RouterModule]
 })

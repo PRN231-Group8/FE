@@ -1,4 +1,5 @@
 import { Guid } from 'guid-typescript';
+import { Location } from './location';
 
 export interface TimeSlot {
     startTime: string;
@@ -11,5 +12,5 @@ export interface TourTimestamp {
     description?: string;
     tourId?: Guid;
     preferredTimeSlot: TimeSlot;
-    locationId?: Guid;
+    location?: Location;
 }

@@ -1,5 +1,72 @@
-<div class="card">
-    <h5>Event Calendar</h5>
-    <full-calendar [options]="calendarOptions"></full-calendar>
+<!-- eslint-disable @angular-eslint/template/alt-text -->
+<div class="layout-wrapper">
+  <p-scrollTop />
+  <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <div class="layout-main-container">
+    <div class="layout-main overflow-hidden z-0">
+      <!-- Skeleton loading -->
+      <div class="grid nested-grid" *ngIf="!tourTrips.length">
+        <div class="col-6">
+          <p-skeleton width="100%" height="750px" />
+        </div>
+        <div class="col-6">
+          <div class="grid">
+            <div class="col-6">
+              <p-skeleton width="100%" styleClass="mb-2" />
+            </div>
+            <div class="col-6">
+              <p-skeleton width="100%" styleClass="mb-2" />
+            </div>
+            <div class="col-12">
+              <p-skeleton width="100%" height="710px" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fully loaded content -->
+      <div class="grid nested-grid" *ngIf="tourTrips.length">
+        <div class="col-6">
+          <div class="card h-full">
+            <p-galleria [value]="images" [responsiveOptions]="responsiveOptions"
+              [containerStyle]="{ 'max-width': '640px' }" [numVisible]="5">
+              <ng-template pTemplate="item" let-item>
+                <img [src]="item.itemImageSrc" style="width: 100%;" />
+              </ng-template>
+              <ng-template pTemplate="thumbnail" let-item>
+                <div class="grid grid-nogutter justify-content-center">
+                  <img [src]="item.thumbnailImageSrc" />
+                </div>
+              </ng-template>
+            </p-galleria>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="grid">
+            <div class="col-6">
+              <div *ngIf="selectedTrip">
+                <h3>Selected Trip Details</h3>
+                <p><strong>Date:</strong> {{ formatDate(selectedTrip.tripDate!) }}</p>
+                <p><strong>Price:</strong> {{ formatPrice(selectedTrip.price) }} VND</p>
+                <p><strong>Total Seats:</strong> {{ selectedTrip.totalSeats }}</p>
+                <p><strong>Status:</strong> {{ selectedTrip.tripStatus }}</p>
+              </div>
+              <div *ngIf="!selectedTrip">
+                <div class="text-xl font-medium">Please select the date you want to go</div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <h5>Event Calendar</h5>
+                <full-calendar [options]="calendarOptions"></full-calendar>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  
+  <app-shared-footer></app-shared-footer>
+</div>
