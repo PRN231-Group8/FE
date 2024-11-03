@@ -133,6 +133,7 @@
             <td>{{ timestamp.location?.name }}</td>
             <td>
               <button pButton pRipple icon="pi pi-pencil" (click)="editTimestamp(tour, timestamp)"></button>
+              <button pButton icon="pi pi-trash" (click)="confirmDeleteTimestamp(timestamp)"></button>
             </td>
           </tr>
         </ng-template>
@@ -147,6 +148,9 @@
       </p-table>
 
       <button pButton label="Add Timestamp" icon="pi pi-plus" (click)="addTimestamp(tour)"></button>
+      <!-- Conditionally Displayed Save All Timestamps Button -->
+      <button *ngIf="newTimestamps.length > 0" pButton label="Save All Timestamps" icon="pi pi-save"
+        class="p-button-success mt-2" (click)="saveAllTimestamps()"></button>
     </div>
     </td>
     </tr>
@@ -286,5 +290,29 @@
     <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
     <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTimestamp()"
       [disabled]="timestampForm.invalid"></button>
+  </ng-template>
+</p-dialog>
+
+<!--Delete Room Dialog-->
+<p-dialog [(visible)]="deleteTourDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+  <div class="flex align-items-center justify-content-center">
+    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+    <span *ngIf="tour">Are you sure you want to delete Room Number <b>{{tour.title}}</b>?</span>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-times" severity="secondary" label="No" (click)="deleteTourDialog = false"></p-button>
+    <p-button icon="pi pi-check" label="Yes" (click)="confirmDelete()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Delete Confirmation Dialog -->
+<p-dialog [(visible)]="deleteTimestampDialog" [modal]="true" [closable]="false" header="Confirm Deletion">
+  <div class="p-d-flex p-ai-center p-jc-center">
+    <i class="pi pi-exclamation-triangle" style="font-size: 2rem; margin-right: 1rem;"></i>
+    <span>Are you sure you want to delete this timestamp <b>{{ timestampToDelete?.title }}</b>?</span>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="No" icon="pi pi-times" class="p-button-text" (click)="cancelDeleteTimestamp()"></button>
+    <button pButton label="Yes" icon="pi pi-check" class="p-button-text" (click)="deleteTimestamp()"></button>
   </ng-template>
 </p-dialog>

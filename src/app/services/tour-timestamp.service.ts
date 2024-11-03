@@ -53,7 +53,7 @@ export class TourTimestampService {
     return this.http.put<BaseResponse<TourTimestamp>>(`${this.apiUrl}/${id}`, tourTimestamp);
   }
 
-  deleteTourTimestamp(id: Guid): Observable<BaseResponse<boolean>> {
-    return this.http.delete<BaseResponse<boolean>>(`${this.apiUrl}/${id}`);
+  deleteTourTimestamp(id: Guid): Observable<BaseResponse<TourTimestamp>> {
+    return this.http.delete<BaseResponse<TourTimestamp>>(`${this.apiUrl}/${id}`);
   }
 }

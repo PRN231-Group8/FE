@@ -60,6 +60,8 @@ export class TourManagementComponent implements OnInit {
   selectedTimestamp: TourTimestamp | null = null;
   isTimestampEdit: boolean = false;
   durationMinutes: number = 1;
+  timestampToDelete: TourTimestamp | null = null;
+  deleteTimestampDialog: boolean = false;
 
   @ViewChild('filter') filter!: ElementRef;
 
@@ -248,7 +250,10 @@ export class TourManagementComponent implements OnInit {
     if (this.expandedRowKeys[tourId] && !tour.tourTimestamps) {
       this.timestampService.getAllTourTimestamps().subscribe({
         next: data => {
-          tour.tourTimestamps = data.result;
+          tour.tourTimestamps = [
+            ...(data.results || []),
+            ...this.newTimestamps,
+          ] as TourTimestamp[];
         },
         error: () => {
           this.messageService.add({
@@ -264,6 +269,7 @@ export class TourManagementComponent implements OnInit {
   addTimestamp(tour: Tour): void {
     this.timestampForm.reset();
     this.tour = tour;
+    this.timestampForm.patchValue({ tourId: tour.id });
     this.isTimestampEdit = false;
     this.timestampDialog = true;
   }
@@ -307,7 +313,7 @@ export class TourManagementComponent implements OnInit {
       return `${hours}:${minutes}:${seconds}`;
     };
 
-    const timestampData: TourTimestamp = {
+    const newTimestamp: TourTimestamp = {
       ...formValues,
       preferredTimeSlot: {
         startTime: formatTime(formValues.startTime),
@@ -315,43 +321,29 @@ export class TourManagementComponent implements OnInit {
       },
     };
 
-    // Save the current expanded state of the rows
-    const currentExpandedKeys = { ...this.expandedRowKeys };
-
-    let saveObservable;
-
     if (this.isTimestampEdit && this.selectedTimestamp) {
-      // Update existing timestamp with selectedTimestamp's id
-      saveObservable = this.timestampService.updateTourTimestamp(
-        this.selectedTimestamp.id!,
-        timestampData,
+      const index = this.tour!.tourTimestamps!.findIndex(
+        t => t.id === this.selectedTimestamp!.id,
       );
-    } else {
-      // Create new timestamp
-      saveObservable = this.timestampService.createBatchTourTimestamps(
-        [timestampData],
-        this.durationMinutes,
-      );
+      this.tour!.tourTimestamps![index] = newTimestamp;
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Timestamp updated locally',
+      });
+      return;
     }
 
-    saveObservable.subscribe({
-      next: () => {
-        this.viewTimestamps(this.tour!); // Refresh timestamps
-        this.timestampDialog = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: this.isTimestampEdit
-            ? 'Timestamp updated successfully'
-            : 'Timestamp created successfully',
-        });
-        // Restore the expanded state after refreshing the timestamps
-        this.expandedRowKeys = currentExpandedKeys;
-      },
-      error: () => {
-        this.sendErrorToast('Error saving timestamp!');
-      },
-    });
+    // Add new timestamp to the array for batch saving
+    this.newTimestamps.push(newTimestamp);
+
+    // Update the local tour's timestamps for immediate display
+    this.tour!.tourTimestamps = [
+      ...(this.tour!.tourTimestamps || []),
+      newTimestamp,
+    ];
+
+    this.timestampDialog = false;
   }
 
   hideDialog(): void {
@@ -359,6 +351,32 @@ export class TourManagementComponent implements OnInit {
     this.deleteTourDialog = false;
     this.timestampDialog = false;
     this.tourForm.reset();
+  }
+
+  saveAllTimestamps(): void {
+    if (this.newTimestamps.length > 0) {
+      this.timestampService
+        .createBatchTourTimestamps(this.newTimestamps, this.durationMinutes)
+        .subscribe({
+          next: data => {
+            if (data.isSucceed) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'All timestamps saved successfully',
+              });
+              // Clear the newTimestamps array after successful save
+              this.newTimestamps = [];
+              this.viewTimestamps(this.tour!); // Refresh the timestamps for the current tour
+            } else {
+              this.sendErrorToast(data.message);
+            }
+          },
+          error: error => {
+            this.sendErrorToast(error.message);
+          },
+        });
+    }
   }
 
   onPageChange(event: any): void {
@@ -408,5 +426,48 @@ export class TourManagementComponent implements OnInit {
   onRowCollapse(event: TableRowCollapseEvent): void {
     const tour = event.data;
     this.expandedRowKeys[tour.id] = false;
+  }
+
+  confirmDeleteTimestamp(timestamp: TourTimestamp): void {
+    this.timestampToDelete = timestamp;
+    this.deleteTimestampDialog = true;
+  }
+
+  deleteTimestamp(): void {
+    if (!this.timestampToDelete?.id) return;
+
+    this.timestampService
+      .deleteTourTimestamp(this.timestampToDelete.id)
+      .subscribe(data => {
+        if (data.isSucceed) {
+          // Safely update the timestamps array if `this.tour` and `this.tour.tourTimestamps` exist
+          if (this.tour && this.tour.tourTimestamps) {
+            this.tour.tourTimestamps = this.tour.tourTimestamps.filter(
+              t => t.id !== this.timestampToDelete!.id,
+            );
+          }
+
+          // Also update the newTimestamps array
+          this.newTimestamps = this.newTimestamps.filter(
+            t => t.id !== this.timestampToDelete!.id,
+          );
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Timestamp deleted successfully',
+          });
+          this.deleteTimestampDialog = false;
+          this.timestampToDelete = null;
+        } else {
+          this.deleteTimestampDialog = false;
+          this.timestampToDelete = null;
+          this.sendErrorToast(data.message);
+        }
+      });
+  }
+
+  cancelDeleteTimestamp(): void {
+    this.deleteTimestampDialog = false;
+    this.timestampToDelete = null;
   }
 }
