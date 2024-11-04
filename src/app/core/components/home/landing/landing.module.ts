@@ -10,7 +10,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
 import { ScrollTopModule } from 'primeng/scrolltop';
-import { CommonModule } from '@angular/common';
 import { sharedModule } from '../../../../layout/shared/shared.module';
 import { DropdownModule } from 'primeng/dropdown';
 import { ImageModule } from 'primeng/image';
@@ -39,7 +38,6 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     RouterModule,
     ButtonModule,
     ScrollTopModule,
-    CommonModule,
     DropdownModule,
     ImageModule,
     NgxAnimatedCounterModule,

@@ -22,6 +22,10 @@ import { TagModule } from 'primeng/tag';
 import { DataViewModule } from 'primeng/dataview';
 import { ProductService } from '../../../../services/product.service';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ExplorationRoutingModule } from './exploration-routing.module';
+import { InputMaskModule } from 'primeng/inputmask';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { FullCalendarModule } from '@fullcalendar/angular';
 
 @NgModule({
   declarations: [ExplorationComponent],
@@ -46,7 +50,11 @@ import { SkeletonModule } from 'primeng/skeleton';
     sharedModule,
     TagModule,
     DataViewModule,
-    SkeletonModule
+    SkeletonModule,
+    ExplorationRoutingModule,
+    InputMaskModule,
+    InputNumberModule,
+    FullCalendarModule,
   ],
   exports: [ExplorationComponent],
   providers: [ProductService]

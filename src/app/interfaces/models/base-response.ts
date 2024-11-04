@@ -1,6 +1,11 @@
 export interface BaseResponse<T> {
-  totalRecords: number;
-  totalPages: number;
+  totalElements?: number;
+  totalPages?: number;
+  last?: boolean;
+  first?: boolean;
+  size?: number;
+  number?: number;
+  numberOfElements?: number;
   isSucceed: boolean;
   result?: T;
   data?: T;

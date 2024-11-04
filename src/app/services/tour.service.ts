@@ -20,6 +20,9 @@ export class TourService {
     if (searchTerm && searchTerm !== '') {
       params = params.set('searchTerm', searchTerm);
     }
+    if (sortByStatus && sortByStatus !== '') {
+      params = params.set('sortByStatus', sortByStatus);
+    }
     return this.http.get<BaseResponse<Tour>>(`${environment.BACKEND_API_URL}/api/tours`, { params });
   }
 
@@ -27,11 +30,11 @@ export class TourService {
     return this.http.get<BaseResponse<Tour>>(`${environment.BACKEND_API_URL}/api/tours/${id}`);
   }
 
-  createTour(tourToCreate: Tour): Observable<BaseResponse<Tour>> {
+  createTour(tourToCreate: any): Observable<BaseResponse<Tour>> {
     return this.http.post<BaseResponse<Tour>>(`${environment.BACKEND_API_URL}/api/tours`, tourToCreate);
   }
 
-  updateTour(tourToUpdate: Tour): Observable<BaseResponse<Tour>> {
+  updateTour(tourToUpdate: any): Observable<BaseResponse<Tour>> {
     return this.http.put<BaseResponse<Tour>>(`${environment.BACKEND_API_URL}/api/tours/${tourToUpdate.id}`, tourToUpdate);
   }
 
