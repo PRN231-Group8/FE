@@ -7,35 +7,53 @@ import { BaseResponse } from '../interfaces/models/base-response';
 import { Location } from '../interfaces/models/location';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LocationService {
+  private readonly baseUrl = `${environment.BACKEND_API_URL}/api/locations`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getLocations(pageNumber: number, pageSize: number, sortByStatus?: string, searchTerm?: string) : Observable<BaseResponse<Location>> {
+  getLocations(
+    pageNumber: number,
+    pageSize: number,
+    sortByStatus?: string,
+    searchTerm?: string,
+  ): Observable<BaseResponse<Location>> {
     let params = new HttpParams()
       .set('pageNumber', pageNumber.toString())
       .set('pageSize', pageSize.toString());
-    if (searchTerm && searchTerm !== '') {
+
+    if (sortByStatus) {
+      params = params.set('sortByStatus', sortByStatus);
+    }
+
+    if (searchTerm) {
       params = params.set('searchTerm', searchTerm);
     }
-    return this.http.get<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations`, { params });
+
+    return this.http.get<BaseResponse<Location>>(this.baseUrl, { params });
   }
 
   getLocationById(id: Guid): Observable<BaseResponse<Location>> {
-    return this.http.get<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${id}`);
+    return this.http.get<BaseResponse<Location>>(`${this.baseUrl}/${id}`);
   }
 
-  createLocation(locationToCreate: Location): Observable<BaseResponse<Location>> {
-    return this.http.post<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations`, locationToCreate);
+  createLocation(locationData: FormData): Observable<BaseResponse<Location>> {
+    return this.http.post<BaseResponse<Location>>(
+      `${this.baseUrl}`,
+      locationData,
+    );
   }
 
-  updateLocation(locationToUpdate: Location): Observable<BaseResponse<Location>> {
-    return this.http.put<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${locationToUpdate.id}`, locationToUpdate);
+  updateLocation(locationData: FormData): Observable<BaseResponse<Location>> {
+    return this.http.put<BaseResponse<Location>>(
+      `${this.baseUrl}/${locationData.get('id')}`,
+      locationData,
+    );
   }
 
   deleteLocation(id: Guid): Observable<BaseResponse<Location>> {
-    return this.http.delete<BaseResponse<Location>>(`${environment.BACKEND_API_URL}/api/locations/${id}`);
+    return this.http.delete<BaseResponse<Location>>(`${this.baseUrl}/${id}`);
   }
 }

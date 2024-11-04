@@ -125,18 +125,23 @@
                     </div>
 
                     <div class="p-field">
+                        <label for="files">Upload Photos</label>
+                        <p-fileUpload id="files" mode="advanced" [auto]="false" name="files" accept="image/*"
+                            [multiple]="true" (onSelect)="onFileSelect($event)" #fileUpload>
+                        </p-fileUpload>
+                    </div>
+
+                    <div class="p-field">
                         <div formArrayName="photos">
                             <div *ngFor="let photo of photos.controls; let i = index" [formGroupName]="i"
                                 class="p-field">
                                 <div class="grid">
                                     <div class="col p-field">
-                                        <label for="url">Photo URL</label>
-                                        <input type="text" pInputText formControlName="url" placeholder="Image URL" />
-                                    </div>
-                                    <div class="col p-field">
-                                        <label for="alt">Alt Text</label>
-                                        <input type="text" pInputText formControlName="alt"
-                                            placeholder="Image Alt Text" />
+                                        <p-image formControlName="url"
+                                            [src]="selectedEditLocation.photos.at(i)?.url"
+                                            [alt]="selectedEditLocation.photos.at(i)?.alt" 
+                                            width="290" 
+                                            height="200"/>
                                     </div>
                                     <div class="col p-field flex align-items-center">
                                         <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger mt-3"
@@ -145,27 +150,27 @@
                                 </div>
                             </div>
                         </div>
-                        <button pButton type="button" label="Add Photo" icon="pi pi-plus" class="p-button-text"
-                            (click)="addPhoto()"></button>
                     </div>
                 </form>
             </ng-template>
             <ng-template pTemplate="footer">
-                <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+                <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" [disabled]="savingState" (click)="hideDialog()"></button>
                 <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveLocation()"
-                    [disabled]="!locationForm.valid"></button>
+                    [disabled]="!locationForm.valid || savingState"></button>
+                <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
             </ng-template>
         </p-dialog>
 
         <p-dialog [(visible)]="deleteLocationDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
             <div class="flex align-items-center justify-content-center">
-              <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-              <span *ngIf="location">Are you sure you want to delete this location <b>{{location.name}}</b>?</span>
+                <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+                <span *ngIf="location">Are you sure you want to delete this location <b>{{location.name}}</b>?</span>
             </div>
             <ng-template pTemplate="footer">
-              <p-button icon="pi pi-times" severity="secondary" label="No" (click)="deleteLocationDialog = false"></p-button>
-              <p-button icon="pi pi-check" label="Yes" (click)="confirmDelete()"></p-button>
+                <p-button icon="pi pi-times" severity="secondary" label="No"
+                    (click)="deleteLocationDialog = false"></p-button>
+                <p-button icon="pi pi-check" label="Yes" (click)="confirmDelete()"></p-button>
             </ng-template>
-          </p-dialog>
+        </p-dialog>
     </div>
 </div>

@@ -107,7 +107,7 @@
               <div class="p-3">
                 <div class="flex gap-4 align-items-center">
                   <h6>Timestamps for {{ tour.title }}</h6>
-                  <p-tag class="pb-4" *ngIf="newTimestamps.length > 0" severity="warning" value="Creation Mode"/>
+                  <p-tag class="pb-4" *ngIf="newTimestamps.length > 0" severity="warning" value="Creation Mode" />
                 </div>
 
                 <!-- Nested Table for Timestamps -->
@@ -137,7 +137,7 @@
             <td>
               <div [hidden]="isCreatingBatch && (newTimestamps.length !== 0)">
                 <button pButton pRipple icon="pi pi-pencil" (click)="editTimestamp(tour, timestamp)"></button>
-                <button pButton icon="pi pi-trash" (click)="confirmDeleteTimestamp(timestamp)"></button>
+                <button pButton icon="pi pi-trash" (click)="confirmDeleteTimestamp(tour, timestamp)"></button>
               </div>
             </td>
           </tr>
@@ -187,139 +187,137 @@
         [showPageLinks]="false" [showFirstLastIcon]="false"></p-paginator>
     </div>
   </div>
+  <p-dialog [(visible)]="createTourDialog" [modal]="true" [header]="isEdit ? 'Edit Tour' : 'Create New Tour'"
+    [style]="{ width: '50vw' }" [closable]="false" [dismissableMask]="true" [blockScroll]="true">
+    <ng-template pTemplate="header">
+      <h2>{{ isEdit ? 'Edit Tour' : 'Create New Tour' }}</h2>
+    </ng-template>
+    <ng-template pTemplate="content">
+      <form [formGroup]="tourForm" class="p-fluid">
+        <div class="p-field">
+          <label for="title">Tour Title</label>
+          <input id="title" type="text" pInputText formControlName="title" />
+        </div>
+
+        <div class="p-field">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" pInputTextarea formControlName="description"></textarea>
+        </div>
+
+        <div class="grid">
+          <div class="col p-field">
+            <label for="startDate">Start Date</label>
+            <p-calendar formControlName="startDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
+              [stepMinute]="15"></p-calendar>
+          </div>
+
+          <div class="col p-field">
+            <label for="endDate">End Date</label>
+            <p-calendar formControlName="endDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
+              [stepMinute]="15"></p-calendar>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col p-field">
+            <label for="totalPrice">Total Price</label>
+            <input id="totalPrice" type="number" pInputText formControlName="totalPrice" />
+          </div>
+
+          <div class="col p-field">
+            <label for="status">Status</label>
+            <p-dropdown [options]="statusOptions" formControlName="status" placeholder="Select Status"
+              appendTo="body"></p-dropdown>
+          </div>
+        </div>
+
+        <div class="p-field">
+          <label for="moods">Moods</label>
+          <p-multiSelect [options]="moodOptions" formControlName="tourMoods" optionLabel="moodTag"
+            placeholder="Select Moods" display="chip" appendTo="body"></p-multiSelect>
+        </div>
+
+        <div class="p-field">
+          <label for="locations">Locations</label>
+          <p-multiSelect [options]="locationOptions" formControlName="locationInTours" optionLabel="name"
+            placeholder="Select Locations" display="chip" appendTo="body"></p-multiSelect>
+        </div>
+      </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTour()"
+        [disabled]="tourForm.invalid"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Timestamp Dialog -->
+  <p-dialog [(visible)]="timestampDialog" [modal]="true" [header]="isTimestampEdit ? 'Edit Timestamp' : 'Add Timestamp'"
+    [style]="{ width: '40vw' }" [closable]="false" [dismissableMask]="true" [blockScroll]="true">
+    <ng-template pTemplate="header">
+      <h2>{{ isTimestampEdit ? 'Edit Timestamp' : 'Add New Timestamp' }}</h2>
+    </ng-template>
+    <ng-template pTemplate="content">
+      <form [formGroup]="timestampForm" class="p-fluid">
+        <div class="p-field">
+          <label for="timestampTitle">Title</label>
+          <input id="timestampTitle" type="text" pInputText formControlName="title" />
+        </div>
+
+        <div class="p-field">
+          <label for="timestampDescription">Description</label>
+          <textarea id="timestampDescription" rows="3" pInputTextarea formControlName="description"></textarea>
+        </div>
+
+        <div class="grid">
+          <div class="col p-field">
+            <label for="startTime">Start Time</label>
+            <p-calendar formControlName="startTime" [timeOnly]="true" appendTo="body" [hourFormat]="'24'"
+              [stepMinute]="15"></p-calendar>
+          </div>
+          <div class="col p-field">
+            <label for="endTime">End Time</label>
+            <p-calendar formControlName="endTime" [timeOnly]="true" appendTo="body" [hourFormat]="'24'"
+              [stepMinute]="15"></p-calendar>
+          </div>
+        </div>
+
+        <div class="p-field">
+          <label for="locationId">Location</label>
+          <p-dropdown [options]="locationOptions" formControlName="locationId" optionLabel="name" optionValue="id"
+            placeholder="Select Location" appendTo="body"></p-dropdown>
+        </div>
+      </form>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+      <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTimestamp()"
+        [disabled]="timestampForm.invalid"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!--Delete Room Dialog-->
+  <p-dialog [(visible)]="deleteTourDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
+    <div class="flex align-items-center justify-content-center">
+      <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
+      <span *ngIf="tour">Are you sure you want to delete Room Number <b>{{tour.title}}</b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button icon="pi pi-times" severity="secondary" label="No" (click)="deleteTourDialog = false"></p-button>
+      <p-button icon="pi pi-check" label="Yes" (click)="confirmDelete()"></p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Delete Confirmation Dialog -->
+  <p-dialog [(visible)]="deleteTimestampDialog" [modal]="true" [closable]="false" header="Confirm Deletion">
+    <div class="p-d-flex p-ai-center p-jc-center">
+      <i class="pi pi-exclamation-triangle" style="font-size: 2rem; margin-right: 1rem;"></i>
+      <span>Are you sure you want to delete this timestamp <b>{{ timestampToDelete?.title }}</b>?</span>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton label="No" icon="pi pi-times" class="p-button-text" (click)="cancelDeleteTimestamp()"></button>
+      <button pButton label="Yes" icon="pi pi-check" class="p-button-text" (click)="deleteTimestamp()"></button>
+    </ng-template>
+  </p-dialog>
 </div>
 </div>
-
-
-<p-dialog [(visible)]="createTourDialog" [modal]="true" [header]="isEdit ? 'Edit Tour' : 'Create New Tour'"
-  [style]="{ width: '50vw' }" [closable]="false" [dismissableMask]="true" [blockScroll]="true">
-  <ng-template pTemplate="header">
-    <h2>{{ isEdit ? 'Edit Tour' : 'Create New Tour' }}</h2>
-  </ng-template>
-  <ng-template pTemplate="content">
-    <form [formGroup]="tourForm" class="p-fluid">
-      <div class="p-field">
-        <label for="title">Tour Title</label>
-        <input id="title" type="text" pInputText formControlName="title" />
-      </div>
-
-      <div class="p-field">
-        <label for="description">Description</label>
-        <textarea id="description" rows="3" pInputTextarea formControlName="description"></textarea>
-      </div>
-
-      <div class="grid">
-        <div class="col p-field">
-          <label for="startDate">Start Date</label>
-          <p-calendar formControlName="startDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
-            [stepMinute]="15"></p-calendar>
-        </div>
-
-        <div class="col p-field">
-          <label for="endDate">End Date</label>
-          <p-calendar formControlName="endDate" [showTime]="true" [hourFormat]="'24'" appendTo="body"
-            [stepMinute]="15"></p-calendar>
-        </div>
-      </div>
-
-      <div class="grid">
-        <div class="col p-field">
-          <label for="totalPrice">Total Price</label>
-          <input id="totalPrice" type="number" pInputText formControlName="totalPrice" />
-        </div>
-
-        <div class="col p-field">
-          <label for="status">Status</label>
-          <p-dropdown [options]="statusOptions" formControlName="status" placeholder="Select Status"
-            appendTo="body"></p-dropdown>
-        </div>
-      </div>
-
-      <div class="p-field">
-        <label for="moods">Moods</label>
-        <p-multiSelect [options]="moodOptions" formControlName="tourMoods" optionLabel="moodTag"
-          placeholder="Select Moods" display="chip" appendTo="body"></p-multiSelect>
-      </div>
-
-      <div class="p-field">
-        <label for="locations">Locations</label>
-        <p-multiSelect [options]="locationOptions" formControlName="locationInTours" optionLabel="name"
-          placeholder="Select Locations" display="chip" appendTo="body"></p-multiSelect>
-      </div>
-    </form>
-  </ng-template>
-  <ng-template pTemplate="footer">
-    <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-    <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTour()"
-      [disabled]="tourForm.invalid"></button>
-  </ng-template>
-</p-dialog>
-
-<!-- Timestamp Dialog -->
-<p-dialog [(visible)]="timestampDialog" [modal]="true" [header]="isTimestampEdit ? 'Edit Timestamp' : 'Add Timestamp'"
-  [style]="{ width: '40vw' }" [closable]="false" [dismissableMask]="true" [blockScroll]="true">
-  <ng-template pTemplate="header">
-    <h2>{{ isTimestampEdit ? 'Edit Timestamp' : 'Add New Timestamp' }}</h2>
-  </ng-template>
-  <ng-template pTemplate="content">
-    <form [formGroup]="timestampForm" class="p-fluid">
-      <div class="p-field">
-        <label for="timestampTitle">Title</label>
-        <input id="timestampTitle" type="text" pInputText formControlName="title" />
-      </div>
-
-      <div class="p-field">
-        <label for="timestampDescription">Description</label>
-        <textarea id="timestampDescription" rows="3" pInputTextarea formControlName="description"></textarea>
-      </div>
-
-      <div class="grid">
-        <div class="col p-field">
-          <label for="startTime">Start Time</label>
-          <p-calendar formControlName="startTime" [timeOnly]="true" appendTo="body" [hourFormat]="'24'"
-            [stepMinute]="15"></p-calendar>
-        </div>
-        <div class="col p-field">
-          <label for="endTime">End Time</label>
-          <p-calendar formControlName="endTime" [timeOnly]="true" appendTo="body" [hourFormat]="'24'"
-            [stepMinute]="15"></p-calendar>
-        </div>
-      </div>
-
-      <div class="p-field">
-        <label for="locationId">Location</label>
-        <p-dropdown [options]="locationOptions" formControlName="locationId" optionLabel="name" optionValue="id"
-          placeholder="Select Location" appendTo="body"></p-dropdown>
-      </div>
-    </form>
-  </ng-template>
-  <ng-template pTemplate="footer">
-    <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
-    <button pButton label="Save" icon="pi pi-check" class="p-button-text" (click)="saveTimestamp()"
-      [disabled]="timestampForm.invalid"></button>
-  </ng-template>
-</p-dialog>
-
-<!--Delete Room Dialog-->
-<p-dialog [(visible)]="deleteTourDialog" header="Confirm" [modal]="true" [style]="{width:'450px'}">
-  <div class="flex align-items-center justify-content-center">
-    <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
-    <span *ngIf="tour">Are you sure you want to delete Room Number <b>{{tour.title}}</b>?</span>
-  </div>
-  <ng-template pTemplate="footer">
-    <p-button icon="pi pi-times" severity="secondary" label="No" (click)="deleteTourDialog = false"></p-button>
-    <p-button icon="pi pi-check" label="Yes" (click)="confirmDelete()"></p-button>
-  </ng-template>
-</p-dialog>
-
-<!-- Delete Confirmation Dialog -->
-<p-dialog [(visible)]="deleteTimestampDialog" [modal]="true" [closable]="false" header="Confirm Deletion">
-  <div class="p-d-flex p-ai-center p-jc-center">
-    <i class="pi pi-exclamation-triangle" style="font-size: 2rem; margin-right: 1rem;"></i>
-    <span>Are you sure you want to delete this timestamp <b>{{ timestampToDelete?.title }}</b>?</span>
-  </div>
-  <ng-template pTemplate="footer">
-    <button pButton label="No" icon="pi pi-times" class="p-button-text" (click)="cancelDeleteTimestamp()"></button>
-    <button pButton label="Yes" icon="pi pi-check" class="p-button-text" (click)="deleteTimestamp()"></button>
-  </ng-template>
-</p-dialog>

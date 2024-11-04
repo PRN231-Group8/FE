@@ -11,7 +11,9 @@ import { PaginatorModule } from 'primeng/paginator';
 import { LocationManagementRoutingModule } from './location-management-routing.module';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
-
+import { FileUploadModule } from 'primeng/fileupload';
+import { ImageModule } from 'primeng/image';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 @NgModule({
   declarations: [LocationManagementComponent],
@@ -27,7 +29,10 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     InputTextModule,
     LocationManagementRoutingModule,
     InputTextareaModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FileUploadModule,
+    ImageModule,
+    ProgressBarModule
   ]
 })
 export class LocationManagementModule { }

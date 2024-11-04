@@ -1,9 +1,9 @@
 import { Guid } from 'guid-typescript';
 import { Transportation } from './transportation';
-import { LocationInTour } from './location-in-tour';
 import { Mood } from './mood';
 import { TourTimestamp } from './tour-timestamp';
 import { TourTrip } from './tour-trip';
+import { Location } from './location';
 
 export interface Tour {
     id?: Guid;
@@ -15,7 +15,7 @@ export interface Tour {
     totalPrice?: number;
     status?: string;
     transportations?: Transportation[];
-    locationInTours?: LocationInTour[];
+    locationInTours?: Location[];
     tourTimestamps?: TourTimestamp[];
     tourMoods?: Mood[];
     tourTrips?: TourTrip[];

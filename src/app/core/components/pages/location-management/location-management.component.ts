@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prefer-const */
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LocationService } from '../../../../services/location.service';
 import { MessageService } from 'primeng/api';
 import { Location } from '../../../../interfaces/models/location';
+import { FileUploadEvent } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-location-management',
@@ -24,6 +28,9 @@ export class LocationManagementComponent implements OnInit {
   rowsPerPageOptions = [5, 10, 20];
   statusOptions = ['SUNNY', 'RAINFALL', 'STORM', 'SNOWY'];
   cols: any[] = [];
+  selectedFiles: File[] = [];
+  selectedEditLocation!: Location;
+  savingState: boolean = false;
 
   constructor(
     private locationService: LocationService,
@@ -77,6 +84,7 @@ export class LocationManagementComponent implements OnInit {
     console.log(location);
     this.createLocationDialog = true;
     this.isEdit = true;
+    this.selectedEditLocation = location;
 
     // Patch form with location data
     this.locationForm.patchValue({
@@ -106,52 +114,102 @@ export class LocationManagementComponent implements OnInit {
 
   removePhoto(index: number): void {
     this.photos.removeAt(index);
+    this.selectedEditLocation.photos = this.photos.controls.map(control => control.value);
+  }
+
+  onFileSelect(event: any): void {
+    this.selectedFiles = Array.from(event.files);
   }
 
   saveLocation(): void {
     this.submitted = true;
+    this.savingState = true;
     if (this.locationForm.invalid) {
       return;
     }
 
-    const locationData = this.locationForm.value;
+    // Create FormData and append form values
+    const formData = new FormData();
+
+    // Append the main location fields
+    formData.append('name', this.locationForm.get('name')?.value);
+    formData.append('description', this.locationForm.get('description')?.value);
+    formData.append('address', this.locationForm.get('address')?.value);
+    formData.append('status', this.locationForm.get('status')?.value);
+    formData.append('temperature', this.locationForm.get('temperature')?.value);
+    if (this.photos.value) {
+      // Append photos array (URLs and alt text)
+      const photosArray = this.photos.value;
+      photosArray.forEach((photo: any, index: number) => {
+        formData.append(`photos[${index}].url`, photo.url);
+        formData.append(`photos[${index}].alt`, photo.alt);
+      });
+    }
+
+    // Append selected files
+    this.selectedFiles.forEach(file => formData.append('files', file));
+
+    // Check if it's an edit or create operation
     if (this.isEdit) {
-      // Perform update
-      this.locationService.updateLocation(locationData).subscribe(data => {
-        if (data.isSucceed) {
-          this.loadLocations(1, this.rows);
-          this.createLocationDialog = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Location updated successfully',
-          });
-        } else {
+      formData.append('id', this.locationForm.get('id')?.value);
+      this.locationService.updateLocation(formData).subscribe({
+        next: data => {
+          if (data.isSucceed) {
+            this.loadLocations(1, this.rows);
+            this.createLocationDialog = false;
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Location updated successfully',
+            });
+            this.savingState = false;
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: data.message,
+            });
+            this.savingState = false;
+          }
+        },
+        error: err => {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: data.message,
+            detail: 'Update failed',
           });
-        }
+          this.savingState = false;
+        },
       });
     } else {
-      // Perform create
-      this.locationService.createLocation(locationData).subscribe(data => {
-        if (data.isSucceed) {
-          this.loadLocations(1, this.rows);
-          this.createLocationDialog = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Location created successfully',
-          });
-        } else {
+      this.locationService.createLocation(formData).subscribe({
+        next: data => {
+          if (data.isSucceed) {
+            this.loadLocations(1, this.rows);
+            this.savingState = false;
+            this.createLocationDialog = false;
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Location created successfully',
+            });
+          } else {
+            this.savingState = false;
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: data.message,
+            });
+          }
+        },
+        error: err => {
+          this.savingState = false;
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: data.message,
+            detail: 'Creation failed',
           });
-        }
+        },
       });
     }
   }
@@ -159,6 +217,7 @@ export class LocationManagementComponent implements OnInit {
   hideDialog(): void {
     this.createLocationDialog = false;
     this.submitted = false;
+    this.selectedFiles = [];
   }
 
   onRowsChange(newRows: number): void {

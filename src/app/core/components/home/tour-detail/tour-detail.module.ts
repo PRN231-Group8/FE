@@ -15,8 +15,9 @@ import { sharedModule } from '../../../../layout/shared/shared.module';
 import { GalleriaModule } from 'primeng/galleria';
 import { FormsModule } from '@angular/forms';
 import { SkeletonModule } from 'primeng/skeleton';
-
-
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { DividerModule } from 'primeng/divider';
 @NgModule({
   declarations: [TourDetailComponent],
   imports: [
@@ -36,7 +37,10 @@ import { SkeletonModule } from 'primeng/skeleton';
     sharedModule,
     GalleriaModule,
     FormsModule,
-    SkeletonModule
+    SkeletonModule,
+    DynamicDialogModule,
+    TooltipModule,
+    DividerModule
   ]
 })
 export class TourDetailModule { }
