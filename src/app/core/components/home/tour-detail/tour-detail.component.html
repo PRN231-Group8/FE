@@ -1,0 +1,95 @@
+<!-- eslint-disable @angular-eslint/template/alt-text -->
+<div class="layout-wrapper">
+  <p-scrollTop />
+  <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <div class="layout-main-container">
+    <div class="layout-main overflow-hidden z-0">
+      <!-- Skeleton loading -->
+      <div class="grid nested-grid" *ngIf="!hasTourTrip">
+        <div class="col-6">
+          <p-skeleton width="100%" height="750px" />
+        </div>
+        <div class="col-6">
+          <div class="grid">
+            <div class="col-6">
+              <p-skeleton width="100%" styleClass="mb-2" />
+            </div>
+            <div class="col-6">
+              <p-skeleton width="100%" styleClass="mb-2" />
+            </div>
+            <div class="col-12">
+              <p-skeleton width="100%" height="710px" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fully loaded content -->
+      <div class="grid nested-grid" *ngIf="hasTourTrip">
+        <div class="col-12">
+          <div class="card h-full">
+            <div class="grid">
+              <div class="col-6">
+                <p-galleria [value]="images" [responsiveOptions]="responsiveOptions"
+                  [containerStyle]="{ 'max-width': '640px' }" [numVisible]="5">
+                  <ng-template pTemplate="item" let-item>
+                    <img [src]="item.itemImageSrc" style="width: 100%;" />
+                  </ng-template>
+                  <ng-template pTemplate="thumbnail" let-item>
+                    <div class="grid grid-nogutter justify-content-center">
+                      <img [src]="item.thumbnailImageSrc" />
+                    </div>
+                  </ng-template>
+                </p-galleria>
+              </div>
+              <div class="col-6">
+                <h2>{{ tour.title }}</h2>
+                <div class="flex justify-content-between">
+                  <div>
+                    <span class="font-bold text-lg">TIME SPAN</span>
+                    <div class="mt-2">{{ calculateDaysAndNights(tour.startDate!, tour.endDate!) }}</div>
+                  </div>
+                  <p-divider layout="vertical"></p-divider>
+                  <div>
+                    <span class="font-bold text-lg">FROM</span>
+                    <div class="mt-2">{{ tour.tourTimestamps?.at(0)?.location?.name }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="grid">
+            <div class="col-12">
+              <div class="card" *ngIf="selectedTrip">
+                <h3>Trip Details</h3>
+                <p><strong>Date:</strong> {{ formatDate(selectedTrip.tripDate!) }}</p>
+                <p><strong>Price:</strong> {{ formatPrice(selectedTrip.price) }} VND</p>
+                <p><strong>Total Seats:</strong> {{ selectedTrip.totalSeats }}</p>
+                <p><strong>Status:</strong> {{ selectedTrip.tripStatus }}</p>
+                <p-button label="Book" (click)="bookTourTrip(selectedTrip)"></p-button>
+              </div>
+              <div *ngIf="!selectedTrip">
+                <div class="text-xl font-medium flex justify-content-center">Please select the date you want to go</div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card" style="width: 100%; height: 100%; overflow: hidden;">
+                <h5>Event Calendar</h5>
+                <full-calendar [options]="calendarOptions" class="z-0"></full-calendar>
+                <div #tooltip class="tooltip" [innerText]="tooltipText"
+                  style="display: none; position: absolute; background-color: #333; color: #fff; padding: 5px; border-radius: 4px;"
+                  class="z-1">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <app-shared-footer></app-shared-footer>
+</div>

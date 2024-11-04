@@ -8,6 +8,9 @@ import { LandingComponent } from './core/components/home/landing/landing.compone
 import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 import { ProfileComponent } from './core/components/profile/profile.component';
+import { AuthGuard } from './_helper/auth.guard';
+import { TourDetailComponent } from './core/components/home/tour-detail/tour-detail.component';
+import { PaymentResultComponent } from './core/components/home/payment-result/payment-result.component';
 
 @NgModule({
   imports: [
@@ -48,6 +51,7 @@ import { ProfileComponent } from './core/components/profile/profile.component';
                 ),
             },
           ],
+          canActivate: [AuthGuard]
         },
         {
           path: 'login',
@@ -63,6 +67,22 @@ import { ProfileComponent } from './core/components/profile/profile.component';
           loadChildren: () =>
             import('./core/components/profile/profile.module').then(
               m => m.ProfileModule,
+            ),
+        },
+        {
+          path: 'tour-detail/:id',
+          component: TourDetailComponent,
+          loadChildren: () =>
+            import('./core/components/home/tour-detail/tour-detail.module').then(
+              m => m.TourDetailModule,
+            ),
+        },
+        {
+          path: 'payment-result',
+          component: PaymentResultComponent,
+          loadChildren: () =>
+            import('./core/components/home/payment-result/payment-result.module').then(
+              m => m.PaymentResultModule,
             ),
         },
         { path: 'notfound', component: NotfoundComponent },

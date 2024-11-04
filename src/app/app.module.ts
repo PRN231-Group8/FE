@@ -33,7 +33,7 @@ import { environment } from '../environments/environment';
 import { JwtInterceptor } from './_helper/jwt.interceptor';
 import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
-import { fakeBackendProvider } from './_helper/fake-backend';
+import { FakeBackendInterceptor } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
 import { LoginComponent } from './core/components/login/login.component';
 import { MapApiService } from './services/map-api.service';
@@ -113,6 +113,11 @@ import { FileUploadModule } from 'primeng/fileupload';
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     {
+      provide: HTTP_INTERCEPTORS,
+      useClass: FakeBackendInterceptor,
+      multi: true
+    },
+    {
       provide: 'SocialAuthServiceConfig',
       useValue: {
         autoLogin: false,
@@ -127,7 +132,6 @@ import { FileUploadModule } from 'primeng/fileupload';
         },
       } as SocialAuthServiceConfig,
     },
-    fakeBackendProvider,
     CountryService,
     CustomerService,
     EventService,

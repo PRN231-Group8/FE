@@ -7,11 +7,14 @@ import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { PaginatorModule } from 'primeng/paginator';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { HttpClientModule } from '@angular/common/http';
+import { TagModule } from 'primeng/tag';
 
 
 @NgModule({
@@ -28,7 +31,12 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     InputTextModule,
     DialogModule,
     CalendarModule,
-    InputTextareaModule
-  ]
+    InputTextareaModule,
+    MultiSelectModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    TagModule
+  ],
+  bootstrap: [TourManagementComponent]
 })
 export class TourManagementModule { }
