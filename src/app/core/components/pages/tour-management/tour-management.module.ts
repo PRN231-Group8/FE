@@ -15,6 +15,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { HttpClientModule } from '@angular/common/http';
 import { TagModule } from 'primeng/tag';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 
 @NgModule({
@@ -35,7 +36,8 @@ import { TagModule } from 'primeng/tag';
     MultiSelectModule,
     ReactiveFormsModule,
     HttpClientModule,
-    TagModule
+    TagModule,
+    ProgressBarModule
   ],
   bootstrap: [TourManagementComponent]
 })

@@ -8,5 +8,7 @@ export interface Location {
     address?: string;
     status?: string;
     temperature?: number;
+    longitude?: number;
+    latitude?: number;
     photos: Photo[];
 }
