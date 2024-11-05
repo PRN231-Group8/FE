@@ -102,7 +102,6 @@ export class TourManagementComponent implements OnInit {
       description: ['', Validators.required],
       startDate: [null, Validators.required],
       endDate: [null, Validators.required],
-      totalPrice: [null, [Validators.required, Validators.min(0)]],
       status: ['', Validators.required],
       tourMoods: [[], Validators.required],
       locationInTours: [[], Validators.required],
