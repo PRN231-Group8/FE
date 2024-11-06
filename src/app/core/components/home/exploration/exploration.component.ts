@@ -6,9 +6,6 @@ import { MoodService } from '../../../../services/mood.service';
 import { LocationService } from '../../../../services/location.service';
 import { BaseResponse } from '../../../../interfaces/models/base-response';
 import { Mood } from '../../../../interfaces/models/mood';
-import {
-  LocationInTour,
-} from '../../../../interfaces/models/location-in-tour';
 import { HttpClient } from '@angular/common/http';
 import { MapApiService } from '../../../../services/map-api.service';
 import { Tour } from '../../../../interfaces/models/tour';
@@ -36,6 +33,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   lat: number = 0.0;
   lng: number = 0.0;
   address: string = '';
+  otherAddress: string = '';
 
   // Filter data for dropdowns
   locations!: Location[];
@@ -89,11 +87,9 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       .subscribe(storedTours => {
         if (storedTours) {
           // If tours are already stored, use them
-          console.log(`get stored tours`);
           this.tours = storedTours;
         } else {
           // Fetch tours if not stored
-          console.log(`fetch tours`);
           this.fetchAndStoreTours();
         }
         this.loading = false;
@@ -140,7 +136,6 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   initializeLocations(): void {
     if (this.filters.locations) {
       this.locations = this.filters.locations;
-      this.locationLoading = false;
     } else {
       this.locationService
         .getLocations(1, 20)
@@ -149,7 +144,6 @@ export class ExplorationComponent implements OnInit, OnDestroy {
             this.locations = data.results as Location[];
           }
         });
-      this.locationLoading = false;
     }
   }
 
@@ -192,6 +186,8 @@ export class ExplorationComponent implements OnInit, OnDestroy {
           this.tours = storedTours;
         }
       });
+
+    // Set filter criteria in common service
     this.commonService.setSearchCriteria({
       mood: this.selectedMood,
       from: this.selectedFrom,
@@ -199,41 +195,47 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       priceRange: this.priceRange,
       transport: this.selectedTransport,
     });
+
     const filters = this.commonService.getSearchCriteria();
+
     if (this.tours) {
       this.tours = this.tours.filter(tour => {
+        // Price Range Filter
+        console.log(filters.priceRange);
         if (
           filters.priceRange &&
           tour.totalPrice !== null &&
-          !tour.totalPrice >= filters.priceRange
+          tour.totalPrice! < filters.priceRange
         ) {
           return false;
         }
 
-        if (
-          filters.to &&
-          (!tour.locationInTours ||
-            !tour.locationInTours.some((loc: LocationInTour) =>
-              loc.locations?.some(ls => ls.name?.includes(filters.to.name)),
-            ))
-        ) {
-          return false;
+        // Location Filter
+        if (filters.to) {
+          const locationNames =
+            tour.locationInTours?.map((location: Location) =>
+              location.name?.toLowerCase(),
+            ) || [];
+          if (!locationNames.includes(filters.to.name.toLowerCase())) {
+            return false;
+          }
         }
 
+        // Transportation Filter
         if (filters.transport) {
           const transportTypes =
             tour.transportations?.map(
               (transportation: Transportation) => transportation.type,
             ) || [];
-
           if (!transportTypes.includes(filters.transport.type)) {
             return false;
           }
         }
+
+        // Mood Filter
         if (filters.mood) {
           const tourMoodTags =
             tour.tourMoods?.map((mood: Mood) => mood.moodTag) || [];
-
           if (!tourMoodTags.includes(filters.mood.moodTag)) {
             return false;
           }
@@ -275,8 +277,9 @@ export class ExplorationComponent implements OnInit, OnDestroy {
         // fetch map API to get cities list
         this.mapApiService.getCities().subscribe((mapData: any) => {
           mapData.forEach((map: any) => {
-            if (this.address.includes(map.city)) {
+            if (this.address.includes(map.city) || this.address.includes(map.admin_name)) {
               this.selectedFrom = map.city;
+              this.fromPlaceholder = map.admin_name;
             }
           });
           this.locationLoading = false;
