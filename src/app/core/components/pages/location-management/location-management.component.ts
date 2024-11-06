@@ -66,6 +66,7 @@ export class LocationManagementComponent implements OnInit {
     this.locationService.getLocations(pageNumber, pageSize).subscribe({
       next: data => {
         this.locations = data.results as Location[];
+        this.totalRecords = data.numberOfElements as number;
         this.loading = false;
       },
       error: error => {
@@ -176,7 +177,7 @@ export class LocationManagementComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Update failed',
+            detail: err.message,
           });
           this.savingState = false;
         },
@@ -207,7 +208,7 @@ export class LocationManagementComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Creation failed',
+            detail: err.message,
           });
         },
       });

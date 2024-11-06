@@ -67,14 +67,20 @@ export class TransportManagementComponent implements OnInit {
   loadTransportations(pageNumber: number = this.first / this.rows + 1): void {
     this.loading = true;
     this.transportationService
-      .getTransportations(pageNumber, this.rows, this.sortBy, 'asc', this.searchTerm)
+      .getTransportations(
+        pageNumber,
+        this.rows,
+        this.sortBy,
+        'asc',
+        this.searchTerm,
+      )
       .subscribe({
-        next: (data) => {
+        next: data => {
           this.transportations = data.results as Transportation[];
           this.totalRecords = data.totalElements as number;
           this.loading = false;
         },
-        error: (error) => {
+        error: error => {
           console.error('Error loading transportations!', error);
           this.loading = false;
         },
@@ -131,19 +137,21 @@ export class TransportManagementComponent implements OnInit {
 
   confirmDelete(): void {
     if (this.transportation.id) {
-      this.transportationService.deleteTransportation(this.transportation.id).subscribe(data => {
-        if (data.isSucceed) {
-          this.loadTransportations();
-          this.deleteTransportationDialog = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Transportation deleted successfully',
-          });
-        } else {
-          this.sendErrorToast(data.message);
-        }
-      });
+      this.transportationService
+        .deleteTransportation(this.transportation.id)
+        .subscribe(data => {
+          if (data.isSucceed) {
+            this.loadTransportations();
+            this.deleteTransportationDialog = false;
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Transportation deleted successfully',
+            });
+          } else {
+            this.sendErrorToast(data.message);
+          }
+        });
     }
   }
 
@@ -154,34 +162,48 @@ export class TransportManagementComponent implements OnInit {
 
     const transportationData = this.transportationForm.value;
     if (this.isEdit) {
-      this.transportationService.updateTransportation(transportationData).subscribe(data => {
-        if (data.isSucceed) {
-          this.createTransportationDialog = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Transportation updated successfully',
-          });
-        } else {
-          this.sendErrorToast(data.message);
-        }
-      });
+      this.transportationService
+        .updateTransportation(transportationData)
+        .subscribe({
+          next: data => {
+            if (data.isSucceed) {
+              this.createTransportationDialog = false;
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Transportation updated successfully',
+              });
+              this.loadTransportations();
+            } else {
+              this.sendErrorToast(data.message);
+            }
+          },
+          error: err => {
+            this.sendErrorToast(err.message);
+          },
+        });
     } else {
-      this.transportationService.createTransportation(transportationData).subscribe(data => {
-        if (data.isSucceed) {
-          this.createTransportationDialog = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Transportation created successfully',
-          });
-        } else {
-          this.sendErrorToast(data.message);
-        }
-      });
+      this.transportationService
+        .createTransportation(transportationData)
+        .subscribe({
+          next: data => {
+            if (data.isSucceed) {
+              this.createTransportationDialog = false;
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Transportation created successfully',
+              });
+              this.loadTransportations();
+            } else {
+              this.sendErrorToast(data.message);
+            }
+          },
+          error: error => {
+            this.sendErrorToast(error.message);
+          },
+        });
     }
-
-    this.loadTransportations();
   }
 
   sendErrorToast(message: string): void {

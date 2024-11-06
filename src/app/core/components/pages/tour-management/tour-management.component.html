@@ -230,7 +230,11 @@
                             icon="pi pi-trash"
                             (click)="confirmDeleteTimestamp(tour, timestamp)"
                           ></button>
-                          <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
+                          <p-progressBar
+                            mode="indeterminate"
+                            [style]="{ height: '6px' }"
+                            *ngIf="savingState"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -323,7 +327,11 @@
                             icon="pi pi-trash"
                             (click)="confirmDeleteTourTrip(tour, trip)"
                           ></button>
-                          <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
+                          <p-progressBar
+                            mode="indeterminate"
+                            [style]="{ height: '6px' }"
+                            *ngIf="savingState"
+                          />
                         </div>
                       </td>
                     </tr>
@@ -503,7 +511,11 @@
           (click)="saveTour()"
           [disabled]="tourForm.invalid"
         ></button>
-        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
+        <p-progressBar
+          mode="indeterminate"
+          [style]="{ height: '6px' }"
+          *ngIf="savingState"
+        />
       </ng-template>
     </p-dialog>
 
@@ -623,7 +635,11 @@
           label="Yes"
           (click)="confirmDelete()"
         ></p-button>
-        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
+        <p-progressBar
+          mode="indeterminate"
+          [style]="{ height: '6px' }"
+          *ngIf="savingState"
+        />
       </ng-template>
     </p-dialog>
 
@@ -660,7 +676,11 @@
           class="p-button-text"
           (click)="deleteTimestamp()"
         ></button>
-        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
+        <p-progressBar
+          mode="indeterminate"
+          [style]="{ height: '6px' }"
+          *ngIf="savingState"
+        />
       </ng-template>
     </p-dialog>
 
@@ -738,7 +758,11 @@
           (click)="saveTourTrip()"
           [disabled]="tourTripForm.invalid"
         ></button>
-        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
+        <p-progressBar
+          mode="indeterminate"
+          [style]="{ height: '6px' }"
+          *ngIf="savingState"
+        />
       </ng-template>
     </p-dialog>
 
@@ -772,7 +796,11 @@
           class="p-button-text"
           (click)="deleteTourTrip()"
         ></button>
-        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }" *ngIf="savingState"/>
+        <p-progressBar
+          mode="indeterminate"
+          [style]="{ height: '6px' }"
+          *ngIf="savingState"
+        />
       </ng-template>
     </p-dialog>
   </div>
