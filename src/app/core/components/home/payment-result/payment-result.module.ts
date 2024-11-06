@@ -4,6 +4,7 @@ import { PaymentResultComponent } from './payment-result.component';
 import { sharedModule } from '../../../../layout/shared/shared.module';
 import { PaymentResultRoutingModule } from './payment-result-routing.module';
 import { ScrollTopModule } from 'primeng/scrolltop';
+import { ButtonModule } from 'primeng/button';
 
 
 @NgModule({
@@ -12,7 +13,8 @@ import { ScrollTopModule } from 'primeng/scrolltop';
     CommonModule,
     sharedModule,
     PaymentResultRoutingModule,
-    ScrollTopModule
+    ScrollTopModule,
+    ButtonModule
   ]
 })
 export class PaymentResultModule { }

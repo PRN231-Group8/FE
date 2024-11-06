@@ -59,7 +59,13 @@ export class NavbarComponent implements OnInit {
         {
           label: 'Managements',
           items: [
-            { label: 'My Trips', icon: 'pi pi-car', shortcut: '⌘+N' },
+            { label: 'My Trips',
+              icon: 'pi pi-car',
+              shortcut: '⌘+N',
+              command: (): void => {
+                this.router.navigate(['/order']);
+              },
+            },
             {
               label: 'My Managements',
               icon: 'pi pi-briefcase',

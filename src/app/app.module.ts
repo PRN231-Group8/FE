@@ -50,6 +50,7 @@ import { ContextMenuModule } from 'primeng/contextmenu';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { sharedModule } from './layout/shared/shared.module';
 import { FileUploadModule } from 'primeng/fileupload';
+import { VnpayFormModule } from './core/components/home/vnpay-form/vnpay-form.module';
 // Third-party imports
 
 @NgModule({
@@ -92,6 +93,7 @@ import { FileUploadModule } from 'primeng/fileupload';
     TabMenuModule,
     sharedModule,
     FileUploadModule,
+    VnpayFormModule,
   ],
   exports: [
     SocialLoginModule,

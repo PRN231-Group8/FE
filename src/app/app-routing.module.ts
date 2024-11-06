@@ -11,6 +11,7 @@ import { ProfileComponent } from './core/components/profile/profile.component';
 import { AuthGuard } from './_helper/auth.guard';
 import { TourDetailComponent } from './core/components/home/tour-detail/tour-detail.component';
 import { PaymentResultComponent } from './core/components/home/payment-result/payment-result.component';
+import { OrderHistoryComponent } from './core/components/order-history/order-history.component';
 
 @NgModule({
   imports: [
@@ -83,6 +84,14 @@ import { PaymentResultComponent } from './core/components/home/payment-result/pa
           loadChildren: () =>
             import('./core/components/home/payment-result/payment-result.module').then(
               m => m.PaymentResultModule,
+            ),
+        },
+        {
+          path: 'order',
+          component: OrderHistoryComponent,
+          loadChildren: () =>
+            import('./core/components/order-history/order-history.module').then(
+              m => m.OrderHistoryModule,
             ),
         },
         { path: 'notfound', component: NotfoundComponent },
