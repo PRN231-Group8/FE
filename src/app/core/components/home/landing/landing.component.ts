@@ -109,8 +109,8 @@ export class LandingComponent implements OnInit {
         // fetch map API to get cities list
         this.mapApiService.getCities().subscribe((mapData: any) => {
           mapData.forEach((map: any) => {
-            if (this.address.includes(map.city)) {
-              this.selectedFrom = map.city;
+            if (this.address.includes(map.city) || this.address.includes(map.admin_name)) {
+              this.selectedFrom = map.admin_name;
             }
           });
           this.locationLoading = false;

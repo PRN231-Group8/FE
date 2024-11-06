@@ -14,11 +14,11 @@ export class PaymentService {
 
   constructor(private http: HttpClient) { }
 
-  createPayment(tourTripId: Guid): Observable<BaseResponse<string>> {
-    return this.http.post<BaseResponse<string>>(`${this.apiUrl}`, { tourTripId });
+  createPayment(tourTripId: Guid, numberOfPassengers: number): Observable<BaseResponse<string>> {
+    return this.http.post<BaseResponse<string>>(`${this.apiUrl}`, { tourTripId, numberOfPassengers });
   }
 
-  callBack(): Observable<CallbackResponse> {
-    return this.http.get<CallbackResponse>(`${this.apiUrl}/callback?`);
+  callBack(query: string): Observable<BaseResponse<CallbackResponse>> {
+    return this.http.get<BaseResponse<CallbackResponse>>(`${this.apiUrl}/callback?${query}`);
   }
 }

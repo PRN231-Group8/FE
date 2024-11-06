@@ -13,11 +13,17 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { ScrollTopModule } from 'primeng/scrolltop';
 import { sharedModule } from '../../../../layout/shared/shared.module';
 import { GalleriaModule } from 'primeng/galleria';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SkeletonModule } from 'primeng/skeleton';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
+import { TimelineModule } from 'primeng/timeline';
+import { CalendarModule } from 'primeng/calendar';
+import { DialogModule } from 'primeng/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastModule } from 'primeng/toast';
 @NgModule({
   declarations: [TourDetailComponent],
   imports: [
@@ -40,7 +46,15 @@ import { DividerModule } from 'primeng/divider';
     SkeletonModule,
     DynamicDialogModule,
     TooltipModule,
-    DividerModule
+    DividerModule,
+    TimelineModule,
+    CalendarModule,
+    CardModule,
+    DialogModule,
+    BrowserAnimationsModule,
+    ReactiveFormsModule,
+    DynamicDialogModule,
+    ToastModule
   ]
 })
 export class TourDetailModule { }
