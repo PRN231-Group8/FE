@@ -7,8 +7,8 @@ import { LoginComponent } from './core/components/login/login.component';
 import { LandingComponent } from './core/components/home/landing/landing.component';
 import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
-import { SharingPostComponent } from './core/components/sharing-post/sharing-post.component';
 import { ProfileComponent } from './core/components/profile/profile.component';
+import { SharingPostComponent } from './core/components/sharing-post/sharing-post.component';
 
 @NgModule({
   imports: [
@@ -61,6 +61,10 @@ import { ProfileComponent } from './core/components/profile/profile.component';
         {
           path: 'sharing-post',
           component: SharingPostComponent,
+          loadChildren: () =>
+            import('./core/components/sharing-post/sharing-post.module').then(
+              m => m.SharingPostModule,
+            ),
         },
         {
           path: 'profile',

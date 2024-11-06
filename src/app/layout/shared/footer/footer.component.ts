@@ -8,16 +8,16 @@ export class FooterComponent {
   FOOTER_LINKS = [
     {
       title: 'Company',
-      links: ['About Us', 'Careers', 'Press']
+      links: ['About Us', 'Careers', 'Press'],
     },
     {
       title: 'Resources',
-      links: ['Blog', 'Help Center', 'Contact']
+      links: ['Blog', 'Help Center', 'Contact'],
     },
     {
       title: 'Legal',
-      links: ['Privacy Policy', 'Terms of Service']
-    }
+      links: ['Privacy Policy', 'Terms of Service'],
+    },
   ];
 
   SOCIALS = {
@@ -25,15 +25,15 @@ export class FooterComponent {
     links: [
       'assets/layout/images/facebook.svg',
       'assets/layout/images/instagram.svg',
-      'assets/layout/images/youtube.svg'
-    ]
+      'assets/layout/images/youtube.svg',
+    ],
   };
 
   FOOTER_CONTACT_INFO = {
     title: 'Contact Us',
     links: [
       { label: 'Email', value: 'lehai112003@gmail.com' },
-      { label: 'Phone', value: '0963500436' }
-    ]
+      { label: 'Phone', value: '0963500436' },
+    ],
   };
 }

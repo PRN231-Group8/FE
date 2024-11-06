@@ -11,14 +11,13 @@ import { CustomerService } from './services/customer.service';
 import { EventService } from './services/event.service';
 import { IconService } from './services/icon.service';
 import { NodeService } from './services/node.service';
-import { PhotoService } from './services/photo.service';
 import { ProductService } from './services/product.service';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { MenuModule } from 'primeng/menu';
 import { ToastModule } from 'primeng/toast';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -40,7 +39,6 @@ import { AvatarModule } from 'primeng/avatar';
 import { LoginComponent } from './core/components/login/login.component';
 import { MapApiService } from './services/map-api.service';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
-import { SharingPostComponent } from './core/components/sharing-post/sharing-post.component';
 import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { BadgeModule } from 'primeng/badge';
@@ -63,7 +61,6 @@ import { sharedModule } from './layout/shared/shared.module';
     NotfoundComponent,
     LoginComponent,
     VerifyEmailComponent,
-    SharingPostComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -144,7 +141,7 @@ import { sharedModule } from './layout/shared/shared.module';
     EventService,
     IconService,
     NodeService,
-    PhotoService,
+    ConfirmationService,
     ProductService,
     MapApiService,
   ],

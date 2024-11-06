@@ -20,7 +20,7 @@ interface PageEvent {
   selector: 'app-tour-management',
   templateUrl: './tour-management.component.html',
   styleUrl: './tour-management.component.scss',
-  providers: [MessageService]
+  providers: [MessageService],
 })
 export class TourManagementComponent implements OnInit {
   isCreating: boolean = false;
@@ -48,7 +48,7 @@ export class TourManagementComponent implements OnInit {
 
   constructor(
     private tourService: TourService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {}
 
   ngOnInit(): void {
@@ -68,22 +68,29 @@ export class TourManagementComponent implements OnInit {
   private loadTours(
     pageNumber: number,
     pageSize: number,
-    searchTerm?: string
+    searchTerm?: string,
   ): void {
     this.loading = true;
-    this.tourService
-      .getTours(pageNumber, pageSize, searchTerm)
-      .subscribe({
-        next: (data) => {
-          this.tours = data.results as Tour[];
-          this.loading = false;
-          this.totalRecords = data.totalRecords;
+    this.tourService.getTours(pageNumber, pageSize, searchTerm).subscribe({
+      next: data => {
+        this.tours = data.results as Tour[];
+        this.loading = false;
+        if (data.totalElements !== undefined) {
+          this.totalRecords = data.totalElements;
+        } else {
+          this.totalRecords = 0;
+        }
+
+        if (data.totalPages !== undefined) {
           this.totalPages = data.totalPages;
-        },
-        error: (error) => {
-          console.error('There was an error!', error);
-        },
-      });
+        } else {
+          this.totalPages = 1;
+        }
+      },
+      error: error => {
+        console.error('There was an error!', error);
+      },
+    });
   }
 
   openNew(): void {
@@ -119,16 +126,20 @@ export class TourManagementComponent implements OnInit {
     if (this.tour.id !== undefined) {
       this.tourService.deleteTour(this.tour.id).subscribe(
         () => {
-          this.tours = this.tours.filter((val) => val.id !== this.tour.id);
+          this.tours = this.tours.filter(val => val.id !== this.tour.id);
           this.messageService.add({
             severity: 'success',
             summary: 'Successful',
             detail: 'Tour Deleted',
             life: 3000,
           });
-          this.loadTours(this.first / this.rows + 1, this.rows, this.searchTerm);
+          this.loadTours(
+            this.first / this.rows + 1,
+            this.rows,
+            this.searchTerm,
+          );
         },
-        (error) => {
+        error => {
           console.error('Error deleting tour:', error);
           this.messageService.add({
             severity: 'error',
@@ -136,7 +147,7 @@ export class TourManagementComponent implements OnInit {
             detail: 'Error occurred while deleting the tour.',
             life: 3000,
           });
-        }
+        },
       );
     } else {
       console.error('Tour ID is undefined');
@@ -155,19 +166,23 @@ export class TourManagementComponent implements OnInit {
     if (this.isCreating || this.isEdit) {
       if (this.tour.id !== undefined) {
         this.tourService.updateTour(this.tour).subscribe({
-          next: (data) => {
+          next: data => {
             this.messageService.add({
               severity: 'success',
               summary: 'Successful',
               detail: data.message,
               life: 3000,
             });
-            this.loadTours(this.first / this.rows + 1, this.rows, this.searchTerm);
+            this.loadTours(
+              this.first / this.rows + 1,
+              this.rows,
+              this.searchTerm,
+            );
             this.isEdit = false;
             this.createTourDialog = false;
             this.tourDialog = false;
           },
-          error: (error) => {
+          error: error => {
             if (error.error.results) {
               // Lặp qua các lỗi trong mảng results và hiển thị chúng
               error.error.results.forEach((err: any) => {
@@ -186,28 +201,38 @@ export class TourManagementComponent implements OnInit {
                 life: 3000,
               });
             }
-          }
+          },
         });
       } else {
-        const formattedStartDate = format(this.tour.startDate as Date, "yyyy-MM-dd'T'HH:mm");
-        const formattedEndDate = format(this.tour.endDate as Date, "yyyy-MM-dd'T'HH:mm");
+        const formattedStartDate = format(
+          this.tour.startDate as Date,
+          "yyyy-MM-dd'T'HH:mm",
+        );
+        const formattedEndDate = format(
+          this.tour.endDate as Date,
+          "yyyy-MM-dd'T'HH:mm",
+        );
         this.tour.startDate = new Date(formattedStartDate);
         this.tour.endDate = new Date(formattedEndDate);
 
         this.tourService.createTour(this.tour).subscribe({
-          next: (data) => {
+          next: data => {
             this.messageService.add({
               severity: 'success',
               summary: 'Successful',
               detail: data.message,
               life: 3000,
             });
-            this.loadTours(this.first / this.rows + 1, this.rows, this.searchTerm);
+            this.loadTours(
+              this.first / this.rows + 1,
+              this.rows,
+              this.searchTerm,
+            );
             this.isEdit = false;
             this.createTourDialog = false;
             this.tourDialog = false;
           },
-          error: (error) => {
+          error: error => {
             if (error.error.results) {
               // Lặp qua các lỗi trong mảng results và hiển thị chúng
               error.error.results.forEach((err: any) => {
@@ -226,7 +251,7 @@ export class TourManagementComponent implements OnInit {
                 life: 3000,
               });
             }
-          }
+          },
         });
       }
     }

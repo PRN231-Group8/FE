@@ -9,4 +9,5 @@ export interface UserProfileResponse {
   address?: string;
   createdDate: Date;
   lastUpdatedDate?: Date;
+  role: string;
 }

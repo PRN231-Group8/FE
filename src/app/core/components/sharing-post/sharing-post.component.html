@@ -1,11 +1,21 @@
+<!-- eslint-disable @angular-eslint/template/elements-content -->
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<p-scrollTop> </p-scrollTop>
+<p-confirmDialog></p-confirmDialog>
+<p-toast> </p-toast>
+<app-navbar class="sticky top-0 z-1"></app-navbar>
 <div class="flex justify-content-center pb-6">
   <!-- Post Creation Section -->
-  <div class="w-full shadow-6 border-round" style="max-width: 800px">
+  <div
+    class="w-full shadow-3 border-1 border-yellow-500 surface-overlay border-round"
+    style="max-width: 800px"
+  >
     <div class="p-card p-p-3 p-mb-3">
       <div class="flex align-items-center p-3">
         <p-avatar
           size="large"
-          [image]="userAvatarUrl"
+          [image]="userAvatarUrl || defaultAvatarPath"
           class="mr-2"
           shape="circle"
         ></p-avatar>
@@ -13,20 +23,21 @@
           pInputText
           [(ngModel)]="postContent"
           class="p-inputtext-lg w-full p-3 border-round-xl"
-          placeholder="{{ userName }}, bạn đang nghĩ gì thế?"
+          placeholder="{{
+            userName
+          }}, what do you want to share after the Tour?"
           (focus)="onFocus()"
         />
       </div>
-
       <div
-        class="flex justify-content-between align-items-center justify-content-center mt-2 p-2"
+        class="flex justify-content-center align-items-center mt-2 p-2"
         style="border-top: 1px solid #9b9b9b"
       >
         <button
           pButton
-          label="Ảnh/video"
+          label="Images"
           icon="pi pi-images"
-          class="flex align-items-center justify-content-center p-button-text text-success font-bold"
+          class="p-button-outlined text-success font-bold"
           (click)="openPhotoVideoModal()"
         ></button>
       </div>
@@ -34,49 +45,383 @@
   </div>
 </div>
 
+<div class="grid">
+  <div class="col-fixed pl-3" style="width: 600px">
+    <div
+      class="flex flex-column p-4 gap-4 shadow-3 border-1 border-yellow-500 surface-overlay border-round"
+    >
+      <h3 class="text-center text-5xl font-bold mb-4 text-yellow-500">
+        Post Filter
+      </h3>
+      <!-- Search and Filter Controls -->
+      <div class="flex flex-wrap gap-3">
+        <!-- Search Term Input -->
+        <p-floatLabel class="mb-4">
+          <input
+            pInputText
+            [(ngModel)]="searchTerm"
+            id="searchTerm"
+            class="p-mb-2"
+          />
+          <label for="searchTerm">Search by term</label>
+        </p-floatLabel>
+
+        <!-- Status Filter Dropdown -->
+        <p-floatLabel class="mb-4">
+          <p-dropdown
+            [(ngModel)]="statusFilter"
+            [options]="statusOptions"
+            id="statusFilter"
+            class="p-mb-2"
+          ></p-dropdown>
+          <label for="statusFilter">Filter by status</label>
+        </p-floatLabel>
+
+        <!-- Page Number Input -->
+        <p-floatLabel>
+          <input
+            pInputText
+            [(ngModel)]="pageNumber"
+            id="pageNumber"
+            type="number"
+            class="p-mb-2"
+          />
+          <label for="pageNumber">Page Number</label>
+        </p-floatLabel>
+
+        <!-- Page Size Input -->
+        <p-floatLabel>
+          <input
+            pInputText
+            [(ngModel)]="pageSize"
+            id="pageSize"
+            type="number"
+            class="p-mb-2"
+          />
+          <label for="pageSize">Page Size</label>
+        </p-floatLabel>
+      </div>
+
+      <!-- Centered Search Button -->
+      <div class="flex justify-content-center mt-4">
+        <button
+          pButton
+          label="Search"
+          icon="pi pi-search"
+          [icon]="isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search'"
+          [disabled]="isLoading"
+          (click)="fetchPosts()"
+          class="p-button-outlined"
+        ></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div
+      class="flex justify-content-center shadow-3 pb-6 border-1 border-yellow-500 surface-overlay border-round"
+    >
+      <!-- Post Feed Section -->
+      <div class="flex flex-column align-items-center pb-6">
+        <h3 class="text-center text-5xl font-bold mb-4 mt-4 text-yellow-500">
+          Post Feed
+        </h3>
+        <div
+          *ngFor="let post of posts; let i = index"
+          class="w-full shadow-3 border-round mb-4"
+          style="max-width: 800px"
+        >
+          <div class="p-card p-p-3">
+            <div class="relative">
+              <div class="absolute top-0 right-0 m-3 z-10">
+                <button
+                  pButton
+                  type="button"
+                  icon="pi pi-ellipsis-v"
+                  class="p-button-text p-button-rounded"
+                  (click)="menu.toggle($event)"
+                  appendTo="body"
+                ></button>
+                <p-menu
+                  #menu
+                  [popup]="true"
+                  [model]="getPostMenuItems(post)"
+                  appendTo="body"
+                  class="absolute"
+                ></p-menu>
+              </div>
+            </div>
+
+            <!-- Post Header -->
+            <div class="flex align-items-center">
+              <p-avatar
+                size="large"
+                [image]="
+                  post.user.avatarPath || userAvatarUrl || defaultAvatarPath
+                "
+                class="mr-2 p-2"
+                shape="circle"
+              ></p-avatar>
+              <div>
+                <p class="m-0 font-bold">
+                  {{ post.user.firstName }} {{ post.user.lastName }}
+                </p>
+                <small class="text-secondary">{{
+                  post.createDate | date: 'medium'
+                }}</small>
+              </div>
+            </div>
+
+            <!-- Post Content -->
+            <p class="mt-3 pl-2">{{ post.content }}</p>
+            <!-- Image Preview Section -->
+            <div class="flex align-items-center justify-content-center mt-3">
+              <!-- Single Image View -->
+              <div
+                *ngIf="post.photos.length === 1"
+                class="w-full p-2"
+                (click)="showGalleria(i)"
+              >
+                <img
+                  [src]="post.photos[0].url"
+                  class="w-full h-auto max-h-30rem object-contain cursor-pointer border-round-lg"
+                  alt="Image"
+                />
+              </div>
+
+              <!-- Two Images View -->
+              <div
+                *ngIf="post.photos.length === 2"
+                class="grid grid-nogutter w-full p-2"
+              >
+                <div
+                  *ngFor="let image of post.photos; let j = index"
+                  class="col-6 p-1"
+                  (click)="showGalleria(i)"
+                >
+                  <img
+                    [src]="image.url"
+                    class="w-full h-auto object-cover cursor-pointer border-round-lg"
+                    alt="Image"
+                  />
+                </div>
+              </div>
+
+              <!-- Three Images View -->
+              <div
+                *ngIf="post.photos.length === 3"
+                class="grid grid-nogutter w-full p-2"
+              >
+                <div
+                  *ngFor="let image of post.photos; let j = index"
+                  class="col-4 p-1"
+                  (click)="showGalleria(i)"
+                >
+                  <img
+                    [src]="image.url"
+                    class="w-full h-auto object-cover cursor-pointer border-round-lg"
+                    alt="Image"
+                  />
+                </div>
+              </div>
+
+              <!-- More than Three Images View -->
+              <div
+                *ngIf="post.photos.length > 3"
+                class="grid grid-nogutter w-full p-2"
+              >
+                <div
+                  *ngFor="let image of post.photos.slice(0, 3); let j = index"
+                  class="col-4 p-1 relative"
+                  (click)="showGalleria(i)"
+                >
+                  <img
+                    [src]="image.url"
+                    class="w-full h-auto object-cover cursor-pointer border-round-lg"
+                    alt="Image"
+                  />
+                  <!-- Overlay for remaining images count -->
+                  <div
+                    *ngIf="j === 2 && post.photos.length > 3"
+                    class="absolute top-0 left-0 w-full h-full flex align-items-center justify-content-center text-white bg-black-alpha-50 border-round-lg"
+                  >
+                    +{{ post.photos.length - 3 }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Galleria Component for Each Post -->
+            <p-galleria
+              *ngIf="post.displayGallery"
+              [value]="post.photos"
+              [(visible)]="post.displayGallery"
+              [responsiveOptions]="[
+                { breakpoint: '1024px', numVisible: 5 },
+                { breakpoint: '768px', numVisible: 3 },
+                { breakpoint: '560px', numVisible: 1 },
+              ]"
+              [containerStyle]="{ 'max-width': '80%' }"
+              [numVisible]="5"
+              [circular]="true"
+              [fullScreen]="true"
+              [showItemNavigators]="true"
+              [showThumbnails]="true"
+              [activeIndex]="activeIndex"
+            >
+              <!-- Full Image Display -->
+              <ng-template pTemplate="item" let-item>
+                <div
+                  class="flex justify-content-center align-items-center h-full"
+                >
+                  <img
+                    [src]="item.url"
+                    class="w-full md:w-10 lg:w-10 max-h-screen border-round-lg"
+                    alt="Image"
+                  />
+                </div>
+              </ng-template>
+
+              <!-- Thumbnail Display -->
+              <ng-template pTemplate="thumbnail" let-item>
+                <div class="p-1">
+                  <img
+                    [src]="item.url"
+                    class="w-4rem h-4rem object-cover border-round"
+                    alt="Thumbnail"
+                  />
+                </div>
+              </ng-template>
+            </p-galleria>
+            <!-- Comment Button -->
+            <div class="mt-3 flex justify-content-center">
+              <button
+                pButton
+                label="Comment"
+                [icon]="
+                  isCommentLoading ? 'pi pi-spin pi-spinner' : 'pi pi-comments'
+                "
+                class="p-button-outlined"
+                (click)="
+                  activeCommentPostId =
+                    activeCommentPostId === post.postsId ? null : post.postsId
+                "
+                [disabled]="isCommentLoading"
+              ></button>
+            </div>
+
+            <!-- Divider Line -->
+            <hr class="mt-3 mb-3" style="border-top: 1px solid #e0e0e0" />
+
+            <!-- Comments Section -->
+            <div *ngIf="activeCommentPostId === post.postsId" class="mt-3">
+              <div
+                *ngFor="let comment of post.comments"
+                class="comment-section mb-3"
+              >
+                <!-- Comment User Info with Tag-Like Name -->
+                <div class="flex align-items-center ml-3">
+                  <p-avatar
+                    size="normal"
+                    [image]="comment.user?.avatarPath || defaultAvatarPath"
+                    class="mr-2"
+                    shape="circle"
+                  ></p-avatar>
+                  <div class="bg-gray-100 border-round-xl px-3 py-2">
+                    <span class="font-bold text-sm"
+                      >{{ comment.user?.firstName }}
+                      {{ comment.user?.lastName }}</span
+                    >
+                    <p class="m-0 text-500">{{ comment.content }}</p>
+                  </div>
+                </div>
+
+                <!-- Comment Time -->
+                <div class="flex align-items-center ml-3 mt-1">
+                  <small class="text-secondary">{{
+                    comment.createDate | date: 'medium'
+                  }}</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Comment Input Section -->
+            <div
+              *ngIf="activeCommentPostId === post.postsId"
+              class="flex align-items-center mt-3"
+            >
+              <!-- User Avatar for Comment Input -->
+              <p-avatar
+                size="normal"
+                [image]="userAvatarUrl || defaultAvatarPath"
+                class="mr-2"
+                shape="circle"
+              ></p-avatar>
+
+              <!-- Comment Input Field -->
+              <input
+                pInputText
+                [(ngModel)]="commentContent"
+                placeholder="Write a comment..."
+                class="w-full p-3 border-round-xl mr-2"
+                (keyup.enter)="postComment(post.postsId)"
+              />
+
+              <!-- Send Button -->
+              <button
+                pButton
+                [icon]="
+                  isCommentLoading ? 'pi pi-spin pi-spinner' : 'pi pi-send'
+                "
+                class="p-button-rounded p-button-text"
+                [disabled]="!commentContent.trim() || isCommentLoading"
+                (click)="postComment(post.postsId)"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal for Creating Post -->
 <p-dialog
-  header="Tạo bài viết"
   [(visible)]="showCreatePostModal"
   [modal]="true"
   [closable]="true"
-  [style]="{ width: '600px', height: 'auto' }"
+  [style]="{ width: '800px', height: 'auto' }"
 >
+  <ng-template pTemplate="header">
+    <h3 class="text-center text-3xl font-bold mb-4 text-yellow-500">
+      Share Post
+    </h3>
+  </ng-template>
   <div class="p-fluid">
     <div class="flex align-items-center mb-3">
       <p-avatar
         size="large"
-        [image]="userAvatarUrl"
+        [image]="userAvatarUrl || defaultAvatarPath"
         class="mr-2"
         shape="circle"
       ></p-avatar>
       <div>
-        <p class="m-0">{{ userName }}</p>
-        <small class="text-secondary">Chỉ mình tôi</small>
+        <p class="m-0 font-bold font-italic">{{ userName }}</p>
       </div>
     </div>
-
-    <!-- Title Input -->
-    <input
-      pInputText
-      [(ngModel)]="postTitle"
-      placeholder="Nhập tiêu đề bài viết"
-      class="w-full p-3 mb-2 border-round-xl"
-    />
 
     <!-- Content Textarea -->
     <textarea
       pInputTextarea
       [(ngModel)]="postContent"
-      placeholder="{{ userName }}, bạn đang nghĩ gì thế?"
+      placeholder="{{ userName }}, what do you want to share after the Tour?"
       rows="5"
       class="w-full p-3 border-round-xl"
     ></textarea>
 
-    <!-- Custom File Upload Component -->
+    <!-- Custom File Upload Component with Drag and Drop -->
     <div class="mt-3">
-      <p-toast></p-toast>
       <p-fileUpload
+        #fileUploader
         name="myfile[]"
         url="https://www.primefaces.org/cdn/api/upload.php"
         [multiple]="true"
@@ -85,122 +430,38 @@
         (onUpload)="onTemplatedUpload()"
         (onSelect)="onSelectedFiles($event)"
       >
+        <!-- Upload Header with Choose Button -->
         <ng-template
           pTemplate="header"
           let-files
           let-chooseCallback="chooseCallback"
           let-clearCallback="clearCallback"
-          let-uploadCallback="uploadCallback"
         >
           <div
             class="flex flex-wrap justify-content-between align-items-center flex-1 gap-2"
           >
             <div class="flex gap-2">
               <p-button
-                (onClick)="choose($event, chooseCallback)"
+                (click)="chooseCallback()"
                 icon="pi pi-images"
+                label="Choose"
                 [rounded]="true"
                 [outlined]="true"
               ></p-button>
               <p-button
-                (onClick)="uploadEvent(uploadCallback)"
-                icon="pi pi-cloud-upload"
-                [rounded]="true"
-                [outlined]="true"
-                severity="success"
-                [disabled]="!files || files.length === 0"
-              ></p-button>
-              <p-button
-                (onClick)="clearCallback()"
+                (click)="clearCallback()"
                 icon="pi pi-times"
+                label="Clear"
                 [rounded]="true"
                 [outlined]="true"
                 severity="danger"
                 [disabled]="!files || files.length === 0"
               ></p-button>
             </div>
-            <p-progressBar
-              [value]="totalSizePercent"
-              [showValue]="false"
-              styleClass="md:w-20rem h-1rem w-full md:ml-auto"
-              [ngClass]="{ 'exceeded-progress-bar': totalSizePercent > 100 }"
-            >
-              <span class="white-space-nowrap">{{ totalSize }}B / 1Mb</span>
-            </p-progressBar>
           </div>
         </ng-template>
-        <ng-template
-          pTemplate="content"
-          let-files
-          let-uploadedFiles="uploadedFiles"
-          let-removeFileCallback="removeFileCallback"
-          let-removeUploadedFileCallback="removeUploadedFileCallback"
-        >
-          <div *ngIf="files?.length > 0">
-            <h5>Pending</h5>
-            <div class="flex flex-wrap p-0 sm:p-5 gap-5">
-              <div
-                *ngFor="let file of files; let i = index"
-                class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3"
-              >
-                <div>
-                  <img
-                    role="presentation"
-                    [alt]="file.name"
-                    [src]="file.objectURL"
-                    width="100"
-                    height="50"
-                  />
-                </div>
-                <span class="font-semibold">{{ file.name }}</span>
-                <div>{{ formatSize(file.size) }}</div>
-                <p-badge value="Pending" severity="warning"></p-badge>
-                <p-button
-                  icon="pi pi-times"
-                  (onClick)="
-                    onRemoveTemplatingFile($event, file, removeFileCallback, i)
-                  "
-                  [outlined]="true"
-                  [rounded]="true"
-                  severity="danger"
-                ></p-button>
-              </div>
-            </div>
-          </div>
-          <div *ngIf="uploadedFiles?.length > 0">
-            <h5>Completed</h5>
-            <div class="flex flex-wrap p-0 sm:p-5 gap-5">
-              <div
-                *ngFor="let file of uploadedFiles; let j = index"
-                class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3"
-              >
-                <div>
-                  <img
-                    role="presentation"
-                    [alt]="file.name"
-                    [src]="file.objectURL"
-                    width="100"
-                    height="50"
-                  />
-                </div>
-                <span class="font-semibold">{{ file.name }}</span>
-                <div>{{ formatSize(file.size) }}</div>
-                <p-badge
-                  value="Completed"
-                  class="mt-3"
-                  severity="success"
-                ></p-badge>
-                <p-button
-                  icon="pi pi-times"
-                  (onClick)="removeUploadedFileCallback(j)"
-                  [outlined]="true"
-                  [rounded]="true"
-                  severity="danger"
-                ></p-button>
-              </div>
-            </div>
-          </div>
-        </ng-template>
+
+        <!-- Drag and Drop Area -->
         <ng-template pTemplate="empty">
           <div
             class="flex align-items-center justify-content-center flex-column"
@@ -217,151 +478,223 @@
     <div class="flex justify-content-end mt-3">
       <button
         pButton
-        label="Đăng"
-        class="p-button-success"
-        [disabled]="!postTitle || !postContent"
+        label="Share"
+        icon="pi pi-check"
+        [icon]="isSubmitting ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+        [disabled]="!postContent || isSubmitting"
         (click)="createPost()"
+        class="p-button-success"
       ></button>
     </div>
   </div>
 </p-dialog>
 
-<div class="flex justify-content-center pb-6">
-  <!-- Post Feed -->
-  <div class="w-full shadow-6 border-round" style="max-width: 800px">
-    <div class="p-card p-p-3 p-mb-3">
-      <div class="flex align-items-center">
-        <p-avatar
-          size="large"
-          [image]="userAvatarUrl"
-          class="mr-2 p-2"
-          shape="circle"
-        ></p-avatar>
-        <div>
-          <p class="m-0 font-bold font-italic">{{ userName }}</p>
-          <small class="text-secondary">{{ time }}</small>
-        </div>
+<!-- Update Dialog  -->
+
+<p-dialog
+  [(visible)]="displayEditModal"
+  [modal]="true"
+  [style]="{ width: '1200px' }"
+  [closable]="true"
+>
+  <ng-template pTemplate="header">
+    <h3 class="text-center text-3xl font-bold mb-4 text-yellow-500">
+      Update Post
+    </h3>
+  </ng-template>
+  <div class="grid">
+    <div class="col-10">
+      <!-- Checkbox for Remove All Comments -->
+      <p-checkbox
+        [(ngModel)]="updatePostRequest.removeAllComments"
+        label="Remove all comments"
+        binary="true"
+        (onChange)="onRemoveAllCommentsChange()"
+      ></p-checkbox>
+
+      <p-table
+        *ngIf="!updatePostRequest.removeAllComments"
+        [value]="comments || []"
+        [paginator]="true"
+        [rows]="5"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Avatar</th>
+            <th>Commenter</th>
+            <th>Content</th>
+            <th>Action</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-comment>
+          <tr>
+            <td>
+              <p-avatar
+                [image]="comment.user?.avatarPath || defaultAvatarPath"
+                [shape]="'circle'"
+                [style]="{ width: '40px', height: '40px' }"
+              ></p-avatar>
+            </td>
+            <td>
+              {{
+                comment.user?.firstName || comment.user?.lastName
+                  ? (comment.user?.firstName || '') +
+                    ' ' +
+                    (comment.user?.lastName || '')
+                  : 'Anonymous'
+              }}
+            </td>
+            <td>{{ comment.content }}</td>
+            <td>
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-text p-button-danger"
+                (click)="confirmRemoveComment(comment.id)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="col-2">
+      <!-- Post Status -->
+      <div class="field mb-4">
+        <label for="status" class="text-lg font-semibold text-800 mb-2"
+          >Status</label
+        ><br />
+        <p-dropdown
+          [(ngModel)]="updatePostRequest.status"
+          [options]="statusOptions"
+          placeholder="Select Status"
+          class="w-full"
+        ></p-dropdown>
       </div>
-      <h3 class="mt-3 pl-2">{{ title }}</h3>
-      <p class="pl-2">{{ description }}</p>
-
-      <!-- Image Preview Section -->
-      <div class="flex gap-2 mt-3">
-        <div
-          *ngFor="let image of images.slice(0, 3); let i = index"
-          class="relative"
-          (click)="showGalleria(i)"
-        >
-          <img
-            [src]="image.itemImageSrc"
-            class="w-16rem h-16rem object-cover cursor-pointer"
-            alt="Image"
-          />
-          <div
-            *ngIf="i === 2 && images.length > 3"
-            class="absolute top-0 left-0 w-full h-full flex align-items-center justify-content-center text-white bg-black-alpha-70"
-          >
-            +{{ images.length - 3 }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Horizontal Line -->
-      <div style="border-top: 1px solid #9b9b9b; margin-top: 10px"></div>
-
-      <!-- Comment Button Section -->
-      <div class="flex justify-content-between align-items-center mt-3">
-        <button
-          pButton
-          label="Comment"
-          icon="pi pi-comments"
-          class="p-button-text"
-          (click)="toggleComments()"
-        ></button>
-      </div>
-
-      <!-- Comments Section -->
-      <div *ngIf="showComments" class="mt-3">
-        <div *ngFor="let comment of comments" class="comment-section mb-3">
-          <div class="flex align-items-center">
-            <p-avatar
-              size="large"
-              [image]="comment.userAvatar"
-              class="mr-2"
-              shape="circle"
-            ></p-avatar>
-            <p class="m-0 font-bold">{{ comment.userName }}</p>
-            <small class="text-secondary ml-2">{{ comment.time }}</small>
-          </div>
-          <p class="ml-10">{{ comment.content }}</p>
-
-          <!-- Reply Button -->
-          <div class="flex align-items-center ml-10">
-            <button
-              pButton
-              label="Reply"
-              icon="pi pi-reply"
-              class="p-button-text"
-              (click)="toggleReply(comment.id)"
-            ></button>
-          </div>
-
-          <!-- Reply Input -->
-          <div
-            *ngIf="comment.id === replyToCommentId"
-            class="flex align-items-center mt-2 ml-10"
-          >
-            <p-avatar
-              size="large"
-              [image]="userAvatarUrl"
-              class="mr-2"
-              shape="circle"
-            ></p-avatar>
-            <input
-              pInputText
-              [(ngModel)]="replyContent"
-              placeholder="Reply..."
-              class="p-inputtext-sm w-full"
-            />
-            <button
-              pButton
-              icon="pi pi-send"
-              (click)="sendReply(comment.id)"
-              class="p-button-sm ml-2"
-            ></button>
-          </div>
-
-          <!-- Galleria Component -->
-          <p-galleria
-            [value]="images"
-            [(visible)]="displayBasic"
-            [responsiveOptions]="responsiveOptions"
-            [containerStyle]="{ 'max-width': '50%' }"
-            [numVisible]="9"
-            [circular]="true"
-            [fullScreen]="true"
-            [showItemNavigators]="true"
-            [activeIndex]="activeIndex"
-          >
-            <ng-template pTemplate="item" let-item>
+    </div>
+    <div class="col-8">
+      <!-- Checkbox for Remove All Photos -->
+      <p-checkbox
+        [(ngModel)]="updatePostRequest.removeAllPhotos"
+        label="Remove all photos"
+        binary="true"
+        (onChange)="onRemoveAllPhotosChange()"
+      ></p-checkbox>
+      <p-table
+        *ngIf="!updatePostRequest.removeAllPhotos"
+        [value]="photoDetails"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Photos</th>
+            <th>Action</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-photo>
+          <tr>
+            <td>
               <img
-                [src]="item.itemImageSrc"
-                style="width: 100%; display: block"
-                alt="Image"
+                [src]="photo.url"
+                alt="Photo"
+                class="thumbnail"
+                style="width: 50px; height: 50px"
               />
-            </ng-template>
-            <ng-template pTemplate="thumbnail" let-item>
-              <div class="grid grid-nogutter justify-content-center">
-                <img
-                  [src]="item.thumbnailImageSrc"
-                  style="display: block"
-                  alt="Thumbnail"
-                />
-              </div>
-            </ng-template>
-          </p-galleria>
-        </div>
+            </td>
+            <td>
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-text p-button-info"
+                (click)="openUpdateImageDialog(photo.id)"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-text p-button-danger"
+                (click)="confirmRemovePhoto(photo.id)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div class="col-4">
+      <!-- Post Content -->
+      <div class="field flex flex-column gap-2 mb-4">
+        <label for="content" class="text-lg font-semibold text-800"
+          >Content</label
+        >
+        <textarea
+          pInputTextarea
+          [(ngModel)]="updatePostRequest.content"
+          rows="5"
+          cols="30"
+          [autoResize]="true"
+          class="p-inputtext p-component w-full p-2 border-round surface-100"
+          placeholder="Enter your post content here..."
+        ></textarea>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Footer Buttons -->
+  <p-footer>
+    <button
+      pButton
+      label="Update"
+      icon="pi pi-check"
+      class="p-button-success"
+      (click)="updatePost()"
+    ></button>
+    <button
+      pButton
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-secondary"
+      (click)="closeEditDialog()"
+    ></button>
+  </p-footer>
+</p-dialog>
+<!-- Update Image Dialog -->
+<p-dialog
+  [(visible)]="displayUpdateImageDialog"
+  header="Update Image"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  [closable]="true"
+  (onHide)="onDialogClose()"
+>
+  <ng-template pTemplate="content">
+    <p-fileUpload
+      mode="basic"
+      chooseLabel="Choose"
+      chooseIcon="pi pi-upload"
+      accept="image/*"
+      maxFileSize="3000000"
+      (onSelect)="onFileSelect($event)"
+    ></p-fileUpload>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      label="Update"
+      icon="pi pi-check"
+      [icon]="isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+      class="p-button-success"
+      (click)="updateImage()"
+      [disabled]="!selectedFile || isLoading"
+    ></button>
+
+    <button
+      pButton
+      label="Cancel"
+      icon="pi pi-times"
+      [icon]="isCancelLoading ? 'pi pi-spin pi-spinner' : 'pi pi-times'"
+      class="p-button-secondary"
+      (click)="cancelUpdate()"
+      [disabled]="isCancelLoading"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<app-shared-footer class="pt-8"></app-shared-footer>
