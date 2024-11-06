@@ -50,6 +50,7 @@ export class SharingPostComponent implements OnInit {
     { label: 'Rejected', value: 'Rejected' },
   ];
   isLoading: boolean = false;
+  isUpdatePostLoading: boolean = false;
   showImageUploadDialog: boolean = false;
   isSubmitting: boolean = false;
   activeCommentPostId: string | null = null;
@@ -228,10 +229,11 @@ export class SharingPostComponent implements OnInit {
 
             // Add the comment to the post
             const newComment: Comments = {
-              createDate: result.createdDate,
+              createdDate: result.createdDate,
               id: result.id,
               content: result.content,
               user: this.currentUser,
+              postId: result.postId,
             };
 
             const post = this.posts.find(p => p.postsId === postId);
@@ -321,7 +323,7 @@ export class SharingPostComponent implements OnInit {
 
   // Update Post
   updatePost(): void {
-    this.isLoading = true; // Start loading for update
+    this.isUpdatePostLoading = true; // Start loading
     if (this.updatePostRequest) {
       this.postService
         .updatePost(this.updatePostRequest.postsId!, this.updatePostRequest)
@@ -329,14 +331,16 @@ export class SharingPostComponent implements OnInit {
           next: response => {
             if (response.isSucceed) {
               this.displayEditModal = false;
-              this.isLoading = false;
+              this.isUpdatePostLoading = false; // Stop loading after success
 
-              // Reload the page
-              window.location.reload();
+              // Delay the reload to allow the UI to show loading state
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
             }
           },
           error: () => {
-            this.isLoading = false;
+            this.isUpdatePostLoading = false; // Stop loading on error
           },
         });
     }
@@ -430,85 +434,43 @@ export class SharingPostComponent implements OnInit {
   }
   // Remove a specific photo
   removePhoto(photoId: string): void {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to remove this comment?',
-      header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        if (this.updatePostRequest) {
-          this.updatePostRequest.photosToRemove =
-            this.updatePostRequest.photosToRemove?.filter(id => id !== photoId);
-        }
-      },
-    });
+    if (this.updatePostRequest) {
+      this.updatePostRequest.photosToRemove =
+        this.updatePostRequest.photosToRemove?.filter(id => id !== photoId);
+    }
   }
 
   // Open the Update Dialog
   openUpdateDialog(post: Post): void {
-    this.postService.getCommentsByPostId(post.postsId).subscribe({
+    this.postService.getPostById(post.postsId).subscribe({
       next: response => {
-        if (response.isSucceed && Array.isArray(response.result)) {
-          const commentsResult = response.result as CommentResponse[];
+        if (response.isSucceed && response.result) {
+          const fullPost = response.result as Post;
+
           this.updatePostRequest = {
-            postsId: post.postsId,
-            content: post.content,
-            status: post.status,
+            postsId: fullPost.postsId,
+            content: fullPost.content,
+            status: fullPost.status,
             removeAllComments: false,
-            commentsToRemove: commentsResult.map(comment => comment.id),
+            commentsToRemove: [],
             removeAllPhotos: false,
-            photosToRemove: post.photos.map(photo => photo.id),
+            photosToRemove: [],
           };
 
-          // Set comments for UI display
-          this.comments = commentsResult;
+          this.comments = fullPost.comments || [];
+          this.photoDetails = (fullPost.photos || []).map(photo => ({
+            id: photo.id,
+            url: photo.url,
+          }));
 
-          // Load photo details
-          this.photoDetails = []; // Reset before loading
-          this.loadPhotoDetails();
-
-          this.cdr.detectChanges();
           this.displayEditModal = true;
+          this.cdr.detectChanges();
         }
       },
+      error: () => {
+        this.displayMessage('error', 'Error', 'Failed to load post details.');
+      },
     });
-  }
-
-  loadPhotoDetails(): void {
-    this.photoDetails = []; // Reset before loading
-    if (this.updatePostRequest.photosToRemove) {
-      this.updatePostRequest.photosToRemove.forEach(photoId => {
-        this.getPhotoUrl(photoId).subscribe(url => {
-          const photoDetail = { id: photoId, url };
-          this.photoDetails.push(photoDetail);
-        });
-      });
-    }
-  }
-
-  getPhotoUrl(photoId: string): Observable<string> {
-    return new Observable(observer => {
-      this.photoService.getPhotoById(photoId).subscribe({
-        next: response => {
-          const result = response.result;
-          if (result && !Array.isArray(result)) {
-            // Only proceed if result is a single PhotoResponse
-            observer.next(result.url);
-          } else {
-            observer.next(''); // Fallback if result is not a single PhotoResponse
-          }
-          observer.complete();
-        },
-        error: () => {
-          observer.next(''); // Provide a fallback if retrieval fails
-          observer.complete();
-        },
-      });
-    });
-  }
-
-  // Close the Edit Dialog
-  closeEditDialog(): void {
-    this.displayEditModal = false;
   }
 
   // Get Post Menu Items
@@ -521,7 +483,7 @@ export class SharingPostComponent implements OnInit {
     const menuItems: MenuItem[] = [];
 
     if (isOwner) {
-      // If not a customer, or if the customer is the owner, allow updating
+      // Allow updating if the user is an owner or moderator
       menuItems.push({
         label: 'Update',
         icon: 'pi pi-pencil',
@@ -544,6 +506,11 @@ export class SharingPostComponent implements OnInit {
     }
 
     return menuItems;
+  }
+
+  // Close the Edit Dialog
+  closeEditDialog(): void {
+    this.displayEditModal = false;
   }
 
   openUpdateImageDialog(photoId: string): void {
@@ -594,20 +561,12 @@ export class SharingPostComponent implements OnInit {
   // Update this method to watch for changes in the checkbox status
   onRemoveAllPhotosChange(): void {
     if (this.updatePostRequest.removeAllPhotos) {
-      // Clear photosToRemove if RemoveAllPhotos is checked
-      this.updatePostRequest.photosToRemove = [];
-    } else {
-      // Initialize an empty array if RemoveAllPhotos is unchecked
       this.updatePostRequest.photosToRemove = [];
     }
   }
 
   onRemoveAllCommentsChange(): void {
     if (this.updatePostRequest.removeAllComments) {
-      // Clear commentsToRemove if RemoveAllComments is checked
-      this.updatePostRequest.commentsToRemove = [];
-    } else {
-      // Initialize an empty array if RemoveAllComments is unchecked
       this.updatePostRequest.commentsToRemove = [];
     }
   }

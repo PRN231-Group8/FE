@@ -5,7 +5,6 @@ import { User } from './user';
 export interface Post {
   showComments: boolean;
   displayGallery: boolean;
-  id: string;
   postsId: string;
   content: string;
   rating: number;

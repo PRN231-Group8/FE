@@ -1,8 +1,9 @@
 import { User } from './user';
 
 export interface Comments {
-  createDate: string | number | Date;
   id: string;
   content: string;
+  createdDate: string;
   user?: User;
+  postId: string;
 }

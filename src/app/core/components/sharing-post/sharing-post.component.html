@@ -338,7 +338,7 @@
                 <!-- Comment Time -->
                 <div class="flex align-items-center ml-3 mt-1">
                   <small class="text-secondary">{{
-                    comment.createDate | date: 'medium'
+                    comment.createdDate
                   }}</small>
                 </div>
               </div>
@@ -641,7 +641,8 @@
     <button
       pButton
       label="Update"
-      icon="pi pi-check"
+      [icon]="isUpdatePostLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+      [disabled]="isUpdatePostLoading"
       class="p-button-success"
       (click)="updatePost()"
     ></button>
