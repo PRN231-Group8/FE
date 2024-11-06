@@ -14,7 +14,6 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ImageModule } from 'primeng/image';
 import { ProgressBarModule } from 'primeng/progressbar';
-
 @NgModule({
   declarations: [LocationManagementComponent],
   imports: [
@@ -32,7 +31,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
     ReactiveFormsModule,
     FileUploadModule,
     ImageModule,
-    ProgressBarModule
+    ProgressBarModule,
   ]
 })
 export class LocationManagementModule { }

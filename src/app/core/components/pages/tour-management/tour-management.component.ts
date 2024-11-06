@@ -11,11 +11,13 @@ import { TourTimestamp } from '../../../../interfaces/models/tour-timestamp';
 import { TourTimestampService } from '../../../../services/tour-timestamp.service';
 import { TableRowCollapseEvent, TableRowExpandEvent } from 'primeng/table';
 import { Guid } from 'guid-typescript';
+import { TourTripService } from '../../../../services/tour-trip.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-tour-management',
   templateUrl: './tour-management.component.html',
-  providers: [MessageService],
+  providers: [MessageService, DatePipe],
   styles: [
     `
       :host ::ng-deep .p-rowgroup-footer td {
@@ -36,35 +38,55 @@ import { Guid } from 'guid-typescript';
   ],
 })
 export class TourManagementComponent implements OnInit {
-  tours: Tour[] = [];
-  tourForm!: FormGroup;
-  timestampForm!: FormGroup;
+  // Components value
   expandedRowKeys: { [key: string]: boolean } = {};
-  newTimestamps: TourTimestamp[] = []; // for storing new timestamp added
-  tour: Tour | null = null;
-  loading: boolean = true;
-  createTourDialog: boolean = false;
-  timestampDialog: boolean = false;
-  deleteTourDialog: boolean = false;
-  isEdit: boolean = false;
   rows: number = 10;
   first: number = 0;
+  loading: boolean = true;
+  cols: any[] = [];
   totalRecords: number = 0;
   rowsPerPageOptions = [5, 10, 20];
-  statusOptions = ['ACTIVE', 'INACTIVE', 'CANCELLED'];
-  moodOptions: Mood[] = [];
-  locationOptions: Location[] = [];
-  cols: any[] = [];
-  sortByStatus: string = '';
   searchTerm: string = '';
-  selectedTimestamp: TourTimestamp | null = null;
-  isTimestampEdit: boolean = false;
-  durationMinutes: number = 1;
-  timestampToDelete: TourTimestamp | null = null;
-  deleteTimestampDialog: boolean = false;
-  isCreatingBatch: boolean = false;
-  tourToDelete!: Tour;
+  isEdit: boolean = false;
+  savingState: boolean = false;
 
+  // Tour variables management
+  tours: Tour[] = [];
+  tourForm!: FormGroup;
+  tour: Tour | null = null;
+  statusOptions = ['ACTIVE', 'INACTIVE', 'CANCELLED'];
+  durationMinutes: number = 1;
+  sortByStatus: string = '';
+  locationOptions: Location[] = [];
+  moodOptions: Mood[] = [];
+  tourToDelete!: Tour;
+  createTourDialog: boolean = false;
+  deleteTourDialog: boolean = false;
+
+  // Timestamp variables management
+  timestampForm!: FormGroup;
+  newTimestamps: TourTimestamp[] = []; // for storing new timestamp added
+  selectedTimestamp: TourTimestamp | null = null;
+  isCreatingBatch: boolean = false;
+  isTimestampEdit: boolean = false;
+  timestampToDelete: TourTimestamp | null = null;
+  timestampDialog: boolean = false;
+  deleteTimestampDialog: boolean = false;
+
+  // Tour Trip management
+  tourTrips: any[] = [];
+  tourTripForm!: FormGroup;
+  newTourTrips: any[] = []; // for storing new Tour Trips added
+  isTourTripEdit: boolean = false;
+  tourTripDialog: boolean = false;
+  tourTripToDelete: any | null = null;
+  deleteTourTripDialog: boolean = false;
+  tourTripStatusOptions = ['OPEN', 'FULLYBOOKED', 'COMPLETED', 'CANCELLED'];
+  minDate: Date | undefined;
+  maxDate: Date | undefined;
+  isCreateTourTripBatch: boolean = false;
+
+  // Others
   @ViewChild('filter') filter!: ElementRef;
 
   constructor(
@@ -74,6 +96,7 @@ export class TourManagementComponent implements OnInit {
     private moodService: MoodService,
     private timestampService: TourTimestampService,
     private locationService: LocationService,
+    private tourTripService: TourTripService,
   ) {}
 
   ngOnInit(): void {
@@ -102,7 +125,6 @@ export class TourManagementComponent implements OnInit {
       description: ['', Validators.required],
       startDate: [null, Validators.required],
       endDate: [null, Validators.required],
-      totalPrice: [null, [Validators.required, Validators.min(0)]],
       status: ['', Validators.required],
       tourMoods: [[], Validators.required],
       locationInTours: [[], Validators.required],
@@ -117,6 +139,17 @@ export class TourManagementComponent implements OnInit {
       locationId: [null, Validators.required],
       tourId: [null],
       location: [null],
+    });
+
+    // Initialize the tour trip form
+    this.tourTripForm = this.fb.group({
+      tourTripId: [null],
+      tripDate: [null, Validators.required],
+      price: [0, [Validators.required, Validators.min(0)]],
+      totalSeats: [0, [Validators.required, Validators.min(1)]],
+      bookedSeats: [0],
+      tripStatus: ['', Validators.required],
+      tourId: [null],
     });
   }
 
@@ -155,17 +188,25 @@ export class TourManagementComponent implements OnInit {
     this.isEdit = false;
   }
 
-  editTour(tour: Tour): void {
+  editTour(tour: any): void {
     this.tour = tour;
     const selectedMoods = this.moodOptions.filter(mood =>
-      tour.tourMoods?.some(m => m.id === mood.id),
+      tour.tourMoods?.some((m: any) => m.id === mood.id),
     );
     const selectedLocations = this.locationOptions.filter(location =>
-      tour.locationInTours?.some(loc => loc.id === location.id),
+      tour.locationInTours?.some((loc: any) => loc.id === location.id),
     );
 
+    const startDate = new Date(tour.startDate);
+    const endDate = new Date(tour.endDate);
+
     this.tourForm.patchValue({
-      ...tour,
+      id: tour.id,
+      title: tour.title,
+      description: tour.description,
+      startDate: startDate,
+      endDate: endDate,
+      status: tour.status,
       tourMoods: selectedMoods,
       locationInTours: selectedLocations,
     });
@@ -175,6 +216,7 @@ export class TourManagementComponent implements OnInit {
   }
 
   saveTour(): void {
+    this.savingState = true;
     if (this.tourForm.invalid) {
       return;
     }
@@ -206,10 +248,12 @@ export class TourManagementComponent implements OnInit {
           this.sendErrorToast(data.message);
         }
       },
-      error: () => {
-        this.sendErrorToast('Error saving tour!');
+      error: (err) => {
+        this.sendErrorToast(err.message);
       },
     });
+
+    this.savingState = false;
   }
 
   deleteTour(tour: Tour): void {
@@ -219,6 +263,7 @@ export class TourManagementComponent implements OnInit {
 
   confirmDelete(): void {
     if (!this.tour?.id) return;
+    this.savingState = true;
 
     this.tourService.deleteTour(this.tour.id).subscribe(data => {
       if (data.isSucceed) {
@@ -233,6 +278,7 @@ export class TourManagementComponent implements OnInit {
         this.sendErrorToast(data.message);
       }
     });
+    this.savingState = false;
   }
 
   sendErrorToast(message: string): void {
@@ -302,6 +348,7 @@ export class TourManagementComponent implements OnInit {
 
   saveTimestamp(): void {
     if (this.timestampForm.invalid || !this.tour) return;
+    this.savingState = true;
 
     const formValues = this.timestampForm.value;
 
@@ -349,12 +396,15 @@ export class TourManagementComponent implements OnInit {
                 }
               }
               this.timestampDialog = false;
+              this.savingState = false;
             } else {
               this.sendErrorToast(data.message);
+              this.savingState = false;
             }
           },
-          error: () => {
-            this.sendErrorToast('Error updating timestamp!');
+          error: (error) => {
+            this.sendErrorToast(error.message);
+            this.savingState = false;
           },
         });
       return;
@@ -373,13 +423,13 @@ export class TourManagementComponent implements OnInit {
     ];
 
     this.timestampDialog = false;
+    this.savingState = false;
   }
 
   hideDialog(): void {
     this.createTourDialog = false;
     this.deleteTourDialog = false;
     this.timestampDialog = false;
-    this.isCreatingBatch = false;
     this.tourForm.reset();
   }
 
@@ -395,6 +445,7 @@ export class TourManagementComponent implements OnInit {
                 summary: 'Success',
                 detail: 'All timestamps saved successfully',
               });
+              this.savingState = false;
               // Clear the newTimestamps array after successful save
               this.newTimestamps = [];
               this.viewTimestamps(this.tour!); // Refresh the timestamps for the current tour
@@ -442,6 +493,21 @@ export class TourManagementComponent implements OnInit {
   onRowExpand(event: TableRowExpandEvent): void {
     const tour = event.data;
     this.expandedRowKeys[tour.id] = true; // Set the specific row key to true
+
+    // Load Tour Trips and Timestamps if not already loaded
+    if (!tour.tourTrips) {
+      this.tourTripService.getTourTripsByTourId(tour.id).subscribe(response => {
+        tour.tourTrips = response.result || [];
+      });
+    }
+
+    if (!tour.tourTimestamps) {
+      this.timestampService
+        .getTourTimestampById(tour.id)
+        .subscribe(response => {
+          tour.tourTimestamps = response.results || [];
+        });
+    }
   }
 
   onRowCollapse(event: TableRowCollapseEvent): void {
@@ -470,9 +536,11 @@ export class TourManagementComponent implements OnInit {
           this.ngOnInit();
           this.deleteTimestampDialog = false;
           this.timestampToDelete = null;
+          this.savingState = false;
         } else {
           this.deleteTimestampDialog = false;
           this.timestampToDelete = null;
+          this.savingState = false;
           this.sendErrorToast(data.message);
         }
       });
@@ -493,5 +561,172 @@ export class TourManagementComponent implements OnInit {
       ),
       ...this.newTimestamps,
     ];
+  }
+
+  // Open dialog to add a new Tour Trip
+  addTourTrip(tour: any): void {
+    this.tourTripForm.reset();
+    this.tour = tour;
+    this.minDate = new Date(this.tour!.startDate!);
+    this.maxDate = new Date(this.tour!.endDate!);
+    this.tourTripForm.patchValue({
+      tourId: tour.id,
+    });
+    this.isTourTripEdit = false;
+    this.tourTripDialog = true;
+  }
+
+  // Open dialog to edit an existing Tour Trip
+  editTourTrip(tour: Tour, trip: any): void {
+    this.tour = tour;
+    this.isTourTripEdit = true;
+
+    // Convert ISO date string to Date object
+    const tripDate = new Date(trip.tripDate);
+
+    this.tourTripForm.patchValue({
+      tourTripId: trip.tourTripId,
+      tripDate: tripDate,
+      price: trip.price,
+      totalSeats: trip.totalSeats,
+      bookedSeats: trip.bookedSeats,
+      tripStatus: trip.tripStatus,
+      tourId: tour.id,
+    });
+    this.tourTripDialog = true;
+  }
+
+  // Save or update a Tour Trip
+  saveTourTrip(): void {
+    if (this.tourTripForm.invalid) return;
+    this.savingState = true;
+
+    const formValues = this.tourTripForm.value;
+    const newTourTrip = {
+      ...formValues,
+    };
+
+    if (this.isTourTripEdit) {
+      // Call the API to update the existing tour trip
+    this.tourTripService.updateTourTrip(newTourTrip.tourTripId, newTourTrip).subscribe({
+      next: data => {
+        if (data.isSucceed) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Tour trip updated successfully'
+          });
+          this.savingState = false;
+
+          // Update the trip in the local tour's trips array
+          const index = this.tour?.tourTrips?.findIndex(
+            trip => trip.tourTripId === newTourTrip.tourTripId
+          );
+          if (index !== undefined && index !== -1) {
+            this.tour?.tourTrips?.splice(index, 1, newTourTrip);
+          }
+          this.tourTripDialog = false;
+        } else {
+          this.sendErrorToast(data.message);
+          this.savingState = false;
+        }
+      },
+      error: (err) => {
+        this.sendErrorToast(err.message);
+        this.savingState = false;
+        return;
+      }
+    });
+    } else {
+      // If adding a new trip, push to newTourTrips array for batch saving
+      this.newTourTrips.push(newTourTrip);
+      this.isCreateTourTripBatch = true;
+      this.tour!.tourTrips = [...(this.tour!.tourTrips || []), newTourTrip];
+    }
+
+    this.tourTripDialog = false;
+    this.savingState = false;
+  }
+
+  // Save all new Tour Trips in batch
+  saveAllTourTrips(): void {
+    if (this.newTourTrips.length > 0) {
+      this.tourTripService.createBatchTourTrips(this.newTourTrips).subscribe({
+        next: data => {
+          if (data.isSucceed) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'All tour trips saved successfully',
+            });
+            this.newTourTrips = [];
+            this.loadTours(); // Refresh tours
+            this.isCreateTourTripBatch = false;
+            this.savingState = false;
+          } else {
+            this.sendErrorToast(data.message);
+            this.savingState = false;
+          }
+        },
+        error: (error) => {
+          this.sendErrorToast(error.message);
+          this.savingState = false;
+        },
+      });
+    }
+  }
+
+  // Confirm deletion of a Tour Trip
+  confirmDeleteTourTrip(tour: Tour, trip: any): void {
+    this.tourTripToDelete = trip;
+    this.tour = tour;
+    this.savingState = true;
+    this.deleteTourTripDialog = true;
+  }
+
+  // Delete a Tour Trip
+  deleteTourTrip(): void {
+    if (!this.tourTripToDelete?.tourTripId) return;
+
+    this.tourTripService
+      .deleteTourTrip(this.tourTripToDelete.tourTripId)
+      .subscribe({
+        next: data => {
+          if (data.isSucceed) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Tour trip deleted successfully',
+            });
+            this.savingState = false;
+            this.loadTours();
+            this.deleteTourTripDialog = false;
+          } else {
+            this.savingState = false;
+            this.sendErrorToast(data.message);
+          }
+        },
+        error: (error) => {
+          this.savingState = false;
+          this.sendErrorToast(error.message);
+        },
+      });
+  }
+
+  // Clear the last added tour trip from newTourTrips
+  clearLastTourTrips(): void {
+    this.newTourTrips.pop();
+    this.tour?.tourTrips?.pop();
+  }
+
+  hideTourTripDialog(): void {
+    this.tourTripDialog = false;
+    this.savingState = false;
+  }
+
+  cancelDeleteTourTrip(): void {
+    this.tourTripToDelete = {};
+    this.deleteTourTripDialog = false;
+    this.savingState = false;
   }
 }
