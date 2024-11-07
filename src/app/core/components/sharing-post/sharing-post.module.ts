@@ -25,6 +25,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @NgModule({
   declarations: [SharingPostComponent],
@@ -54,6 +55,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     InputTextareaModule,
     CheckboxModule,
     ConfirmDialogModule,
+    InfiniteScrollModule,
   ],
   providers: [ConfirmationService, MessageService],
 })

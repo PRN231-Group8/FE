@@ -4,17 +4,16 @@ import { UserService } from '../../../services/user.service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Post } from '../../../interfaces/models/post';
 import { AuthenticationService } from '../../../services/authentication.service';
-import { CommentRequest } from '../../../interfaces/models/request/commentRequest';
 import { CommentResponse } from '../../../interfaces/models/response/commentResponse';
 import { UserProfileResponse } from '../../../interfaces/models/response/userProfileResponse';
 import { FileUpload } from 'primeng/fileupload';
 import { User } from '../../../interfaces/models/user';
-import { Comments } from '../../../interfaces/models/comment';
 import { UpdatePostRequest } from '../../../interfaces/models/request/updatePostRequest';
 import { PostsRequest } from '../../../interfaces/models/request/postsResquest';
 import { PhotoService } from '../../../services/photo.service';
 import { UpdatePhotoRequest } from '../../../interfaces/models/request/photoRequest';
 import { Guid } from 'guid-typescript';
+import { BaseResponse } from '../../../interfaces/models/base-response';
 
 @Component({
   selector: 'app-sharing-post',
@@ -73,6 +72,12 @@ export class SharingPostComponent implements OnInit {
   selectedPhotoId: string | null = null;
   selectedFile: File | null = null;
   photoDetails: { id: Guid; url: string }[] = [];
+  displayCommentDialog: boolean = false;
+  selectedComment: CommentResponse[] = [];
+  selectedPostWithComments: Post | null = null;
+  isModerator: boolean = false;
+  private postPage = 1;
+  private commentPage = 1;
   constructor(
     private postService: PostService,
     private userService: UserService,
@@ -85,6 +90,7 @@ export class SharingPostComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserProfile();
+    this.loadPosts();
   }
 
   private loadUserProfile(): void {
@@ -92,11 +98,7 @@ export class SharingPostComponent implements OnInit {
     if (email) {
       this.userService.getUserByEmail(email).subscribe({
         next: response => {
-          if (
-            response.isSucceed &&
-            response.result &&
-            !Array.isArray(response.result)
-          ) {
+          if (response.isSucceed && response.result) {
             const user = response.result as UserProfileResponse;
             this.userName = `${user.firstName} ${user.lastName}`;
             this.userAvatarUrl = user.avatarPath || '';
@@ -110,10 +112,11 @@ export class SharingPostComponent implements OnInit {
               firstName: user.firstName,
               lastName: user.lastName,
               avatarPath: user.avatarPath || '',
-              dob: user.dob || undefined, // Ensure dob aligns with the User model
+              dob: user.dob || undefined,
             };
 
-            this.fetchPosts();
+            // Set isModerator based on the role
+            this.isModerator = this.role === 'MODERATOR';
           }
         },
         error: () => {
@@ -121,6 +124,30 @@ export class SharingPostComponent implements OnInit {
         },
       });
     }
+  }
+
+  loadPosts(): void {
+    this.isLoading = true;
+    this.postService
+      .getAllPosts(
+        this.statusFilter,
+        this.searchTerm,
+        this.postPage,
+        this.pageSize,
+      )
+      .subscribe({
+        next: (response: BaseResponse<Post[]>) => {
+          if (response.isSucceed && response.result) {
+            this.posts = [...this.posts, ...response.result];
+            this.postPage++; // Increment page number for pagination
+          }
+          this.isLoading = false;
+        },
+        error: () => {
+          this.displayMessage('error', 'Error', 'Failed to load posts.');
+          this.isLoading = false;
+        },
+      });
   }
 
   fetchPosts(): void {
@@ -135,10 +162,9 @@ export class SharingPostComponent implements OnInit {
       .subscribe({
         next: response => {
           if (response.isSucceed && Array.isArray(response.result)) {
-            // Initialize displayGallery for each post to control the gallery visibility
             this.posts = response.result.map(post => ({
               ...post,
-              displayGallery: false, // default to hidden gallery
+              showComments: false, // Initialize with comments hidden
             })) as Post[];
           } else {
             this.posts = [];
@@ -214,46 +240,6 @@ export class SharingPostComponent implements OnInit {
     this.showComments = !this.showComments;
   }
 
-  postComment(postId: string): void {
-    if (this.commentContent.trim()) {
-      this.isCommentLoading = true; // Start loading indicator
-      const commentRequest: CommentRequest = {
-        postId,
-        content: this.commentContent,
-      };
-
-      this.postService.addComment(commentRequest).subscribe({
-        next: response => {
-          if (response.isSucceed && response.result) {
-            const result = response.result as CommentResponse;
-
-            // Add the comment to the post
-            const newComment: Comments = {
-              createdDate: result.createdDate,
-              id: result.id,
-              content: result.content,
-              user: this.currentUser,
-              postId: result.postId,
-            };
-
-            const post = this.posts.find(p => p.postsId === postId);
-            if (post) {
-              post.comments.push(newComment);
-            }
-
-            // Clear the comment input field
-            this.commentContent = '';
-          }
-          this.isCommentLoading = false; // Stop loading after success
-        },
-        error: () => {
-          this.displayMessage('error', 'Error', 'Failed to post comment.');
-          this.isCommentLoading = false; // Stop loading on error
-        },
-      });
-    }
-  }
-
   // Load a specific post to refresh its comments
   loadSinglePost(postId: string): void {
     this.postService.getPostById(postId).subscribe({
@@ -295,9 +281,6 @@ export class SharingPostComponent implements OnInit {
     setTimeout(() => {
       this.fileUploader.choose();
     }, 0);
-  }
-  toggleCommentsVisibility(index: number): void {
-    this.posts[index].showComments = !this.posts[index].showComments;
   }
   deletePost(postId: string): void {
     if (confirm('Are you sure you want to delete this post?')) {
@@ -475,35 +458,19 @@ export class SharingPostComponent implements OnInit {
 
   // Get Post Menu Items
   getPostMenuItems(post: Post): MenuItem[] {
-    // Check if the user is a Customer and if they own the post
-    const isCustomer = this.role === 'CUSTOMER';
-    const isOwner = this.role === 'MODERATOR';
-
-    // Define the menu items based on the role and ownership
-    const menuItems: MenuItem[] = [];
-
-    if (isOwner) {
-      // Allow updating if the user is an owner or moderator
-      menuItems.push({
+    // Define the menu items accessible to all roles
+    const menuItems: MenuItem[] = [
+      {
         label: 'Update',
         icon: 'pi pi-pencil',
         command: () => this.openUpdateDialog(post),
-      });
-      menuItems.push({
+      },
+      {
         label: 'Delete',
         icon: 'pi pi-trash',
         command: () => this.deletePost(post.postsId),
-      });
-    }
-
-    // Allow deleting if the user is the owner (or if the role has additional permissions)
-    if (isCustomer) {
-      menuItems.push({
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        command: () => this.deletePost(post.postsId),
-      });
-    }
+      },
+    ];
 
     return menuItems;
   }
@@ -558,6 +525,7 @@ export class SharingPostComponent implements OnInit {
     this.selectedFile = null;
     this.selectedPhotoId = null;
   }
+
   // Update this method to watch for changes in the checkbox status
   onRemoveAllPhotosChange(): void {
     if (this.updatePostRequest.removeAllPhotos) {
@@ -569,5 +537,101 @@ export class SharingPostComponent implements OnInit {
     if (this.updatePostRequest.removeAllComments) {
       this.updatePostRequest.commentsToRemove = [];
     }
+  }
+
+  // Trigger loadPosts when the user scrolls to the bottom
+  onScrollPosts(): void {
+    this.loadPosts();
+  }
+
+  toggleCommentsVisibility(post: Post): void {
+    if (this.selectedPostWithComments === post) {
+      // Clear the selection to close the comment section
+      this.selectedPostWithComments = null;
+    } else {
+      // Set the selected post and reset comments
+      this.selectedPostWithComments = post;
+      this.commentPage = 1; // Reset pagination
+      post.comments = []; // Clear existing comments to avoid duplication
+      this.loadComments(post);
+    }
+  }
+
+  loadComments(post: Post): void {
+    this.postService.getCommentsByPostId(post.postsId).subscribe({
+      next: response => {
+        if (response.isSucceed && response.result) {
+          post.comments = [...post.comments, ...response.result]; // Append new comments to avoid duplicate entries
+          this.commentPage++;
+        }
+      },
+      error: () => {
+        this.displayMessage('error', 'Error', 'Failed to load comments.');
+      },
+    });
+  }
+
+  onScrollComments(): void {
+    if (this.selectedPostWithComments && !this.isCommentLoading) {
+      this.isCommentLoading = true; // Prevent duplicate loads
+      this.postService
+        .getCommentsByPostId(this.selectedPostWithComments.postsId)
+        .subscribe({
+          next: (response: BaseResponse<CommentResponse[]>) => {
+            if (
+              response.isSucceed &&
+              response.result &&
+              response.result.length > 0
+            ) {
+              const newComments = response.result.filter(
+                newComment =>
+                  !this.selectedPostWithComments!.comments.some(
+                    existingComment => existingComment.id === newComment.id,
+                  ),
+              );
+              this.selectedPostWithComments!.comments = [
+                ...(this.selectedPostWithComments?.comments || []),
+                ...newComments,
+              ];
+              this.commentPage++; // Move to the next page for the next load
+            } else {
+              // No more comments to load
+              this.isCommentLoading = false;
+            }
+          },
+          error: () => {
+            this.displayMessage('error', 'Error', 'Failed to load comments.');
+            this.isCommentLoading = false;
+          },
+          complete: () => {
+            this.isCommentLoading = false; // Reset loading status after completion
+          },
+        });
+    }
+  }
+
+  postComment(postId: string): void {
+    if (this.commentContent.trim()) {
+      this.isCommentLoading = true;
+      const commentRequest = { postId, content: this.commentContent };
+
+      this.postService.addComment(commentRequest).subscribe({
+        next: response => {
+          if (response.isSucceed && response.result) {
+            this.selectedPostWithComments?.comments.unshift(response.result); // Add new comment at the top
+            this.commentContent = ''; // Clear input
+          }
+          this.isCommentLoading = false;
+        },
+        error: () => {
+          this.isCommentLoading = false;
+        },
+      });
+    }
+  }
+
+  closeCommentSection(): void {
+    this.selectedPostWithComments = null;
+    this.commentContent = '';
   }
 }
