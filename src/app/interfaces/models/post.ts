@@ -1,5 +1,5 @@
 import { Comments } from './comment';
-import { Photos } from './photo';
+import { Photo } from './photo';
 import { User } from './user';
 
 export interface Post {
@@ -12,5 +12,5 @@ export interface Post {
   createDate: string;
   user: User;
   comments: Comments[];
-  photos: Photos[];
+  photos: Photo[];
 }

@@ -45,339 +45,325 @@
   </div>
 </div>
 
-<div class="grid">
-  <div class="col-fixed pl-3" style="width: 600px">
-    <div
-      class="flex flex-column p-4 gap-4 shadow-3 border-1 border-yellow-500 surface-overlay border-round"
-    >
-      <h3 class="text-center text-5xl font-bold mb-4 text-yellow-500">
-        Post Filter
-      </h3>
-      <!-- Search and Filter Controls -->
-      <div class="flex flex-wrap gap-3">
-        <!-- Search Term Input -->
-        <p-floatLabel class="mb-4">
-          <input
-            pInputText
-            [(ngModel)]="searchTerm"
-            id="searchTerm"
-            class="p-mb-2"
-          />
-          <label for="searchTerm">Search by term</label>
-        </p-floatLabel>
+<div
+  class="flex flex-column p-4 gap-4 shadow-3 border-1 border-yellow-500 surface-overlay border-round"
+>
+  <h3 class="text-center text-5xl font-bold mb-4 text-yellow-500">
+    Post Filter
+  </h3>
+  <!-- Search and Filter Controls -->
+  <div class="flex flex-wrap gap-3">
+    <!-- Search Term Input -->
+    <p-floatLabel class="mb-4">
+      <input
+        pInputText
+        [(ngModel)]="searchTerm"
+        id="searchTerm"
+        class="p-mb-2"
+      />
+      <label for="searchTerm">Search by term</label>
+    </p-floatLabel>
 
-        <!-- Status Filter Dropdown -->
-        <p-floatLabel class="mb-4">
-          <p-dropdown
-            [(ngModel)]="statusFilter"
-            [options]="statusOptions"
-            id="statusFilter"
-            class="p-mb-2"
-          ></p-dropdown>
-          <label for="statusFilter">Filter by status</label>
-        </p-floatLabel>
+    <!-- Status Filter Dropdown -->
+    <p-floatLabel class="mb-4">
+      <p-dropdown
+        [(ngModel)]="statusFilter"
+        [options]="statusOptions"
+        id="statusFilter"
+        class="p-mb-2"
+      ></p-dropdown>
+      <label for="statusFilter">Filter by status</label>
+    </p-floatLabel>
 
-        <!-- Page Number Input -->
-        <p-floatLabel>
-          <input
-            pInputText
-            [(ngModel)]="pageNumber"
-            id="pageNumber"
-            type="number"
-            class="p-mb-2"
-          />
-          <label for="pageNumber">Page Number</label>
-        </p-floatLabel>
+    <!-- Page Number Input -->
+    <p-floatLabel>
+      <input
+        pInputText
+        [(ngModel)]="pageNumber"
+        id="pageNumber"
+        type="number"
+        class="p-mb-2"
+      />
+      <label for="pageNumber">Page Number</label>
+    </p-floatLabel>
 
-        <!-- Page Size Input -->
-        <p-floatLabel>
-          <input
-            pInputText
-            [(ngModel)]="pageSize"
-            id="pageSize"
-            type="number"
-            class="p-mb-2"
-          />
-          <label for="pageSize">Page Size</label>
-        </p-floatLabel>
-      </div>
-
-      <!-- Centered Search Button -->
-      <div class="flex justify-content-center mt-4">
-        <button
-          pButton
-          label="Search"
-          icon="pi pi-search"
-          [icon]="isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search'"
-          [disabled]="isLoading"
-          (click)="fetchPosts()"
-          class="p-button-outlined"
-        ></button>
-      </div>
-    </div>
+    <!-- Page Size Input -->
+    <p-floatLabel>
+      <input
+        pInputText
+        [(ngModel)]="pageSize"
+        id="pageSize"
+        type="number"
+        class="p-mb-2"
+      />
+      <label for="pageSize">Page Size</label>
+    </p-floatLabel>
   </div>
 
-  <div class="col">
+  <!-- Centered Search Button -->
+  <div class="flex justify-content-center mt-4">
+    <button
+      pButton
+      label="Search"
+      icon="pi pi-search"
+      [icon]="isLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search'"
+      [disabled]="isLoading"
+      (click)="fetchPosts()"
+      class="p-button-outlined"
+    ></button>
+  </div>
+</div>
+
+<div
+  class="flex justify-content-center shadow-3 pb-6 border-1 border-yellow-500 surface-overlay border-round"
+>
+  <!-- Post Feed Section -->
+  <div class="flex flex-column align-items-center pb-6">
+    <h3 class="text-center text-5xl font-bold mb-4 mt-4 text-yellow-500">
+      Post Feed
+    </h3>
     <div
-      class="flex justify-content-center shadow-3 pb-6 border-1 border-yellow-500 surface-overlay border-round"
+      *ngFor="let post of posts; let i = index"
+      class="w-full shadow-3 border-round mb-4"
+      style="max-width: 800px"
     >
-      <!-- Post Feed Section -->
-      <div class="flex flex-column align-items-center pb-6">
-        <h3 class="text-center text-5xl font-bold mb-4 mt-4 text-yellow-500">
-          Post Feed
-        </h3>
-        <div
-          *ngFor="let post of posts; let i = index"
-          class="w-full shadow-3 border-round mb-4"
-          style="max-width: 800px"
-        >
-          <div class="p-card p-p-3">
-            <div class="relative">
-              <div class="absolute top-0 right-0 m-3 z-10">
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-ellipsis-v"
-                  class="p-button-text p-button-rounded"
-                  (click)="menu.toggle($event)"
-                  appendTo="body"
-                ></button>
-                <p-menu
-                  #menu
-                  [popup]="true"
-                  [model]="getPostMenuItems(post)"
-                  appendTo="body"
-                  class="absolute"
-                ></p-menu>
-              </div>
-            </div>
+      <div class="p-card p-p-3">
+        <div class="relative">
+          <div class="absolute top-0 right-0 m-3 z-10">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-ellipsis-v"
+              class="p-button-text p-button-rounded"
+              (click)="menu.toggle($event)"
+              appendTo="body"
+            ></button>
+            <p-menu
+              #menu
+              [popup]="true"
+              [model]="getPostMenuItems(post)"
+              appendTo="body"
+              class="absolute"
+            ></p-menu>
+          </div>
+        </div>
 
-            <!-- Post Header -->
-            <div class="flex align-items-center">
-              <p-avatar
-                size="large"
-                [image]="
-                  post.user.avatarPath || userAvatarUrl || defaultAvatarPath
-                "
-                class="mr-2 p-2"
-                shape="circle"
-              ></p-avatar>
-              <div>
-                <p class="m-0 font-bold">
-                  {{ post.user.firstName }} {{ post.user.lastName }}
-                </p>
-                <small class="text-secondary">{{
-                  post.createDate | date: 'medium'
-                }}</small>
-              </div>
-            </div>
+        <!-- Post Header -->
+        <div class="flex align-items-center">
+          <p-avatar
+            size="large"
+            [image]="post.user.avatarPath || userAvatarUrl || defaultAvatarPath"
+            class="mr-2 p-2"
+            shape="circle"
+          ></p-avatar>
+          <div>
+            <p class="m-0 font-bold">
+              {{ post.user.firstName }} {{ post.user.lastName }}
+            </p>
+            <small class="text-secondary">{{
+              post.createDate | date: 'medium'
+            }}</small>
+          </div>
+        </div>
 
-            <!-- Post Content -->
-            <p class="mt-3 pl-2">{{ post.content }}</p>
-            <!-- Image Preview Section -->
-            <div class="flex align-items-center justify-content-center mt-3">
-              <!-- Single Image View -->
-              <div
-                *ngIf="post.photos.length === 1"
-                class="w-full p-2"
-                (click)="showGalleria(i)"
-              >
-                <img
-                  [src]="post.photos[0].url"
-                  class="w-full h-auto max-h-30rem object-contain cursor-pointer border-round-lg"
-                  alt="Image"
-                />
-              </div>
+        <!-- Post Content -->
+        <p class="mt-3 pl-2">{{ post.content }}</p>
+        <!-- Image Preview Section -->
+        <div class="flex align-items-center justify-content-center mt-3">
+          <!-- Single Image View -->
+          <div
+            *ngIf="post.photos.length === 1"
+            class="w-full p-2"
+            (click)="showGalleria(i)"
+          >
+            <img
+              [src]="post.photos[0].url"
+              class="w-full h-auto max-h-30rem object-contain cursor-pointer border-round-lg"
+              alt="Image"
+            />
+          </div>
 
-              <!-- Two Images View -->
-              <div
-                *ngIf="post.photos.length === 2"
-                class="grid grid-nogutter w-full p-2"
-              >
-                <div
-                  *ngFor="let image of post.photos; let j = index"
-                  class="col-6 p-1"
-                  (click)="showGalleria(i)"
-                >
-                  <img
-                    [src]="image.url"
-                    class="w-full h-auto object-cover cursor-pointer border-round-lg"
-                    alt="Image"
-                  />
-                </div>
-              </div>
-
-              <!-- Three Images View -->
-              <div
-                *ngIf="post.photos.length === 3"
-                class="grid grid-nogutter w-full p-2"
-              >
-                <div
-                  *ngFor="let image of post.photos; let j = index"
-                  class="col-4 p-1"
-                  (click)="showGalleria(i)"
-                >
-                  <img
-                    [src]="image.url"
-                    class="w-full h-auto object-cover cursor-pointer border-round-lg"
-                    alt="Image"
-                  />
-                </div>
-              </div>
-
-              <!-- More than Three Images View -->
-              <div
-                *ngIf="post.photos.length > 3"
-                class="grid grid-nogutter w-full p-2"
-              >
-                <div
-                  *ngFor="let image of post.photos.slice(0, 3); let j = index"
-                  class="col-4 p-1 relative"
-                  (click)="showGalleria(i)"
-                >
-                  <img
-                    [src]="image.url"
-                    class="w-full h-auto object-cover cursor-pointer border-round-lg"
-                    alt="Image"
-                  />
-                  <!-- Overlay for remaining images count -->
-                  <div
-                    *ngIf="j === 2 && post.photos.length > 3"
-                    class="absolute top-0 left-0 w-full h-full flex align-items-center justify-content-center text-white bg-black-alpha-50 border-round-lg"
-                  >
-                    +{{ post.photos.length - 3 }}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Galleria Component for Each Post -->
-            <p-galleria
-              *ngIf="post.displayGallery"
-              [value]="post.photos"
-              [(visible)]="post.displayGallery"
-              [responsiveOptions]="[
-                { breakpoint: '1024px', numVisible: 5 },
-                { breakpoint: '768px', numVisible: 3 },
-                { breakpoint: '560px', numVisible: 1 },
-              ]"
-              [containerStyle]="{ 'max-width': '80%' }"
-              [numVisible]="5"
-              [circular]="true"
-              [fullScreen]="true"
-              [showItemNavigators]="true"
-              [showThumbnails]="true"
-              [activeIndex]="activeIndex"
-            >
-              <!-- Full Image Display -->
-              <ng-template pTemplate="item" let-item>
-                <div
-                  class="flex justify-content-center align-items-center h-full"
-                >
-                  <img
-                    [src]="item.url"
-                    class="w-full md:w-10 lg:w-10 max-h-screen border-round-lg"
-                    alt="Image"
-                  />
-                </div>
-              </ng-template>
-
-              <!-- Thumbnail Display -->
-              <ng-template pTemplate="thumbnail" let-item>
-                <div class="p-1">
-                  <img
-                    [src]="item.url"
-                    class="w-4rem h-4rem object-cover border-round"
-                    alt="Thumbnail"
-                  />
-                </div>
-              </ng-template>
-            </p-galleria>
-            <!-- Comment Button -->
-            <div class="mt-3 flex justify-content-center">
-              <button
-                pButton
-                label="Comment"
-                [icon]="
-                  isCommentLoading ? 'pi pi-spin pi-spinner' : 'pi pi-comments'
-                "
-                class="p-button-outlined"
-                (click)="
-                  activeCommentPostId =
-                    activeCommentPostId === post.postsId ? null : post.postsId
-                "
-                [disabled]="isCommentLoading"
-              ></button>
-            </div>
-
-            <!-- Divider Line -->
-            <hr class="mt-3 mb-3" style="border-top: 1px solid #e0e0e0" />
-
-            <!-- Comments Section -->
-            <div *ngIf="activeCommentPostId === post.postsId" class="mt-3">
-              <div
-                *ngFor="let comment of post.comments"
-                class="comment-section mb-3"
-              >
-                <!-- Comment User Info with Tag-Like Name -->
-                <div class="flex align-items-center ml-3">
-                  <p-avatar
-                    size="normal"
-                    [image]="comment.user?.avatarPath || defaultAvatarPath"
-                    class="mr-2"
-                    shape="circle"
-                  ></p-avatar>
-                  <div class="bg-gray-100 border-round-xl px-3 py-2">
-                    <span class="font-bold text-sm"
-                      >{{ comment.user?.firstName }}
-                      {{ comment.user?.lastName }}</span
-                    >
-                    <p class="m-0 text-500">{{ comment.content }}</p>
-                  </div>
-                </div>
-
-                <!-- Comment Time -->
-                <div class="flex align-items-center ml-3 mt-1">
-                  <small class="text-secondary">{{
-                    comment.createdDate
-                  }}</small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Comment Input Section -->
+          <!-- Two Images View -->
+          <div
+            *ngIf="post.photos.length === 2"
+            class="grid grid-nogutter w-full p-2"
+          >
             <div
-              *ngIf="activeCommentPostId === post.postsId"
-              class="flex align-items-center mt-3"
+              *ngFor="let image of post.photos; let j = index"
+              class="col-6 p-1"
+              (click)="showGalleria(i)"
             >
-              <!-- User Avatar for Comment Input -->
+              <img
+                [src]="image.url"
+                class="w-full h-auto object-cover cursor-pointer border-round-lg"
+                alt="Image"
+              />
+            </div>
+          </div>
+
+          <!-- Three Images View -->
+          <div
+            *ngIf="post.photos.length === 3"
+            class="grid grid-nogutter w-full p-2"
+          >
+            <div
+              *ngFor="let image of post.photos; let j = index"
+              class="col-4 p-1"
+              (click)="showGalleria(i)"
+            >
+              <img
+                [src]="image.url"
+                class="w-full h-auto object-cover cursor-pointer border-round-lg"
+                alt="Image"
+              />
+            </div>
+          </div>
+
+          <!-- More than Three Images View -->
+          <div
+            *ngIf="post.photos.length > 3"
+            class="grid grid-nogutter w-full p-2"
+          >
+            <div
+              *ngFor="let image of post.photos.slice(0, 3); let j = index"
+              class="col-4 p-1 relative"
+              (click)="showGalleria(i)"
+            >
+              <img
+                [src]="image.url"
+                class="w-full h-auto object-cover cursor-pointer border-round-lg"
+                alt="Image"
+              />
+              <!-- Overlay for remaining images count -->
+              <div
+                *ngIf="j === 2 && post.photos.length > 3"
+                class="absolute top-0 left-0 w-full h-full flex align-items-center justify-content-center text-white bg-black-alpha-50 border-round-lg"
+              >
+                +{{ post.photos.length - 3 }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Galleria Component for Each Post -->
+        <p-galleria
+          *ngIf="post.displayGallery"
+          [value]="post.photos"
+          [(visible)]="post.displayGallery"
+          [responsiveOptions]="[
+            { breakpoint: '1024px', numVisible: 5 },
+            { breakpoint: '768px', numVisible: 3 },
+            { breakpoint: '560px', numVisible: 1 },
+          ]"
+          [containerStyle]="{ 'max-width': '80%' }"
+          [numVisible]="5"
+          [circular]="true"
+          [fullScreen]="true"
+          [showItemNavigators]="true"
+          [showThumbnails]="true"
+          [activeIndex]="activeIndex"
+        >
+          <!-- Full Image Display -->
+          <ng-template pTemplate="item" let-item>
+            <div class="flex justify-content-center align-items-center h-full">
+              <img
+                [src]="item.url"
+                class="w-full md:w-10 lg:w-10 max-h-screen border-round-lg"
+                alt="Image"
+              />
+            </div>
+          </ng-template>
+
+          <!-- Thumbnail Display -->
+          <ng-template pTemplate="thumbnail" let-item>
+            <div class="p-1">
+              <img
+                [src]="item.url"
+                class="w-4rem h-4rem object-cover border-round"
+                alt="Thumbnail"
+              />
+            </div>
+          </ng-template>
+        </p-galleria>
+        <!-- Comment Button -->
+        <div class="mt-3 flex justify-content-center">
+          <button
+            pButton
+            label="Comment"
+            [icon]="
+              isCommentLoading ? 'pi pi-spin pi-spinner' : 'pi pi-comments'
+            "
+            class="p-button-outlined"
+            (click)="
+              activeCommentPostId =
+                activeCommentPostId === post.postsId ? null : post.postsId
+            "
+            [disabled]="isCommentLoading"
+          ></button>
+        </div>
+
+        <!-- Divider Line -->
+        <hr class="mt-3 mb-3" style="border-top: 1px solid #e0e0e0" />
+
+        <!-- Comments Section -->
+        <div *ngIf="activeCommentPostId === post.postsId" class="mt-3">
+          <div
+            *ngFor="let comment of post.comments"
+            class="comment-section mb-3"
+          >
+            <!-- Comment User Info with Tag-Like Name -->
+            <div class="flex align-items-center ml-3">
               <p-avatar
                 size="normal"
-                [image]="userAvatarUrl || defaultAvatarPath"
+                [image]="comment.user?.avatarPath || defaultAvatarPath"
                 class="mr-2"
                 shape="circle"
               ></p-avatar>
+              <div class="bg-gray-100 border-round-xl px-3 py-2">
+                <span class="font-bold text-sm"
+                  >{{ comment.user?.firstName }}
+                  {{ comment.user?.lastName }}</span
+                >
+                <p class="m-0 text-500">{{ comment.content }}</p>
+              </div>
+            </div>
 
-              <!-- Comment Input Field -->
-              <input
-                pInputText
-                [(ngModel)]="commentContent"
-                placeholder="Write a comment..."
-                class="w-full p-3 border-round-xl mr-2"
-                (keyup.enter)="postComment(post.postsId)"
-              />
-
-              <!-- Send Button -->
-              <button
-                pButton
-                [icon]="
-                  isCommentLoading ? 'pi pi-spin pi-spinner' : 'pi pi-send'
-                "
-                class="p-button-rounded p-button-text"
-                [disabled]="!commentContent.trim() || isCommentLoading"
-                (click)="postComment(post.postsId)"
-              ></button>
+            <!-- Comment Time -->
+            <div class="flex align-items-center ml-3 mt-1">
+              <small class="text-secondary">{{ comment.createdDate }}</small>
             </div>
           </div>
+        </div>
+
+        <!-- Comment Input Section -->
+        <div
+          *ngIf="activeCommentPostId === post.postsId"
+          class="flex align-items-center mt-3"
+        >
+          <!-- User Avatar for Comment Input -->
+          <p-avatar
+            size="normal"
+            [image]="userAvatarUrl || defaultAvatarPath"
+            class="mr-2"
+            shape="circle"
+          ></p-avatar>
+
+          <!-- Comment Input Field -->
+          <input
+            pInputText
+            [(ngModel)]="commentContent"
+            placeholder="Write a comment..."
+            class="w-full p-3 border-round-xl mr-2"
+            (keyup.enter)="postComment(post.postsId)"
+          />
+
+          <!-- Send Button -->
+          <button
+            pButton
+            [icon]="isCommentLoading ? 'pi pi-spin pi-spinner' : 'pi pi-send'"
+            class="p-button-rounded p-button-text"
+            [disabled]="!commentContent.trim() || isCommentLoading"
+            (click)="postComment(post.postsId)"
+          ></button>
         </div>
       </div>
     </div>

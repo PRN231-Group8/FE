@@ -6,6 +6,13 @@ import { CommonService } from '../../../../services/common.service';
 import { ProductService } from '../../../../services/product.service';
 import { HttpClient } from '@angular/common/http';
 import { MapApiService } from '../../../../services/map-api.service';
+import { MoodService } from '../../../../services/mood.service';
+import { Mood } from '../../../../interfaces/models/mood';
+import { BaseResponse } from '../../../../interfaces/models/base-response';
+import { LocationService } from '../../../../services/location.service';
+import { Location } from '../../../../interfaces/models/location';
+import { Transportation } from '../../../../interfaces/models/transportation';
+import { TransportationService } from '../../../../services/transportation.service';
 
 @Component({
   selector: 'app-home',
@@ -35,12 +42,12 @@ export class LandingComponent implements OnInit {
   selectedFrom: any;
   selectedTo: any;
 
-  moods!: any[];
-  locations!: any[];
-  transportOptions!: any[];
+  moods!: Mood[];
+  locations!: Location[];
+  transportOptions!: Transportation[];
 
   address: string = '';
-  selectedTransport: string = 'Car (4 seats)';
+  selectedTransport!: string;
   citySuggestion: any[] | undefined;
 
   locationLoading: boolean = true;
@@ -52,6 +59,9 @@ export class LandingComponent implements OnInit {
     private primengConfig: PrimeNGConfig,
     private router: Router,
     private mapApiService: MapApiService,
+    private moodService: MoodService,
+    private locationService: LocationService,
+    private transportationService: TransportationService
   ) {}
 
   ngOnInit(): void {
@@ -63,62 +73,10 @@ export class LandingComponent implements OnInit {
       tooltip: 1100,
       body: 100,
     };
-    // fetch api here
-    this.moods = [
-      {
-        title: 'Happy',
-        icon: 'pi pi-face-smile',
-        description: 'Feeling joyous and content',
-      },
-      {
-        title: 'Angry',
-        icon: 'pi pi-bolt',
-        description: 'Feeling frustration or anger',
-      },
-      {
-        title: 'Sad',
-        icon: 'pi pi-thumbs-down',
-        description: 'Feeling down or upset',
-      },
-      {
-        title: 'Confident',
-        icon: 'pi pi-star',
-        description: 'Feeling sure and determined',
-      },
-      {
-        title: 'Excited',
-        icon: 'pi pi-sparkles',
-        description: 'Feeling full of energy',
-      },
-      {
-        title: 'Shy',
-        icon: 'pi pi-question',
-        description: 'Feeling reserved or nervous',
-      },
-      {
-        title: 'Bored',
-        icon: 'pi pi-circle-off',
-        description: 'Feeling uninterested or weary',
-      },
-      {
-        title: 'Stressed',
-        icon: 'pi pi-exclamation-triangle',
-        description: 'Feeling overwhelmed or tense',
-      },
-    ];
+    this.getAllMoods();
+    this.getAllLocations();
+    this.getAllTransportations();
 
-    this.locations = [
-      { name: 'Hanoi' },
-      { name: 'Ho Chi Minh City' },
-      { name: 'Da Nang' },
-      { name: 'Hue' },
-    ];
-
-    this.transportOptions = [
-      { label: 'Car (4 seats)', value: 'Car (4 seats)' },
-      { label: 'Bus', value: 'Bus' },
-      { label: 'Motorbike', value: 'Motorbike' },
-    ];
     this.transportationLoading = false;
   }
 
@@ -127,18 +85,14 @@ export class LandingComponent implements OnInit {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
           if (position) {
-            console.log(
-              'Latitude: ' +
-                position.coords.latitude +
-                'Longitude: ' +
-                position.coords.longitude,
-            );
             this.lat = position.coords.latitude;
             this.lng = position.coords.longitude;
             this.reverseGeocode();
           }
         },
-        (error: GeolocationPositionError) => console.log(error),
+        () => {
+          alert('You should provide us your location to have better experience.');
+        },
       );
     } else {
       alert('You should provide us your location to have better experience.');
@@ -150,30 +104,24 @@ export class LandingComponent implements OnInit {
 
     this.http.get<any>(url).subscribe(
       data => {
-        console.log(data);
         this.address = data.display_name;
-        console.log('Current city:', this.address);
 
         // fetch map API to get cities list
         this.mapApiService.getCities().subscribe((mapData: any) => {
           mapData.forEach((map: any) => {
-            if (this.address.includes(map.admin_name)) {
-              this.selectedFrom = map.city;
+            if (this.address.includes(map.city) || this.address.includes(map.admin_name)) {
+              this.selectedFrom = map.admin_name;
             }
           });
           this.locationLoading = false;
         });
-      },
-      error => {
-        console.error('Error fetching location data:', error);
-        this.locationLoading = false;
-      },
+      }
     );
   }
 
   searchTours(): void {
     this.commonService.setSearchCriteria({
-      mood: this.moods[this.activeIndex].title,
+      mood: this.moods[this.activeIndex],
       from: this.selectedFrom,
       to: this.selectedTo,
       priceRange: this.priceRange,
@@ -181,5 +129,35 @@ export class LandingComponent implements OnInit {
     });
 
     this.router.navigate(['/explore']);
+  }
+
+  getAllMoods(): void {
+    this.moodService.getMoods(1, 20).subscribe(
+      (data: BaseResponse<Mood>) => {
+        if (data.isSucceed) {
+          this.moods = data.results as Mood[];
+        }
+      }
+    );
+  }
+
+  getAllLocations(): void {
+    this.locationService.getLocations(1, 20).subscribe(
+      (data: BaseResponse<Location>) => {
+        if (data.isSucceed) {
+          this.locations = data.results as Location[];
+        }
+      }
+    );
+  }
+
+  getAllTransportations(): void {
+    this.transportationService.getTransportations(1, 20).subscribe(
+      (data: BaseResponse<Transportation>) => {
+        if (data.isSucceed) {
+          this.transportOptions = data.results as Transportation[];
+        }
+      }
+    );
   }
 }

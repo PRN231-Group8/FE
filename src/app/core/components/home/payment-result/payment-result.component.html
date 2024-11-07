@@ -1,0 +1,63 @@
+<div class="layout-wrapper">
+  <p-scrollTop />
+  <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <div class="layout-main-container">
+    <div class="layout-main overflow-hidden z-0">
+      <div class="grid">
+        <div class="col-6 col-offset-3">
+          <div class="flex flex-wrap justify-content-center">
+            <div
+              *ngIf="isSuccessPayment"
+              class="border-circle w-6rem h-6rem m-2 bg-green-200 font-bold flex align-items-center justify-content-center"
+            >
+              <i class="pi pi-check" style="font-size: 2.5rem"></i>
+            </div>
+            <div
+              *ngIf="!isSuccessPayment"
+              class="border-circle w-6rem h-6rem m-2 bg-red-200 font-bold flex align-items-center justify-content-center"
+            >
+              <i class="pi pi-times" style="font-size: 2.5rem"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-2xl font-semibold text-primary mb-2 text-center">
+          {{ this.message }}
+        </div>
+        <div class="text-xl font-medium text-secondary text-center">
+          {{ this.totalAmountTransaction | currency: 'VND' : '' : '1.0-0' }} VND
+        </div>
+        <div class="text-center text-700">
+          {{ this.orderId }}
+        </div>
+        <div class="text-center text-700">
+          {{ this.orderDescription }}
+        </div>
+        <div class="text-center text-lg mt-8">
+          Need help? <b>Contact us</b> for support your payment
+        </div>
+      </div>
+      <div class="flex flex-wrap justify-content-center align-item-center">
+        <p-button
+          label="Return"
+          icon="pi pi-sign-out"
+          severity="info"
+          class="flex justify-content-center align-item-center mt-2 mr-6"
+          routerLink="/"
+        >
+        </p-button>
+        <p-button
+          label="Help"
+          icon="pi pi-question"
+          severity="warning"
+          class="flex justify-content-center align-item-center mt-2"
+          routerLink="/"
+        >
+        </p-button>
+      </div>
+    </div>
+  </div>
+  <app-shared-footer></app-shared-footer>
+</div>

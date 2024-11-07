@@ -21,7 +21,6 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// Third-party imports
 import {
   GoogleLoginProvider,
   GoogleSigninButtonModule,
@@ -32,7 +31,7 @@ import { environment } from '../environments/environment';
 import { JwtInterceptor } from './_helper/jwt.interceptor';
 import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
-import { fakeBackendProvider } from './_helper/fake-backend';
+import { FakeBackendInterceptor } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
 import { GalleriaModule } from 'primeng/galleria';
 import { AvatarModule } from 'primeng/avatar';
@@ -53,7 +52,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { sharedModule } from './layout/shared/shared.module';
-// Third-party imports
+import { VnpayFormModule } from './core/components/home/vnpay-form/vnpay-form.module';
 
 @NgModule({
   declarations: [
@@ -100,6 +99,7 @@ import { sharedModule } from './layout/shared/shared.module';
     TabMenuModule,
     sharedModule,
     FileUploadModule,
+    VnpayFormModule,
   ],
   exports: [
     SocialLoginModule,
@@ -121,6 +121,11 @@ import { sharedModule } from './layout/shared/shared.module';
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     {
+      provide: HTTP_INTERCEPTORS,
+      useClass: FakeBackendInterceptor,
+      multi: true,
+    },
+    {
       provide: 'SocialAuthServiceConfig',
       useValue: {
         autoLogin: false,
@@ -135,7 +140,6 @@ import { sharedModule } from './layout/shared/shared.module';
         },
       } as SocialAuthServiceConfig,
     },
-    fakeBackendProvider,
     CountryService,
     CustomerService,
     EventService,

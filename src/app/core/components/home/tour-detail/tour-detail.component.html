@@ -1,0 +1,269 @@
+<!-- eslint-disable @angular-eslint/template/alt-text -->
+<div class="layout-wrapper">
+  <p-scrollTop />
+  <p-toast></p-toast>
+  <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <div class="layout-main-container">
+    <div class="layout-main overflow-hidden z-0">
+      <div class="flex justify-content-center align-items-center">
+        <div class="text-6xl font-bold text-primary pb-3">Booking Trips</div>
+      </div>
+      <div class="flex justify-content-center align-items-center">
+        <div class="text-xl text-secondary pb-3">
+          Select a trip date and go to process payment
+        </div>
+      </div>
+
+      <!-- Skeleton loading while fetching data -->
+      <div class="grid nested-grid" *ngIf="!hasTourTrip && loading">
+        <div class="col-6">
+          <p-skeleton width="100%" height="750px" />
+        </div>
+        <div class="col-6">
+          <div class="grid">
+            <div class="col-6">
+              <p-skeleton width="100%" styleClass="mb-2" />
+            </div>
+            <div class="col-6">
+              <p-skeleton width="100%" styleClass="mb-2" />
+            </div>
+            <div class="col-12">
+              <p-skeleton width="100%" height="710px" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message for no locations found -->
+      <div class="grid nested-grid" *ngIf="!hasTourTrip && !loading">
+        <div class="col-12">
+          <div
+            class="text-center text-xl font-medium text-gray-500 h-6rem flex align-items-center justify-content-center"
+          >
+            No tour trip found.
+          </div>
+        </div>
+      </div>
+
+      <!-- Fully loaded content when tours are available -->
+      <div class="grid nested-grid" *ngIf="hasTourTrip && loading">
+        <div class="col-12">
+          <div class="card h-full">
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <p-galleria
+                  [value]="images"
+                  [responsiveOptions]="responsiveOptions"
+                  [containerStyle]="{ 'max-width': '640px' }"
+                  [numVisible]="5"
+                >
+                  <ng-template pTemplate="item" let-item>
+                    <img [src]="item.itemImageSrc" style="width: 100%" />
+                  </ng-template>
+                  <ng-template pTemplate="thumbnail" let-item>
+                    <div class="grid grid-nogutter justify-content-center">
+                      <img [src]="item.thumbnailImageSrc" />
+                    </div>
+                  </ng-template>
+                </p-galleria>
+              </div>
+              <div class="col-12 md:col-6">
+                <h2>{{ tour.title }}</h2>
+                <div class="flex justify-content-between">
+                  <div>
+                    <span class="pi pi-clock text-primary mr-2"></span>
+                    <span class="font-bold text-lg">TIME SPAN</span>
+                    <div class="mt-2">
+                      {{
+                        calculateDaysAndNights(tour.startDate!, tour.endDate!)
+                      }}
+                    </div>
+                  </div>
+                  <p-divider layout="vertical"></p-divider>
+                  <div>
+                    <span class="pi pi-map-marker text-primary mr-2"></span>
+                    <span class="font-bold text-lg">TO</span>
+                    <div class="mt-2">
+                      {{ getLocation(tour.locationInTours!) }}
+                    </div>
+                  </div>
+                  <p-divider layout="vertical"></p-divider>
+                  <div>
+                    <span class="pi pi-truck text-primary mr-2"></span>
+                    <span class="font-bold text-lg">TRANSPORTATION</span>
+                    <div class="mt-2">
+                      {{ getTransportation(tour.transportations!) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  {{ tour.description }}
+                </div>
+                <div class="mt-6">
+                  <span class="pi pi-heart-fill text-primary mr-2"></span>
+                  <span class="font-bold text-lg">Mood that suits you:</span>
+                  <div class="mt-2">
+                    {{ getMoods(tour.tourMoods!) }}
+                  </div>
+                </div>
+                <div
+                  class="mt-4 flex flex-wrap justify-content-center align-items-center"
+                >
+                  <p-button
+                    label="Select Trip Date"
+                    class="mr-2"
+                    (onClick)="goToCalendar()"
+                  ></p-button>
+                  <p-button
+                    icon="pi pi-bookmark"
+                    [rounded]="true"
+                    severity="warning"
+                    outlined="true"
+                  />
+                </div>
+              </div>
+              <div class="col-8 col-offset-2">
+                <div class="mt-4">
+                  <h4 class="text-center">Tour Timestamps</h4>
+                  <p-timeline
+                    [value]="tour.tourTimestamps"
+                    align="alternate"
+                    styleClass="customized-timeline"
+                  >
+                    <ng-template pTemplate="content" let-timestamp>
+                      <p-card [header]="timestamp.title">
+                        <img
+                          *ngIf="timestamp.location.photos[0]"
+                          [src]="timestamp.location.photos[0].url"
+                          [alt]="timestamp.location.photos[0].alt"
+                          width="200"
+                          class="shadow-2"
+                        />
+                        <small class="p-text-secondary"
+                          >{{ timestamp.preferredTimeSlot.startTime }} -
+                          {{ timestamp.preferredTimeSlot.endTime }}</small
+                        >
+                        <p>
+                          {{ timestamp.description }}
+                        </p>
+                        <p-divider></p-divider>
+                        <div class="text-lg font-medium">
+                          {{ timestamp.location.name }}
+                        </div>
+                      </p-card>
+                    </ng-template>
+                  </p-timeline>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="grid">
+            <div class="col-12">
+              <div
+                class="card"
+                style="width: 100%; height: 100%; overflow: hidden"
+              >
+                <h3 #calendar class="text-center text-primary">
+                  Trip Calendar
+                </h3>
+                <h6 class="text-center">Choose a trip date you want to go</h6>
+                <full-calendar
+                  [options]="calendarOptions"
+                  class="z-0"
+                ></full-calendar>
+                <div
+                  #tooltip
+                  class="tooltip"
+                  [innerText]="tooltipText"
+                  style="
+                    display: none;
+                    position: absolute;
+                    background-color: #333;
+                    color: #fff;
+                    padding: 5px;
+                    border-radius: 4px;
+                  "
+                  class="z-1"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p-dialog
+        header="Tour Trip Details"
+        [(visible)]="displayTripDialog"
+        [modal]="true"
+        [style]="{ width: '50vw' }"
+        [closable]="true"
+        [dismissableMask]="true"
+      >
+        <ng-container *ngIf="selectedTrip">
+          <h3>{{ selectedTrip.tripDate | date: 'fullDate' }}</h3>
+          <p>
+            <strong>Price:</strong> {{ formatPrice(selectedTrip.price) }} VND
+          </p>
+          <p><strong>Total Seats:</strong> {{ selectedTrip.totalSeats }}</p>
+          <p><strong>Status:</strong> {{ selectedTrip.tripStatus }}</p>
+          <p>
+            <strong>Remaining seats:</strong> {{ remainingSeats(selectedTrip) }}
+          </p>
+          <div class="flex justify-content-center mt-3">
+            <p-button
+              label="Book"
+              icon="pi pi-check"
+              (click)="bookTourTrip(selectedTrip)"
+            ></p-button>
+            <p-button
+              label="Close"
+              icon="pi pi-times"
+              class="p-button-text ml-2"
+              (click)="displayTripDialog = false"
+            ></p-button>
+          </div>
+        </ng-container>
+      </p-dialog>
+      <p-dialog
+        header="Enter Number of Passengers"
+        [(visible)]="displayPassengerDialog"
+        [modal]="true"
+        [style]="{ width: '30vw' }"
+        [closable]="true"
+        [dismissableMask]="true"
+      >
+        <form [formGroup]="passengerForm" (ngSubmit)="confirmBooking()">
+          <div class="p-field">
+            <label for="passengers">Number of Passengers</label>
+            <input
+              id="passengers"
+              type="number"
+              pInputText
+              formControlName="numberOfPassengers"
+              min="1"
+              required
+            />
+          </div>
+          <div class="flex justify-content-center mt-3">
+            <p-button
+              label="Confirm"
+              icon="pi pi-check"
+              [disabled]="!passengerForm.valid"
+              type="submit"
+            ></p-button>
+            <p-button
+              label="Cancel"
+              icon="pi pi-times"
+              class="p-button-text ml-2"
+              (click)="displayPassengerDialog = false"
+            ></p-button>
+          </div>
+        </form>
+      </p-dialog>
+    </div>
+  </div>
+  <app-shared-footer></app-shared-footer>
+</div>

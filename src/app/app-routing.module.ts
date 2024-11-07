@@ -9,6 +9,10 @@ import { ExplorationComponent } from './core/components/home/exploration/explora
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 import { ProfileComponent } from './core/components/profile/profile.component';
 import { SharingPostComponent } from './core/components/sharing-post/sharing-post.component';
+import { AuthGuard } from './_helper/auth.guard';
+import { TourDetailComponent } from './core/components/home/tour-detail/tour-detail.component';
+import { PaymentResultComponent } from './core/components/home/payment-result/payment-result.component';
+import { OrderHistoryComponent } from './core/components/order-history/order-history.component';
 
 @NgModule({
   imports: [
@@ -49,6 +53,7 @@ import { SharingPostComponent } from './core/components/sharing-post/sharing-pos
                 ),
             },
           ],
+          canActivate: [AuthGuard],
         },
         {
           path: 'login',
@@ -72,6 +77,30 @@ import { SharingPostComponent } from './core/components/sharing-post/sharing-pos
           loadChildren: () =>
             import('./core/components/profile/profile.module').then(
               m => m.ProfileModule,
+            ),
+        },
+        {
+          path: 'tour-detail/:id',
+          component: TourDetailComponent,
+          loadChildren: () =>
+            import(
+              './core/components/home/tour-detail/tour-detail.module'
+            ).then(m => m.TourDetailModule),
+        },
+        {
+          path: 'payment-result',
+          component: PaymentResultComponent,
+          loadChildren: () =>
+            import(
+              './core/components/home/payment-result/payment-result.module'
+            ).then(m => m.PaymentResultModule),
+        },
+        {
+          path: 'order',
+          component: OrderHistoryComponent,
+          loadChildren: () =>
+            import('./core/components/order-history/order-history.module').then(
+              m => m.OrderHistoryModule,
             ),
         },
         { path: 'notfound', component: NotfoundComponent },

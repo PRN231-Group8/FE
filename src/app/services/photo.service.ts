@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { BaseResponse } from '../interfaces/models/base-response';
 import { PhotoResponse } from '../interfaces/models/response/photoResponse';
 import { UpdatePhotoRequest } from '../interfaces/models/request/photoRequest';
+import { Image } from '../interfaces/models/image';
 
 @Injectable({
   providedIn: 'root',
@@ -32,5 +33,12 @@ export class PhotoService {
   // Method for retrieving a photo by its id
   getPhotoById(id: string): Observable<BaseResponse<PhotoResponse>> {
     return this.http.get<BaseResponse<PhotoResponse>>(`${this.apiUrl}/${id}`);
+  }
+  getImages(): any {
+    return this.http
+      .get<any>('assets/demo/data/photos.json')
+      .toPromise()
+      .then(res => res.data as Image[])
+      .then(data => data);
   }
 }

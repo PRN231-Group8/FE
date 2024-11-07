@@ -14,7 +14,7 @@ import { UpdatePostRequest } from '../../../interfaces/models/request/updatePost
 import { PostsRequest } from '../../../interfaces/models/request/postsResquest';
 import { PhotoService } from '../../../services/photo.service';
 import { UpdatePhotoRequest } from '../../../interfaces/models/request/photoRequest';
-import { Observable } from 'rxjs';
+import { Guid } from 'guid-typescript';
 
 @Component({
   selector: 'app-sharing-post',
@@ -72,7 +72,7 @@ export class SharingPostComponent implements OnInit {
   displayUpdateImageDialog = false;
   selectedPhotoId: string | null = null;
   selectedFile: File | null = null;
-  photoDetails: { id: string; url: string }[] = [];
+  photoDetails: { id: Guid; url: string }[] = [];
   constructor(
     private postService: PostService,
     private userService: UserService,
@@ -398,7 +398,7 @@ export class SharingPostComponent implements OnInit {
       accept: () => {
         // Temporarily remove the photo from the UI
         this.photoDetails = this.photoDetails.filter(
-          photo => photo.id !== photoId,
+          photo => photo.id.toString() !== photoId,
         );
 
         // Add the photo ID to photosToRemove for tracking
@@ -459,8 +459,8 @@ export class SharingPostComponent implements OnInit {
 
           this.comments = fullPost.comments || [];
           this.photoDetails = (fullPost.photos || []).map(photo => ({
-            id: photo.id,
-            url: photo.url,
+            id: photo.id as Guid,
+            url: photo.url as string,
           }));
 
           this.displayEditModal = true;

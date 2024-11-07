@@ -1,8 +1,8 @@
 export interface BaseResponse<T> {
   isSucceed: boolean;
-  result?: T | T[];
+  result?: T;
   results?: T[];
-  message?: string;
+  message: string;
   totalElements?: number;
   totalPages?: number;
   last?: boolean;
