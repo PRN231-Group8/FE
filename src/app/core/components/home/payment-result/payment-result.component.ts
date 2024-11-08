@@ -37,11 +37,11 @@ export class PaymentResultComponent implements OnInit {
           this.orderDescription = response.result?.orderDescription as string;
           this.message = response.result?.message as string;
         },
-        error: (error) => {
+        error: error => {
           this.isSuccessPayment = error.result?.success as boolean;
           this.message = error.result?.message as string;
           console.error('Payment processing failed', error);
-        }
+        },
       });
     });
   }

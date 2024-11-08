@@ -57,6 +57,6 @@ import { FullCalendarModule } from '@fullcalendar/angular';
     FullCalendarModule,
   ],
   exports: [ExplorationComponent],
-  providers: [ProductService]
+  providers: [ProductService],
 })
 export class ExplorationModule {}
