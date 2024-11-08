@@ -136,16 +136,19 @@
                           *ngIf="timestamp.location.photos[0]"
                           [src]="timestamp.location.photos[0].url"
                           [alt]="timestamp.location.photos[0].alt"
-                          width="200"
+                          width="300"
+                          height="200"
                           class="shadow-2"
                         />
-                        <small class="p-text-secondary"
+                        <div>
+                          <small class="p-text-secondary"
                           >{{ timestamp.preferredTimeSlot.startTime }} -
                           {{ timestamp.preferredTimeSlot.endTime }}</small
                         >
                         <p>
                           {{ timestamp.description }}
                         </p>
+                        </div>
                         <p-divider></p-divider>
                         <div class="text-lg font-medium">
                           {{ timestamp.location.name }}

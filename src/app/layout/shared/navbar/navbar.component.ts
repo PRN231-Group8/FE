@@ -26,7 +26,7 @@ export class NavbarComponent implements OnInit {
   NAV_LINKS = [
     { key: 'home', label: 'Home', href: '/' },
     { key: 'explore', label: 'Explore', href: '/explore' },
-    { key: 'sharing', label: 'Sharing', href: '/share' },
+    { key: 'sharing', label: 'Sharing', href: '/sharing-post' },
     { key: 'contact', label: 'Contact', href: '/contact' },
   ];
 
@@ -59,7 +59,8 @@ export class NavbarComponent implements OnInit {
         {
           label: 'Managements',
           items: [
-            { label: 'My Trips',
+            {
+              label: 'My Trips',
               icon: 'pi pi-car',
               shortcut: '⌘+N',
               command: (): void => {

@@ -56,7 +56,7 @@
                 (click)="item.command?.({ originalEvent: $event, item: item })"
                 class="w-full p-button p-shadow-6 custom-hover-button"
                 [disabled]="loading"
-              > </button>
+              ></button>
             </div>
           </div>
         </div>
@@ -136,7 +136,8 @@
                   label="Update"
                   class="mr-2 custom-hover-button w-10rem"
                   [loading]="loading"
-                > </button>
+                  [disabled]="!profileForm.valid || loading"
+                ></button>
                 <button
                   pButton
                   type="button"
@@ -144,7 +145,7 @@
                   (click)="resetProfileForm()"
                   class="p-button-secondary custom-hover-button w-10rem"
                   [disabled]="loading"
-                > </button>
+                ></button>
               </div>
             </form>
           </div>
@@ -212,7 +213,7 @@
                   label="Save"
                   class="mr-2 custom-hover-button w-10rem"
                   [loading]="loading"
-                > </button>
+                ></button>
                 <button
                   pButton
                   type="button"
@@ -220,7 +221,7 @@
                   (click)="resetPasswordForm()"
                   class="p-button-secondary custom-hover-button w-10rem"
                   [disabled]="loading"
-                > </button>
+                ></button>
               </div>
             </form>
           </div>

@@ -55,7 +55,6 @@ export class TourManagementComponent implements OnInit {
   tourForm!: FormGroup;
   tour: Tour | null = null;
   statusOptions = ['ACTIVE', 'INACTIVE', 'CANCELLED'];
-  durationMinutes: number = 1;
   sortByStatus: string = '';
   locationOptions: Location[] = [];
   moodOptions: Mood[] = [];
@@ -248,7 +247,7 @@ export class TourManagementComponent implements OnInit {
           this.sendErrorToast(data.message);
         }
       },
-      error: (err) => {
+      error: err => {
         this.sendErrorToast(err.message);
       },
     });
@@ -402,7 +401,7 @@ export class TourManagementComponent implements OnInit {
               this.savingState = false;
             }
           },
-          error: (error) => {
+          error: error => {
             this.sendErrorToast(error.message);
             this.savingState = false;
           },
@@ -436,7 +435,7 @@ export class TourManagementComponent implements OnInit {
   saveAllTimestamps(): void {
     if (this.newTimestamps.length > 0) {
       this.timestampService
-        .createBatchTourTimestamps(this.newTimestamps, this.durationMinutes)
+        .createBatchTourTimestamps(this.newTimestamps)
         .subscribe({
           next: data => {
             if (data.isSucceed) {
@@ -608,35 +607,37 @@ export class TourManagementComponent implements OnInit {
 
     if (this.isTourTripEdit) {
       // Call the API to update the existing tour trip
-    this.tourTripService.updateTourTrip(newTourTrip.tourTripId, newTourTrip).subscribe({
-      next: data => {
-        if (data.isSucceed) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Tour trip updated successfully'
-          });
-          this.savingState = false;
+      this.tourTripService
+        .updateTourTrip(newTourTrip.tourTripId, newTourTrip)
+        .subscribe({
+          next: data => {
+            if (data.isSucceed) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Tour trip updated successfully',
+              });
+              this.savingState = false;
 
-          // Update the trip in the local tour's trips array
-          const index = this.tour?.tourTrips?.findIndex(
-            trip => trip.tourTripId === newTourTrip.tourTripId
-          );
-          if (index !== undefined && index !== -1) {
-            this.tour?.tourTrips?.splice(index, 1, newTourTrip);
-          }
-          this.tourTripDialog = false;
-        } else {
-          this.sendErrorToast(data.message);
-          this.savingState = false;
-        }
-      },
-      error: (err) => {
-        this.sendErrorToast(err.message);
-        this.savingState = false;
-        return;
-      }
-    });
+              // Update the trip in the local tour's trips array
+              const index = this.tour?.tourTrips?.findIndex(
+                trip => trip.tourTripId === newTourTrip.tourTripId,
+              );
+              if (index !== undefined && index !== -1) {
+                this.tour?.tourTrips?.splice(index, 1, newTourTrip);
+              }
+              this.tourTripDialog = false;
+            } else {
+              this.sendErrorToast(data.message);
+              this.savingState = false;
+            }
+          },
+          error: err => {
+            this.sendErrorToast(err.message);
+            this.savingState = false;
+            return;
+          },
+        });
     } else {
       // If adding a new trip, push to newTourTrips array for batch saving
       this.newTourTrips.push(newTourTrip);
@@ -668,7 +669,7 @@ export class TourManagementComponent implements OnInit {
             this.savingState = false;
           }
         },
-        error: (error) => {
+        error: error => {
           this.sendErrorToast(error.message);
           this.savingState = false;
         },
@@ -706,7 +707,7 @@ export class TourManagementComponent implements OnInit {
             this.sendErrorToast(data.message);
           }
         },
-        error: (error) => {
+        error: error => {
           this.savingState = false;
           this.sendErrorToast(error.message);
         },

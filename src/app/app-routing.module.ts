@@ -8,6 +8,7 @@ import { LandingComponent } from './core/components/home/landing/landing.compone
 import { ExplorationComponent } from './core/components/home/exploration/exploration.component';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
 import { ProfileComponent } from './core/components/profile/profile.component';
+import { SharingPostComponent } from './core/components/sharing-post/sharing-post.component';
 import { AuthGuard } from './_helper/auth.guard';
 import { TourDetailComponent } from './core/components/home/tour-detail/tour-detail.component';
 import { PaymentResultComponent } from './core/components/home/payment-result/payment-result.component';
@@ -29,9 +30,9 @@ import { OrderHistoryComponent } from './core/components/order-history/order-his
           path: 'explore',
           component: ExplorationComponent,
           loadChildren: () =>
-            import('./core/components/home/exploration/exploration.module').then(
-              m => m.ExplorationModule,
-            ),
+            import(
+              './core/components/home/exploration/exploration.module'
+            ).then(m => m.ExplorationModule),
         },
         {
           path: 'dashboard',
@@ -52,7 +53,7 @@ import { OrderHistoryComponent } from './core/components/order-history/order-his
                 ),
             },
           ],
-          canActivate: [AuthGuard]
+          canActivate: [AuthGuard],
         },
         {
           path: 'login',
@@ -61,6 +62,14 @@ import { OrderHistoryComponent } from './core/components/order-history/order-his
         {
           path: 'verify-email',
           component: VerifyEmailComponent,
+        },
+        {
+          path: 'sharing-post',
+          component: SharingPostComponent,
+          loadChildren: () =>
+            import('./core/components/sharing-post/sharing-post.module').then(
+              m => m.SharingPostModule,
+            ),
         },
         {
           path: 'profile',
@@ -74,17 +83,17 @@ import { OrderHistoryComponent } from './core/components/order-history/order-his
           path: 'tour-detail/:id',
           component: TourDetailComponent,
           loadChildren: () =>
-            import('./core/components/home/tour-detail/tour-detail.module').then(
-              m => m.TourDetailModule,
-            ),
+            import(
+              './core/components/home/tour-detail/tour-detail.module'
+            ).then(m => m.TourDetailModule),
         },
         {
           path: 'payment-result',
           component: PaymentResultComponent,
           loadChildren: () =>
-            import('./core/components/home/payment-result/payment-result.module').then(
-              m => m.PaymentResultModule,
-            ),
+            import(
+              './core/components/home/payment-result/payment-result.module'
+            ).then(m => m.PaymentResultModule),
         },
         {
           path: 'order',

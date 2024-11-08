@@ -90,7 +90,7 @@
                 *ngIf="location.photos.length > 0"
                 [src]="location.photos[0].url"
                 [alt]="location.photos[0].alt"
-                width="100"
+                width="170"
                 height="100"
               />
               <span *ngIf="location.photos.length === 0">No Image</span>
@@ -163,7 +163,7 @@
         <h2>{{ isEdit ? 'Edit Location' : 'Create New Location' }}</h2>
       </ng-template>
       <ng-template pTemplate="content">
-        <form [formGroup]="locationForm" class="p-fluid">
+        <form [formGroup]="locationForm" *ngIf="locationForm" class="p-fluid">
           <div class="p-field">
             <label for="name">Location Name</label>
             <input
@@ -244,12 +244,12 @@
                 <div class="grid">
                   <div class="col p-field">
                     <p-image
-                      formControlName="url"
-                      [src]="selectedEditLocation.photos.at(i)?.url"
-                      [alt]="selectedEditLocation.photos.at(i)?.alt"
+                      [src]="photo.get('url')?.value"
+                      [alt]="photo.get('alt')?.value"
                       width="290"
                       height="200"
-                    />
+                    ></p-image>
+                    <input type="hidden" formControlName="url" />
                   </div>
                   <div class="col p-field flex align-items-center">
                     <button

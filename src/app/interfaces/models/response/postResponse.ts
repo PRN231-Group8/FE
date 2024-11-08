@@ -1,7 +1,9 @@
-export interface BaseResponse<T> {
+import { Post } from '../post';
+
+export interface PostResponse {
   isSucceed: boolean;
-  result?: T;
-  results?: T[];
+  result?: Post;
+  results?: Post[];
   message: string;
   totalElements?: number;
   totalPages?: number;

@@ -150,8 +150,6 @@
                         placeholder="{{ selectedFrom ? selectedFrom : 'Finding your nearby city' }}"
                         optionLabel="name"
                         class="p-mt-4 p-col-12 p-md-6"
-                        [virtualScroll]="true"
-                        [virtualScrollItemSize]="10"
                         appendTo="body"
                         [loading]="locationLoading"
                         variant="filled"
@@ -164,8 +162,7 @@
                         placeholder="To Destination"
                         optionLabel="name"
                         class="p-mt-4 p-col-12 p-md-6"
-                        [virtualScroll]="true"
-                        [virtualScrollItemSize]="10"
+                        scrollHeight="200px"
                         [loading]="locationLoading"
                         appendTo="body"
                       ></p-dropdown>
@@ -192,8 +189,7 @@
                         placeholder="Select Transportation"
                         class="p-mt-4 ml-2 w-auto"
                         [loading]="transportationLoading"
-                        [virtualScroll]="true"
-                        [virtualScrollItemSize]="10"
+                        scrollHeight="200px"
                         appendTo="body"
                       ></p-dropdown>
                     </div>
