@@ -19,7 +19,7 @@ export class UserService {
     id: string,
     model: UserProfileRequest,
   ): Observable<BaseResponse<any>> {
-    const url = `${this.apiUrl}/profile/${id}`;
+    const url = `${this.apiUrl}/${id}`;
     return this.http.put<BaseResponse<any>>(url, model);
   }
 
@@ -31,7 +31,7 @@ export class UserService {
     return this.http.post<BaseResponse<any>>(url, formData);
   }
   getUserByEmail(email: string): Observable<BaseResponse<UserProfileResponse>> {
-    const url = `${this.apiUrl}/${email}/email`;
+    const url = `${this.apiUrl}/${email}`;
     return this.http.get<BaseResponse<UserProfileResponse>>(url);
   }
   getAllUsers(): Observable<BaseResponse<User[]>> {

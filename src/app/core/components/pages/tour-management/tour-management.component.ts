@@ -55,7 +55,6 @@ export class TourManagementComponent implements OnInit {
   tourForm!: FormGroup;
   tour: Tour | null = null;
   statusOptions = ['ACTIVE', 'INACTIVE', 'CANCELLED'];
-  durationMinutes: number = 1;
   sortByStatus: string = '';
   locationOptions: Location[] = [];
   moodOptions: Mood[] = [];
@@ -436,7 +435,7 @@ export class TourManagementComponent implements OnInit {
   saveAllTimestamps(): void {
     if (this.newTimestamps.length > 0) {
       this.timestampService
-        .createBatchTourTimestamps(this.newTimestamps, this.durationMinutes)
+        .createBatchTourTimestamps(this.newTimestamps)
         .subscribe({
           next: data => {
             if (data.isSucceed) {

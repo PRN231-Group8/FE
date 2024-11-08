@@ -66,6 +66,8 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     this.filters = this.commonService.getSearchCriteria() || null;
     if (this.filters.from) {
       this.selectedFrom = this.filters.from;
+      this.fromPlaceholder = this.filters.from;
+      this.locationLoading = false;
     } else {
       this.getLocation();
     }
@@ -84,10 +86,11 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     // Subscribe to tours from CommonService
     this.toursSubscription = this.commonService
       .getTours()
-      .subscribe(storedTours => {
+      .subscribe(async storedTours => {
         if (storedTours) {
           // If tours are already stored, use them
           this.tours = storedTours;
+          await this.applyFilters();
         } else {
           // Fetch tours if not stored
           this.fetchAndStoreTours();
@@ -211,6 +214,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
         }
 
         // Location Filter
+        console.log(filters.to);
         if (filters.to) {
           const locationNames =
             tour.locationInTours?.map((location: Location) =>
