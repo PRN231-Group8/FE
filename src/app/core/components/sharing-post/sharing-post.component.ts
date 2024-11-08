@@ -106,16 +106,15 @@ export class SharingPostComponent implements OnInit {
             this.statusFilter =
               this.role === 'MODERATOR' ? 'Pending' : 'Approved';
 
-            // Set the currentUser property with necessary fields
+            // Set currentUser properly
             this.currentUser = {
-              userId: user.id,
+              userId: user.userId,
               firstName: user.firstName,
               lastName: user.lastName,
               avatarPath: user.avatarPath || '',
               dob: user.dob || undefined,
             };
 
-            // Set isModerator based on the role
             this.isModerator = this.role === 'MODERATOR';
           }
         },
@@ -140,12 +139,16 @@ export class SharingPostComponent implements OnInit {
           if (response.isSucceed && response.result) {
             this.posts = [...this.posts, ...response.result];
             this.postPage++; // Increment page number for pagination
+          } else {
+            const errorMessage = response.message || 'No posts available.';
+            this.displayMessage('info', 'Info', errorMessage);
           }
           this.isLoading = false;
         },
-        error: () => {
-          this.displayMessage('error', 'Error', 'Failed to load posts.');
-          this.isLoading = false;
+        error: errorResponse => {
+          const errorMessage =
+            errorResponse?.error?.message || 'Failed to load user profile.';
+          this.displayMessage('error', 'Error', errorMessage);
         },
       });
   }
@@ -195,19 +198,42 @@ export class SharingPostComponent implements OnInit {
     this.postService.createPost(formData).subscribe({
       next: response => {
         if (response.isSucceed && response.result) {
-          this.posts.unshift(response.result as Post);
-          this.displayMessage(
-            'success',
-            'Success',
-            'Post created successfully.',
-          );
+          const createdPost = response.result as Post;
+
+          // Check if the user is a CUSTOMER and the post is approved
+          if (this.role === 'CUSTOMER') {
+            // Only display if the post status is Approved
+            if (createdPost.status === 'Approved') {
+              this.posts.unshift(createdPost);
+            } else {
+              // Display a message indicating the post is pending approval
+              this.displayMessage(
+                'info',
+                'Confirmation',
+                'Please wait for your post to be approved.',
+              );
+            }
+          } else {
+            // For non-CUSTOMER roles, add the post immediately
+            this.posts.unshift(createdPost);
+          }
+
+          // Display the success message
+          const successMessage =
+            response.message || 'Post created successfully.';
+          this.displayMessage('success', 'Success', successMessage);
+
           this.resetPostCreation();
         }
         this.isSubmitting = false;
       },
       error: errorResponse => {
+        console.error('Full error response:', errorResponse); // Log the entire error response for inspection
+        // Adjusted error message extraction
         const errorMessage =
-          errorResponse.error?.message || 'Failed to create post.';
+          errorResponse.error?.message ||
+          errorResponse.message ||
+          'Failed to create post.';
         this.displayMessage('error', 'Error', errorMessage);
         this.isSubmitting = false;
       },
@@ -275,30 +301,25 @@ export class SharingPostComponent implements OnInit {
   onTemplatedUpload(): void {
     this.displayMessage('success', 'Success', 'Files Uploaded Successfully');
   }
-  openPhotoVideoModal(): void {
-    this.showCreatePostModal = true;
+  // openPhotoVideoModal(): void {
+  //   this.showCreatePostModal = true;
 
-    setTimeout(() => {
-      this.fileUploader.choose();
-    }, 0);
-  }
+  //   setTimeout(() => {
+  //     this.fileUploader.choose();
+  //   }, 0);
+  // }
   deletePost(postId: string): void {
     if (confirm('Are you sure you want to delete this post?')) {
       this.postService.deletePost(postId).subscribe({
-        next: () => {
+        next: response => {
+          const successMessage =
+            response.message || 'Post deleted successfully.';
           this.posts = this.posts.filter(p => p.postsId !== postId);
-          this.displayMessage(
-            'success',
-            'Success',
-            'Post deleted successfully.',
-          );
+          this.displayMessage('success', 'Success', successMessage);
         },
         error: err => {
-          this.displayMessage(
-            'error',
-            'Error',
-            'Failed to delete post: ' + err.message,
-          );
+          const errorMessage = err?.message || 'Failed to delete post.';
+          this.displayMessage('error', 'Error', errorMessage);
         },
       });
     }
@@ -313,17 +334,20 @@ export class SharingPostComponent implements OnInit {
         .subscribe({
           next: response => {
             if (response.isSucceed) {
+              const successMessage =
+                response.message || 'Post updated successfully.';
+              this.displayMessage('success', 'Success', successMessage);
               this.displayEditModal = false;
-              this.isUpdatePostLoading = false; // Stop loading after success
+              this.isUpdatePostLoading = false;
 
-              // Delay the reload to allow the UI to show loading state
-              setTimeout(() => {
-                window.location.reload();
-              }, 500);
+              setTimeout(() => window.location.reload(), 500);
             }
           },
-          error: () => {
-            this.isUpdatePostLoading = false; // Stop loading on error
+          error: errorResponse => {
+            const errorMessage =
+              errorResponse?.response?.message || 'Failed to update post.';
+            this.displayMessage('error', 'Error', errorMessage);
+            this.isUpdatePostLoading = false;
           },
         });
     }
@@ -458,19 +482,23 @@ export class SharingPostComponent implements OnInit {
 
   // Get Post Menu Items
   getPostMenuItems(post: Post): MenuItem[] {
-    // Define the menu items accessible to all roles
-    const menuItems: MenuItem[] = [
-      {
-        label: 'Update',
-        icon: 'pi pi-pencil',
-        command: () => this.openUpdateDialog(post),
-      },
-      {
-        label: 'Delete',
-        icon: 'pi pi-trash',
-        command: () => this.deletePost(post.postsId),
-      },
-    ];
+    const isOwner = this.currentUser?.userId === post.user.userId;
+    const isModerator = this.isModerator;
+    const menuItems: MenuItem[] = [];
+    if (isOwner || isModerator) {
+      menuItems.push(
+        {
+          label: 'Update',
+          icon: 'pi pi-pencil',
+          command: () => this.openUpdateDialog(post),
+        },
+        {
+          label: 'Delete',
+          icon: 'pi pi-trash',
+          command: () => this.deletePost(post.postsId),
+        },
+      );
+    }
 
     return menuItems;
   }
@@ -500,7 +528,7 @@ export class SharingPostComponent implements OnInit {
       };
 
       this.photoService.updatePhoto(updateRequest).subscribe({
-        next: response => {
+        next: () => {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
@@ -620,10 +648,10 @@ export class SharingPostComponent implements OnInit {
           if (response.isSucceed && response.result) {
             this.selectedPostWithComments?.comments.unshift(response.result); // Add new comment at the top
             this.commentContent = ''; // Clear input
+            const successMessage =
+              response.message || 'Comment posted successfully.';
+            this.displayMessage('success', 'Success', successMessage);
           }
-          this.isCommentLoading = false;
-        },
-        error: () => {
           this.isCommentLoading = false;
         },
       });

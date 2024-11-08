@@ -21,7 +21,7 @@
       style="height: 100%; display: flex; flex-direction: column"
     >
       <div
-        class="flex flex-column p-2 gap-4 shadow-3 border-1 border-yellow-500 surface-overlay border-round mb-4"
+        class="flex flex-column p-2 gap-4 shadow-3 surface-overlay border-round mb-4"
       >
         <!-- Search and Filter Controls in a single row -->
         <div class="flex justify-content-between align-items-center gap-2">
@@ -36,7 +36,7 @@
                 class="w-full"
                 appendTo="body"
               />
-              <label for="searchTerm">Search by term</label>
+              <label for="searchTerm">Search by content</label>
             </p-floatLabel>
 
             <!-- Search Button (remove gap) -->
@@ -90,7 +90,10 @@
           }"
         >
           <div class="relative">
-            <div class="absolute top-0 right-0 m-3 z-10">
+            <div
+              *ngIf="getPostMenuItems(post).length > 0"
+              class="absolute top-0 right-0 m-3 z-10"
+            >
               <button
                 pButton
                 type="button"
@@ -108,13 +111,12 @@
               ></p-menu>
             </div>
           </div>
+
           <!-- Post Header -->
           <div class="flex align-items-center mb-2">
             <p-avatar
               size="large"
-              [image]="
-                post.user.avatarPath || userAvatarUrl || defaultAvatarPath
-              "
+              [image]="post.user.avatarPath || defaultAvatarPath"
               class="mr-2 p-2"
               shape="circle"
             ></p-avatar>
@@ -123,7 +125,7 @@
                 {{ post.user.firstName }} {{ post.user.lastName }}
               </p>
               <small class="text-secondary">{{
-                post.createDate | date: 'medium'
+                post.createDate | relativeTime
               }}</small>
             </div>
           </div>
@@ -310,17 +312,19 @@
             <p class="m-0">{{ comment.content }}</p>
           </div>
           <div class="flex align-items-center ml-3 mt-1">
-            <small class="text-secondary">{{ comment.createdDate }}</small>
+            <small class="text-secondary">{{
+              comment.createdDate | relativeTime
+            }}</small>
           </div>
         </div>
       </div>
 
       <div
-        class="comment-input-section p-2 flex align-items-center shadow-3 border-1 border-yellow-500 surface-overlay border-round"
+        class="comment-input-section p-2 flex align-items-center shadow-3 surface-overlay border-round"
       >
         <p-avatar
           size="normal"
-          [image]="userAvatarUrl || defaultAvatarPath"
+          [image]="userAvatarUrl ? userAvatarUrl : defaultAvatarPath"
           class="mr-2"
           shape="circle"
         ></p-avatar>
@@ -414,9 +418,10 @@
     </div>
     <div class="col-2">
       <!-- Post Status -->
-      <div class="field mb-4">
-        <label for="status" class="text-lg font-semibold text-800 mb-2"
-          >Status</label
+      <!-- Only visible to MODERATOR role -->
+      <div *ngIf="isModerator" class="field mb-4">
+        <label for="status" class="text-lg font-semibold text-800 mb-2">
+          Status </label
         ><br />
         <p-dropdown
           [(ngModel)]="updatePostRequest.status"
@@ -552,9 +557,6 @@
     ></button>
   </ng-template>
 </p-dialog>
-
-CreatePostDialog
-
 <!-- Modal for Creating Post -->
 <p-dialog
   [(visible)]="showCreatePostModal"
@@ -571,7 +573,7 @@ CreatePostDialog
     <div class="flex align-items-center mb-3">
       <p-avatar
         size="large"
-        [image]="userAvatarUrl || defaultAvatarPath"
+        [image]="userAvatarUrl ? userAvatarUrl : defaultAvatarPath"
         class="mr-2"
         shape="circle"
       ></p-avatar>

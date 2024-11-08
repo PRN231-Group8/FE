@@ -26,9 +26,10 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { RelativeTimePipe } from './relative-time.pipe';
 
 @NgModule({
-  declarations: [SharingPostComponent],
+  declarations: [SharingPostComponent, RelativeTimePipe],
   imports: [
     CommonModule,
     FormsModule,

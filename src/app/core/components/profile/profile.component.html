@@ -136,6 +136,7 @@
                   label="Update"
                   class="mr-2 custom-hover-button w-10rem"
                   [loading]="loading"
+                  [disabled]="!profileForm.valid || loading"
                 ></button>
                 <button
                   pButton
