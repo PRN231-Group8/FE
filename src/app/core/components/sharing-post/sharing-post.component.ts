@@ -90,7 +90,6 @@ export class SharingPostComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserProfile();
-    this.loadPosts();
   }
 
   private loadUserProfile(): void {
@@ -103,10 +102,12 @@ export class SharingPostComponent implements OnInit {
             this.userName = `${user.firstName} ${user.lastName}`;
             this.userAvatarUrl = user.avatarPath || '';
             this.role = user.role || 'CUSTOMER';
+
+            // Set statusFilter based on role
             this.statusFilter =
               this.role === 'MODERATOR' ? 'Pending' : 'Approved';
 
-            // Set currentUser properly
+            // Set currentUser
             this.currentUser = {
               userId: user.userId,
               firstName: user.firstName,
@@ -116,6 +117,9 @@ export class SharingPostComponent implements OnInit {
             };
 
             this.isModerator = this.role === 'MODERATOR';
+
+            // Load posts only after setting statusFilter
+            this.loadPosts();
           }
         },
         error: () => {
@@ -325,9 +329,9 @@ export class SharingPostComponent implements OnInit {
     }
   }
 
-  // Update Post
   updatePost(): void {
     this.isUpdatePostLoading = true; // Start loading
+
     if (this.updatePostRequest) {
       this.postService
         .updatePost(this.updatePostRequest.postsId!, this.updatePostRequest)
@@ -336,12 +340,30 @@ export class SharingPostComponent implements OnInit {
             if (response.isSucceed) {
               const successMessage =
                 response.message || 'Post updated successfully.';
+
+              // Update the specific post in the posts list without reloading
+              const updatedPostIndex = this.posts.findIndex(
+                post => post.postsId === this.updatePostRequest.postsId,
+              );
+              if (updatedPostIndex !== -1) {
+                // Update the post's content and status in the current list
+                this.posts[updatedPostIndex].content =
+                  this.updatePostRequest.content ?? '';
+                this.posts[updatedPostIndex].status =
+                  this.updatePostRequest.status;
+              }
+
+              // Show the success message
               this.displayMessage('success', 'Success', successMessage);
               this.displayEditModal = false;
-              this.isUpdatePostLoading = false;
-
-              setTimeout(() => window.location.reload(), 500);
+            } else {
+              this.displayMessage(
+                'error',
+                'Error',
+                response.message || 'Failed to update post.',
+              );
             }
+            this.isUpdatePostLoading = false;
           },
           error: errorResponse => {
             const errorMessage =
