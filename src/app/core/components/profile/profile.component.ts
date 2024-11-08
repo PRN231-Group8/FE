@@ -85,17 +85,18 @@ export class ProfileComponent implements OnInit {
     this.loading = true;
     this.email = this.authenticationService.getEmailFromToken();
     if (this.email) {
-      // Ensure email is not null before using it
       setTimeout(() => {
         this.userService.getUserByEmail(this.email!).subscribe(
           response => {
             this.loading = false;
             if (response.isSucceed && response.result) {
-              this.profileForm.patchValue(response.result);
-              this.avatarUrl = response.result.avatarPath || this.avatarUrl;
-              this.date = response.result.dob
-                ? new Date(response.result.dob)
-                : new Date();
+              const user = Array.isArray(response.result)
+                ? response.result[0]
+                : response.result;
+
+              this.profileForm.patchValue(user);
+              this.avatarUrl = user.avatarPath || this.avatarUrl;
+              this.date = user.dob ? new Date(user.dob) : new Date();
             } else {
               this.messageService.add({
                 severity: 'error',

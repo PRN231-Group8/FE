@@ -1,5 +1,5 @@
 export interface UserProfileResponse {
-  id: string;
+  userId: string;
   firstName: string;
   lastName: string;
   dob: Date | null;
@@ -9,4 +9,5 @@ export interface UserProfileResponse {
   address?: string;
   createdDate: Date;
   lastUpdatedDate?: Date;
+  role: string;
 }

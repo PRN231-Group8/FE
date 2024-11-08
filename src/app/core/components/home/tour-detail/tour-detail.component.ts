@@ -61,7 +61,7 @@ export class TourDetailComponent implements OnInit {
     private paymentService: PaymentService,
     private fb: FormBuilder,
     public dialogService: DialogService,
-    private messageService: MessageService
+    private messageService: MessageService,
   ) {
     this.calendarOptions = {
       initialView: 'dayGridMonth',
@@ -299,8 +299,8 @@ export class TourDetailComponent implements OnInit {
       width: '70%',
       height: '70%',
       data: {
-        url: url
-      }
+        url: url,
+      },
     });
   }
 }
