@@ -3,6 +3,7 @@ import { MenuItem } from 'primeng/api';
 import { Menu } from 'primeng/menu';
 import { AuthenticationService } from '../../../services/authentication.service';
 import { Router } from '@angular/router';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-navbar',
@@ -17,9 +18,12 @@ export class NavbarComponent implements OnInit {
   firstName: any;
   role: any;
   isLoggedIn: boolean = false;
-
+  defaultAvatarPath: string =
+    'https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1';
+  avatarPath: string | null = null;
   constructor(
     private authenticationService: AuthenticationService,
+    private userService: UserService,
     private router: Router,
   ) {}
 
@@ -33,14 +37,17 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     this.isLoggedIn = !!user?.token;
-    if (this.isLoggedIn) {
-      this.firstName = user?.firstName || 'Unknown';
-      this.lastName = user?.lastName || 'Unknown';
-      this.role = user?.role || 'User';
+
+    if (this.isLoggedIn && user?.email) {
+      this.userService.getUserByEmail(user.email).subscribe(response => {
+        const userProfile = response.result;
+        this.firstName = userProfile?.firstName || 'Unknown';
+        this.lastName = userProfile?.lastName || 'Unknown';
+        this.role = userProfile?.role || 'User';
+        this.avatarPath = userProfile?.avatarPath || this.defaultAvatarPath;
+      });
     }
     this.updateMenuItems();
-
-    // Add event listener for window resize to handle responsiveness
     window.addEventListener('resize', this.updateMenuItems.bind(this));
   }
 
