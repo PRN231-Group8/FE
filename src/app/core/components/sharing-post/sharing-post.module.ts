@@ -16,7 +16,7 @@ import { BadgeModule } from 'primeng/badge';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SharingPostComponent } from './sharing-post.component';
-import { SharingPostRoutingModule } from './sharing-post-routing';
+import { SharingPostRoutingModule } from './sharing-post-routing.module';
 import { sharedModule } from '../../../layout/shared/shared.module';
 import { GalleriaModule } from 'primeng/galleria';
 import { MenuModule } from 'primeng/menu';

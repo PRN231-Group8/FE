@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BaseResponse } from '../interfaces/models/base-response';
-import { PhotoResponse } from '../interfaces/models/response/photoResponse';
+import { PhotoResponse } from '../interfaces/models/response/photo-response';
 import { UpdatePhotoRequest } from '../interfaces/models/request/photo-request';
 import { Image } from '../interfaces/models/image';
 
