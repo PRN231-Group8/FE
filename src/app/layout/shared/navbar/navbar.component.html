@@ -50,9 +50,10 @@
         class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround"
       >
         <p-avatar
-          image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+          [image]="avatarPath || defaultAvatarPath"
           class="mr-2"
           shape="circle"
+          (error)="avatarPath = defaultAvatarPath"
         ></p-avatar>
         <span class="inline-flex flex-column">
           <span class="font-bold">{{ firstName }}{{ lastName }}</span>
