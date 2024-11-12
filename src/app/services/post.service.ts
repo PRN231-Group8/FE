@@ -107,7 +107,7 @@ export class PostService {
     postId: string,
   ): Observable<BaseResponse<CommentResponse[]>> {
     return this.http.get<BaseResponse<CommentResponse[]>>(
-      `${environment.BACKEND_API_URL}/api/comments/post/${postId}`,
+      `${environment.BACKEND_API_URL}/api/comments/${postId}/post`,
     );
   }
 }

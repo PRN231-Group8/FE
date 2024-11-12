@@ -9,7 +9,6 @@ import { CalendarModule } from 'primeng/calendar';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ToastModule } from 'primeng/toast';
 import { ScrollTopModule } from 'primeng/scrolltop';
-import { FloatLabelModule } from 'primeng/floatlabel';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
@@ -27,7 +26,11 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { RelativeTimePipe } from './relative-time.pipe';
-
+import { ToolbarModule } from 'primeng/toolbar';
+import { PanelModule } from 'primeng/panel';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { SkeletonModule } from 'primeng/skeleton';
+import { TooltipModule } from 'primeng/tooltip';
 @NgModule({
   declarations: [SharingPostComponent, RelativeTimePipe],
   imports: [
@@ -42,7 +45,6 @@ import { RelativeTimePipe } from './relative-time.pipe';
     FileUploadModule,
     ToastModule,
     ScrollTopModule,
-    FloatLabelModule,
     ProgressSpinnerModule,
     AvatarModule,
     BadgeModule,
@@ -57,6 +59,12 @@ import { RelativeTimePipe } from './relative-time.pipe';
     CheckboxModule,
     ConfirmDialogModule,
     InfiniteScrollModule,
+    ToolbarModule,
+    PanelModule,
+    ScrollPanelModule,
+    SkeletonModule,
+    TooltipModule,
+    ConfirmDialogModule
   ],
   providers: [ConfirmationService, MessageService],
 })
