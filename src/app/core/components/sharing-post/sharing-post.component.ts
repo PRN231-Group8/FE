@@ -14,6 +14,7 @@ import { PhotoService } from '../../../services/photo.service';
 import { UpdatePhotoRequest } from '../../../interfaces/models/request/photoRequest';
 import { Guid } from 'guid-typescript';
 import { BaseResponse } from '../../../interfaces/models/base-response';
+import { CommentRequest } from '../../../interfaces/models/request/commentRequest';
 
 @Component({
   selector: 'app-sharing-post',
@@ -76,8 +77,27 @@ export class SharingPostComponent implements OnInit {
   selectedComment: CommentResponse[] = [];
   selectedPostWithComments: Post | null = null;
   isModerator: boolean = false;
+  commentDialog: boolean = false;
   private postPage = 1;
   private commentPage = 1;
+  responsiveOptions: any[] = [
+    {
+      breakpoint: '1500px',
+      numVisible: 5,
+    },
+    {
+      breakpoint: '1024px',
+      numVisible: 3,
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 2,
+    },
+    {
+      breakpoint: '560px',
+      numVisible: 1,
+    },
+  ];
   constructor(
     private postService: PostService,
     private userService: UserService,
@@ -141,7 +161,10 @@ export class SharingPostComponent implements OnInit {
       .subscribe({
         next: (response: BaseResponse<Post[]>) => {
           if (response.isSucceed && response.result) {
-            this.posts = [...this.posts, ...response.result];
+            this.posts = response.result.map(post => ({
+              ...post,
+              menuItems: this.generateMenuItems(post),
+            }));
             this.postPage++; // Increment page number for pagination
           } else {
             const errorMessage = response.message || 'No posts available.';
@@ -172,6 +195,7 @@ export class SharingPostComponent implements OnInit {
             this.posts = response.result.map(post => ({
               ...post,
               showComments: false, // Initialize with comments hidden
+              menuItems: this.generateMenuItems(post),
             })) as Post[];
           } else {
             this.posts = [];
@@ -201,31 +225,9 @@ export class SharingPostComponent implements OnInit {
 
     this.postService.createPost(formData).subscribe({
       next: response => {
-        if (response.isSucceed && response.result) {
-          const createdPost = response.result as Post;
-
-          // Check if the user is a CUSTOMER and the post is approved
-          if (this.role === 'CUSTOMER') {
-            // Only display if the post status is Approved
-            if (createdPost.status === 'Approved') {
-              this.posts.unshift(createdPost);
-            } else {
-              // Display a message indicating the post is pending approval
-              this.displayMessage(
-                'info',
-                'Confirmation',
-                'Please wait for your post to be approved.',
-              );
-            }
-          } else {
-            // For non-CUSTOMER roles, add the post immediately
-            this.posts.unshift(createdPost);
-          }
-
-          // Display the success message
-          const successMessage =
-            response.message || 'Post created successfully.';
-          this.displayMessage('success', 'Success', successMessage);
+        if (response.isSucceed) {
+          const successMessage = 'Please wait for your post to be approved.';
+          this.displayMessage('info', 'Approval Request', successMessage);
 
           this.resetPostCreation();
         }
@@ -313,20 +315,28 @@ export class SharingPostComponent implements OnInit {
   //   }, 0);
   // }
   deletePost(postId: string): void {
-    if (confirm('Are you sure you want to delete this post?')) {
-      this.postService.deletePost(postId).subscribe({
-        next: response => {
-          const successMessage =
-            response.message || 'Post deleted successfully.';
-          this.posts = this.posts.filter(p => p.postsId !== postId);
-          this.displayMessage('success', 'Success', successMessage);
-        },
-        error: err => {
-          const errorMessage = err?.message || 'Failed to delete post.';
-          this.displayMessage('error', 'Error', errorMessage);
-        },
-      });
-    }
+    this.confirmationService.confirm({
+      header: 'Confirmation',
+      message: 'Are you sure you want to delete this post?',
+      acceptIcon: 'pi pi-check mr-2',
+      rejectIcon: 'pi pi-times mr-2',
+      rejectButtonStyleClass: 'p-button-sm',
+      acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+      accept: () => {
+        this.postService.deletePost(postId).subscribe({
+          next: response => {
+            const successMessage =
+              response.message || 'Post deleted successfully.';
+            this.posts = this.posts.filter(p => p.postsId !== postId);
+            this.displayMessage('success', 'Success', successMessage);
+          },
+          error: err => {
+            const errorMessage = err?.message || 'Failed to delete post.';
+            this.displayMessage('error', 'Error', errorMessage);
+          },
+        });
+      }
+    });
   }
 
   updatePost(): void {
@@ -471,43 +481,32 @@ export class SharingPostComponent implements OnInit {
 
   // Open the Update Dialog
   openUpdateDialog(post: Post): void {
-    this.postService.getPostById(post.postsId).subscribe({
-      next: response => {
-        if (response.isSucceed && response.result) {
-          const fullPost = response.result as Post;
+    console.log(post);
+    this.updatePostRequest = {
+      postsId: post.postsId,
+      content: post.content,
+      status: post.status,
+      removeAllComments: false,
+      commentsToRemove: [],
+      removeAllPhotos: false,
+      photosToRemove: [],
+    };
 
-          this.updatePostRequest = {
-            postsId: fullPost.postsId,
-            content: fullPost.content,
-            status: fullPost.status,
-            removeAllComments: false,
-            commentsToRemove: [],
-            removeAllPhotos: false,
-            photosToRemove: [],
-          };
+    this.comments = post.comments || [];
+    this.photoDetails = (post.photos || []).map(photo => ({
+      id: photo.id as Guid,
+      url: photo.url as string,
+    }));
 
-          this.comments = fullPost.comments || [];
-          this.photoDetails = (fullPost.photos || []).map(photo => ({
-            id: photo.id as Guid,
-            url: photo.url as string,
-          }));
-
-          this.displayEditModal = true;
-          this.cdr.detectChanges();
-        }
-      },
-      error: () => {
-        this.displayMessage('error', 'Error', 'Failed to load post details.');
-      },
-    });
+    this.displayEditModal = true;
+    this.cdr.detectChanges();
   }
 
-  // Get Post Menu Items
-  getPostMenuItems(post: Post): MenuItem[] {
+  private generateMenuItems(post: Post): MenuItem[] {
+    console.log(post);
     const isOwner = this.currentUser?.userId === post.user.userId;
-    const isModerator = this.isModerator;
     const menuItems: MenuItem[] = [];
-    if (isOwner || isModerator) {
+    if (isOwner || this.isModerator) {
       menuItems.push(
         {
           label: 'Update',
@@ -521,7 +520,6 @@ export class SharingPostComponent implements OnInit {
         },
       );
     }
-
     return menuItems;
   }
 
@@ -595,6 +593,7 @@ export class SharingPostComponent implements OnInit {
   }
 
   toggleCommentsVisibility(post: Post): void {
+    this.commentDialog = false;
     if (this.selectedPostWithComments === post) {
       // Clear the selection to close the comment section
       this.selectedPostWithComments = null;
@@ -603,6 +602,7 @@ export class SharingPostComponent implements OnInit {
       this.selectedPostWithComments = post;
       this.commentPage = 1; // Reset pagination
       post.comments = []; // Clear existing comments to avoid duplication
+      this.commentDialog = true;
       this.loadComments(post);
     }
   }
@@ -611,7 +611,7 @@ export class SharingPostComponent implements OnInit {
     this.postService.getCommentsByPostId(post.postsId).subscribe({
       next: response => {
         if (response.isSucceed && response.result) {
-          post.comments = [...post.comments, ...response.result]; // Append new comments to avoid duplicate entries
+          post.comments = [...post.comments, ...response.result];
           this.commentPage++;
         }
       },
@@ -660,18 +660,20 @@ export class SharingPostComponent implements OnInit {
     }
   }
 
-  postComment(postId: string): void {
+  postComment(post: Post): void {
     if (this.commentContent.trim()) {
       this.isCommentLoading = true;
-      const commentRequest = { postId, content: this.commentContent };
+      const commentRequest: CommentRequest = {
+        postId: post.postsId, // Map 'postsId' to 'postId'
+        content: this.commentContent,
+      };
 
       this.postService.addComment(commentRequest).subscribe({
         next: response => {
-          if (response.isSucceed && response.result) {
-            this.selectedPostWithComments?.comments.unshift(response.result); // Add new comment at the top
+          if (response.isSucceed) {
+            this.loadComments(post);
             this.commentContent = ''; // Clear input
-            const successMessage =
-              response.message || 'Comment posted successfully.';
+            const successMessage = response.message || 'Comment successfully.';
             this.displayMessage('success', 'Success', successMessage);
           }
           this.isCommentLoading = false;
@@ -683,5 +685,14 @@ export class SharingPostComponent implements OnInit {
   closeCommentSection(): void {
     this.selectedPostWithComments = null;
     this.commentContent = '';
+    this.commentDialog = false;
+  }
+
+  showCommentDialog(): void {
+    this.commentDialog = true;
+  }
+
+  getNumberCommentsOfPost(post: Post): string {
+    return post.comments.length.toString();
   }
 }
