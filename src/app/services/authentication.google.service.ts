@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { User } from '../interfaces/models/user';
 import { environment } from '../../environments/environment';
-import { ExternalAuthRequest } from '../interfaces/models/request/externalAuthRequest';
+import { ExternalAuthRequest } from '../interfaces/models/request/external-auth-request';
 import { AuthenticationService } from './authentication.service';
 import { jwtDecode } from 'jwt-decode';
 
