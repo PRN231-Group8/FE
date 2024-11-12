@@ -14,7 +14,7 @@ import { PhotoService } from '../../../services/photo.service';
 import { UpdatePhotoRequest } from '../../../interfaces/models/request/photo-request';
 import { Guid } from 'guid-typescript';
 import { BaseResponse } from '../../../interfaces/models/base-response';
-import { CommentRequest } from '../../../interfaces/models/request/commentRequest';
+import { CommentRequest } from '../../../interfaces/models/request/comment-request';
 
 @Component({
   selector: 'app-sharing-post',
