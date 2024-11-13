@@ -1,6 +1,12 @@
 <div class="layout-wrapper">
   <p-toast></p-toast>
   <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <div class="text-2xl text-primary text-center font-bold mb-2 mt-4">
+    Booking History
+  </div>
+  <div class="text-lg text-secondary text-center mb-2">
+    A place that we can view booking history
+  </div>
   <div class="layout-main-container">
     <div class="layout-main overflow-hidden z-0">
       <div class="card px-6 py-6">
@@ -39,11 +45,12 @@
                 <div class="flex">
                   <button
                     pButton
-                    label="Clear"
                     class="p-button-outlined mr-2"
                     icon="pi pi-filter-slash"
                     (click)="clear(dt1)"
-                  ></button>
+                  >
+                    Clear
+                  </button>
                   <p-dropdown
                     [options]="transactionStatusOptions"
                     [(ngModel)]="selectedTransactionStatus"

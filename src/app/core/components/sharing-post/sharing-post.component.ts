@@ -78,6 +78,7 @@ export class SharingPostComponent implements OnInit {
   selectedPostWithComments: Post | null = null;
   isModerator: boolean = false;
   commentDialog: boolean = false;
+  isRecommended: boolean = false;
   private postPage = 1;
   private commentPage = 1;
   responsiveOptions: any[] = [
@@ -221,6 +222,7 @@ export class SharingPostComponent implements OnInit {
     this.isSubmitting = true;
     const formData = new FormData();
     formData.append('content', this.postContent);
+    formData.append('isRecommended', String(this.isRecommended));
     this.selectedFiles.forEach(file => formData.append('Photos', file));
 
     this.postService.createPost(formData).subscribe({
@@ -335,7 +337,7 @@ export class SharingPostComponent implements OnInit {
             this.displayMessage('error', 'Error', errorMessage);
           },
         });
-      }
+      },
     });
   }
 
