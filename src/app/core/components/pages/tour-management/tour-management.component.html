@@ -149,7 +149,14 @@
             <td>{{ tour.startDate | date: 'dd/MM/yyyy' }}</td>
             <td>{{ tour.endDate | date: 'dd/MM/yyyy' }}</td>
             <td>{{ tour.totalPrice | currency: 'VND' : '' : '1.0-0' }} VNĐ</td>
-            <td>{{ tour.status }}</td>
+            <td>
+              <p-tag
+                [rounded]="true"
+                [value]="tour.status"
+                [severity]="getSeverity(tour.status)"
+              >
+              </p-tag>
+            </td>
             <td>
               <div class="flex">
                 <button
@@ -230,11 +237,6 @@
                             icon="pi pi-trash"
                             (click)="confirmDeleteTimestamp(tour, timestamp)"
                           ></button>
-                          <p-progressBar
-                            mode="indeterminate"
-                            [style]="{ height: '6px' }"
-                            *ngIf="savingState"
-                          />
                         </div>
                       </td>
                     </tr>
@@ -607,6 +609,11 @@
           [disabled]="timestampForm.invalid"
         ></button>
       </ng-template>
+      <p-progressBar
+        mode="indeterminate"
+        [style]="{ height: '6px' }"
+        *ngIf="savingState"
+      />
     </p-dialog>
 
     <!--Delete Room Dialog-->

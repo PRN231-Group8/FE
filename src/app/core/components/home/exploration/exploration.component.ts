@@ -204,7 +204,6 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     if (this.tours) {
       this.tours = this.tours.filter(tour => {
         // Price Range Filter
-        console.log(filters.priceRange);
         if (
           filters.priceRange &&
           tour.totalPrice !== null &&
@@ -214,7 +213,6 @@ export class ExplorationComponent implements OnInit, OnDestroy {
         }
 
         // Location Filter
-        console.log(filters.to);
         if (filters.to) {
           const locationNames =
             tour.locationInTours?.map((location: Location) =>
@@ -316,7 +314,6 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   }
 
   goToTourDetail(id: Guid): void {
-    console.log(id);
     this.router.navigate([`tour-detail/${id}`]);
   }
 }

@@ -37,13 +37,13 @@
             <ng-template pTemplate="caption">
               <div class="flex justify-content-between flex-column sm:flex-row">
                 <div class="flex">
-                  <button
-                    pButton
+                  <p-button
                     label="Clear"
-                    class="p-button-outlined mr-2"
+                    [outlined]="true"
+                    class="mr-2"
                     icon="pi pi-filter-slash"
                     (click)="clear(dt1)"
-                  ></button>
+                  ></p-button>
                   <p-dropdown
                     [options]="transactionStatusOptions"
                     [(ngModel)]="selectedTransactionStatus"

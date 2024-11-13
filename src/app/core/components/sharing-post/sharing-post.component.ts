@@ -481,7 +481,6 @@ export class SharingPostComponent implements OnInit {
 
   // Open the Update Dialog
   openUpdateDialog(post: Post): void {
-    console.log(post);
     this.updatePostRequest = {
       postsId: post.postsId,
       content: post.content,
@@ -503,7 +502,6 @@ export class SharingPostComponent implements OnInit {
   }
 
   private generateMenuItems(post: Post): MenuItem[] {
-    console.log(post);
     const isOwner = this.currentUser?.userId === post.user.userId;
     const menuItems: MenuItem[] = [];
     if (isOwner || this.isModerator) {
