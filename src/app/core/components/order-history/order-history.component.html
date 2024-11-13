@@ -1,6 +1,12 @@
 <div class="layout-wrapper">
   <p-toast></p-toast>
   <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <div class="text-2xl text-primary text-center font-bold mb-2 mt-4">
+    Booking History
+  </div>
+  <div class="text-lg text-secondary text-center">
+    A place that we can view booking history
+  </div>
   <div class="layout-main-container">
     <div class="layout-main overflow-hidden z-0">
       <div class="card px-6 py-6">
@@ -77,6 +83,7 @@
                 <th>Passengers</th>
                 <th>Tour Title</th>
                 <th>Tour Trip Date</th>
+                <th>Feedback</th>
               </tr>
             </ng-template>
 
@@ -102,6 +109,25 @@
                 <td>{{ booking.numberOfPassengers }}</td>
                 <td>{{ booking.tour?.title }}</td>
                 <td>{{ booking.tourTripDate | date: 'medium' }}</td>
+                <td>
+                  <p-button
+                    *ngIf="
+                      isFeedbackEnabled(
+                        booking.tour?.endDate,
+                        booking.tour?.tourTrips[0]?.tourTripId
+                      )
+                    "
+                    label="Feedback"
+                    icon="pi pi-comments"
+                    class="p-button-success"
+                    (onClick)="
+                      navigateToCreatePost(
+                        booking.tour?.tourTrips[0]?.tourTripId,
+                        booking.tour?.title
+                      )
+                    "
+                  ></p-button>
+                </td>
               </tr>
             </ng-template>
 

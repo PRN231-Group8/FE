@@ -2,6 +2,7 @@
   <p-scrollTop />
   <app-navbar class="sticky top-0 z-4"></app-navbar>
   <app-chatbox class="z-3"></app-chatbox>
+
   <div class="layout-main-container">
     <div class="layout-main overflow-hidden">
       <div class="exploration-page">
@@ -99,7 +100,7 @@
             <p-dataView #dv *ngIf="loading" [layout]="layout">
               <ng-template pTemplate="header">
                 <div class="flex justify-content-end">
-                  <p-dataViewLayoutOptions/>
+                  <p-dataViewLayoutOptions />
                 </div>
               </ng-template>
 

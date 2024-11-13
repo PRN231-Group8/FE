@@ -1,6 +1,5 @@
 <div class="layout-wrapper">
   <p-scrollTop> </p-scrollTop>
-  <p-confirmDialog></p-confirmDialog>
   <p-toast> </p-toast>
   <app-navbar class="sticky top-0 z-1"></app-navbar>
   <div class="overflow-hidden z-0 pt-5">
@@ -116,6 +115,20 @@
                     </p>
                   </span>
                 </div>
+                <div class="flex ml-3">
+                  <p-tag
+                    *ngIf="post.isRecommended"
+                    icon="pi pi-thumbs-up-fill"
+                    severity="success"
+                    value="Recommended"
+                  ></p-tag>
+                  <p-tag
+                    *ngIf="!post.isRecommended"
+                    icon="pi pi-thumbs-down-fill"
+                    severity="danger"
+                    value="Not Recommended"
+                  ></p-tag>
+                </div>
               </ng-template>
 
               <!-- Post Content -->
@@ -132,7 +145,7 @@
                           ? 'pi pi-spin pi-spinner'
                           : 'pi pi-comments'
                       "
-                      [badge]="getNumberCommentsOfPost(post)" 
+                      [badge]="getNumberCommentsOfPost(post)"
                       (onClick)="toggleCommentsVisibility(post)"
                     ></p-button>
                   </div>
@@ -512,6 +525,17 @@
             <p class="m-0 font-bold font-italic">{{ userName }}</p>
           </div>
         </div>
+        <div class="card flex justify-content-center">
+          <form [formGroup]="formGroup">
+            <p-selectButton
+              [options]="stateOptions"
+              formControlName="isRecommended"
+              optionLabel="label"
+              optionValue="value"
+              class="flex mb-2 w-full"
+            ></p-selectButton>
+          </form>
+        </div>
 
         <!-- Content Textarea -->
         <textarea
@@ -605,10 +629,15 @@
         class="flex-grow-1 scrollable-content overflow-y-auto"
         [style]="{ width: '100%', height: '350px' }"
       >
-      <div class="flex flex-column pt-8" *ngIf="selectedPostWithComments?.comments!.length < 1">
-        <div class="text-lg text-center">No comment available</div>
-        <div class="text-center text-400">Be the first comment this post!</div>
-      </div>
+        <div
+          class="flex flex-column pt-8"
+          *ngIf="(selectedPostWithComments?.comments)!.length < 1"
+        >
+          <div class="text-lg text-center">No comment available</div>
+          <div class="text-center text-400">
+            Be the first comment this post!
+          </div>
+        </div>
         <div
           *ngFor="let comment of selectedPostWithComments?.comments"
           class="flex align-items-start mb-3"

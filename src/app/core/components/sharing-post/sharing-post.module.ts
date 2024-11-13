@@ -31,6 +31,8 @@ import { PanelModule } from 'primeng/panel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
+import { SelectButtonModule } from 'primeng/selectbutton';
 @NgModule({
   declarations: [SharingPostComponent, RelativeTimePipe],
   imports: [
@@ -64,7 +66,9 @@ import { TooltipModule } from 'primeng/tooltip';
     ScrollPanelModule,
     SkeletonModule,
     TooltipModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    TagModule,
+    SelectButtonModule,
   ],
   providers: [ConfirmationService, MessageService],
 })
