@@ -34,6 +34,6 @@ export class PaymentService {
     if (searchTerm) {
       params = params.set('search-term', searchTerm);
     }
-    return this.http.get<BaseResponse<BookingHistoryResponse>>(`${this.apiUrl}/booking-history`, { params });
+    return this.http.get<BaseResponse<BookingHistoryResponse>>(`${this.apiUrl}/history`, { params });
   }
 }
