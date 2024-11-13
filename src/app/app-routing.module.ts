@@ -13,6 +13,7 @@ import { AuthGuard } from './_helper/auth.guard';
 import { TourDetailComponent } from './core/components/home/tour-detail/tour-detail.component';
 import { PaymentResultComponent } from './core/components/home/payment-result/payment-result.component';
 import { OrderHistoryComponent } from './core/components/order-history/order-history.component';
+import { ChatboxComponent } from './core/components/chatbox/chatbox.component';
 
 @NgModule({
   imports: [
@@ -101,6 +102,14 @@ import { OrderHistoryComponent } from './core/components/order-history/order-his
           loadChildren: () =>
             import('./core/components/order-history/order-history.module').then(
               m => m.OrderHistoryModule,
+            ),
+        },
+        {
+          path: 'chat-hub',
+          component: ChatboxComponent,
+          loadChildren: () =>
+            import('./core/components/chatbox/chatbox.module').then(
+              m => m.ChatboxModule,
             ),
         },
         { path: 'notfound', component: NotfoundComponent },
