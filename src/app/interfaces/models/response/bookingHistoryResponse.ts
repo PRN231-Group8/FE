@@ -1,6 +1,6 @@
 import { TourResponse } from './tourResponse';
 
-export interface BookingHistoryResponse{
+export interface BookingHistoryResponse {
   id: string;
   transactionAmount: number;
   transactionStatus: PaymentTransactionStatus;
@@ -8,5 +8,6 @@ export interface BookingHistoryResponse{
   numberOfPassengers: number;
   tourTripDate: Date;
   tour: TourResponse;
+  createDate: Date;
 }
 export type PaymentTransactionStatus = 'SUCCESSFUL' | 'FAILED' | 'PENDING';

@@ -83,6 +83,7 @@
                 <th>Passengers</th>
                 <th>Tour Title</th>
                 <th>Tour Trip Date</th>
+                <th>CreateDate</th>
                 <th>Feedback</th>
               </tr>
             </ng-template>
@@ -109,6 +110,7 @@
                 <td>{{ booking.numberOfPassengers }}</td>
                 <td>{{ booking.tour?.title }}</td>
                 <td>{{ booking.tourTripDate | date: 'medium' }}</td>
+                <td>{{ booking.createDate | date: 'medium' }}</td>
                 <td>
                   <p-button
                     *ngIf="
