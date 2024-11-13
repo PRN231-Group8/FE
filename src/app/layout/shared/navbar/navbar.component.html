@@ -1,3 +1,4 @@
+<!-- eslint-disable @angular-eslint/template/elements-content -->
 <nav
   class="flex align-items-center justify-content-between px-6 shadow-1 surface-800"
   style="border-top: 2px solid #000; border-bottom: 2px solid #000"
@@ -25,7 +26,7 @@
   </ul>
 
   <!-- Menu (Profile, Settings, Logout) -->
-  <p-menu #menu [model]="items" popup="true" styleClass="w-full md:w-15rem">
+  <p-menu #menu [model]="items" popup="true" styleClass="w-full md:w-15rem" appendTo="body">
     <ng-template pTemplate="start">
       <span class="inline-flex align-items-center gap-1 px-2 py-2">
         <svg
@@ -50,9 +51,10 @@
         class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround"
       >
         <p-avatar
-          image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+          [image]="avatarPath || defaultAvatarPath"
           class="mr-2"
           shape="circle"
+          (error)="avatarPath = defaultAvatarPath"
         ></p-avatar>
         <span class="inline-flex flex-column">
           <span class="font-bold">{{ firstName }}{{ lastName }}</span>

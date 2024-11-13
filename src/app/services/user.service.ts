@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BaseResponse } from '../interfaces/models/base-response';
-import { UserProfileRequest } from '../interfaces/models/request/userProfileRequest';
-import { UserProfileResponse } from '../interfaces/models/response/userProfileResponse';
+import { UserProfileRequest } from '../interfaces/models/request/user-profile-request';
+import { UserProfileResponse } from '../interfaces/models/response/user-profile-response';
 import { User } from '../interfaces/models/user';
 
 @Injectable({

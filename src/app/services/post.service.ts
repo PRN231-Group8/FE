@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BaseResponse } from '../interfaces/models/base-response';
 import { Post } from '../interfaces/models/post';
-import { CommentRequest } from '../interfaces/models/request/commentRequest';
-import { CommentResponse } from '../interfaces/models/response/commentResponse';
-import { UpdatePostRequest } from '../interfaces/models/request/updatePostRequest';
+import { CommentRequest } from '../interfaces/models/request/comment-request';
+import { CommentResponse } from '../interfaces/models/response/comment-response';
+import { UpdatePostRequest } from '../interfaces/models/request/update-post-request';
 
 @Injectable({
   providedIn: 'root',
@@ -107,7 +107,7 @@ export class PostService {
     postId: string,
   ): Observable<BaseResponse<CommentResponse[]>> {
     return this.http.get<BaseResponse<CommentResponse[]>>(
-      `${environment.BACKEND_API_URL}/api/comments/post/${postId}`,
+      `${environment.BACKEND_API_URL}/api/comments/${postId}/post`,
     );
   }
 }

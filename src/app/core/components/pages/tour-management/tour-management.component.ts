@@ -159,6 +159,7 @@ export class TourManagementComponent implements OnInit {
       .subscribe({
         next: data => {
           this.tours = data.results as Tour[];
+
           this.totalRecords = data.totalElements || 0;
           this.loading = false;
         },
@@ -234,7 +235,17 @@ export class TourManagementComponent implements OnInit {
     saveObservable.subscribe({
       next: data => {
         if (data.isSucceed) {
-          this.loadTours();
+          if (this.isEdit) {
+            // Find and update the specific tour in the local array
+            const index = this.tours.findIndex(
+              tour => tour.id === tourData.id
+            );
+            if (index !== -1) {
+              this.tours[index] = { ...this.tours[index], ...tourData };
+            }
+          } else {
+            this.loadTours();
+          }
           this.createTourDialog = false;
           this.messageService.add({
             severity: 'success',
@@ -412,8 +423,6 @@ export class TourManagementComponent implements OnInit {
     // Add new timestamp to the array for batch saving
     this.newTimestamps.push(newTimestamp);
     this.isCreatingBatch = true;
-
-    console.log(this.newTimestamps);
 
     // Update the local tour's timestamps for immediate display
     this.tour!.tourTimestamps = [
@@ -729,5 +738,18 @@ export class TourManagementComponent implements OnInit {
     this.tourTripToDelete = {};
     this.deleteTourTripDialog = false;
     this.savingState = false;
+  }
+
+  getSeverity(status: string): 'success' | 'warning' | 'danger' | 'info' | undefined {
+    switch (status) {
+      case 'ACTIVE':
+        return 'success';
+      case 'INACTIVE':
+        return 'warning';
+      case 'CANCELLED':
+        return 'danger';
+      default:
+        return 'info'; // fallback for undefined statuses
+    }
   }
 }

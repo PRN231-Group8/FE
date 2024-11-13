@@ -1,0 +1,465 @@
+<div class="chatbox-container fixed bottom-0 left-0 m-3 p-3">
+  <!-- Chat Button -->
+  <p-button
+    #chatBtn
+    icon="pi pi-comments"
+    (click)="toggleChat($event)"
+    [rounded]="true"
+    size="large"
+    severity="info"
+  ></p-button>
+
+  <!-- Chat Widget -->
+  <p-overlayPanel
+    #chatPanel
+    [showCloseIcon]="true"
+    [dismissable]="false"
+    appendTo="body"
+    [style]="{ width: '800px' }"
+    [(visible)]="display"
+    [ngClass]="{ moderator: isModerator$ | async }"
+  >
+    <!-- Moderator View -->
+    <ng-container *ngIf="isModerator$ | async; else customerView">
+      <!-- Header -->
+      <div
+        class="surface-section p-4 border-bottom-1 surface-border flex justify-content-between align-items-center"
+      >
+        <div class="flex align-items-center gap-2">
+          <h1 class="text-lg font-semibold m-0">Chat Support</h1>
+          <p-tag severity="info" value="Moderator"></p-tag>
+        </div>
+        <div class="flex align-items-center gap-3">
+          <ng-container *ngIf="connectionStatus$ | async as status">
+            <span
+              *ngIf="isConnected(status)"
+              class="flex align-items-center gap-1"
+            >
+              <i class="pi pi-check-circle text-green-500"></i>
+              <p-tag severity="success" value="Connected"></p-tag>
+            </span>
+            <span
+              *ngIf="!isConnected(status)"
+              class="flex align-items-center gap-1"
+            >
+              <i class="pi pi-sync text-yellow-500 pi-spin"></i>
+              <p-tag severity="warning" value="Connecting..."></p-tag>
+            </span>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Main Layout -->
+      <div class="grid pt-2">
+        <!-- Left: Chat List -->
+        <div class="col-4 pr-2">
+          <p-tabMenu
+            [model]="tabItems"
+            [activeItem]="activeTab === 'pending' ? tabItems[0] : tabItems[1]"
+            class="flex justify-content-center align-items-center gap-4"
+          >
+            <ng-template pTemplate="item" let-item>
+              <div class="p-menuitem-link">
+                <span class="text-center mr-2">{{ item.label }}</span>
+                <p-badge
+                  *ngIf="item.label === 'Pending'"
+                  [value]="pendingChatsCount$ | async"
+                  severity="danger"
+                >
+                </p-badge>
+              </div>
+            </ng-template>
+          </p-tabMenu>
+
+          <p-scrollPanel [style]="{ height: '400px' }">
+            <ng-container [ngSwitch]="activeTab">
+              <!-- Pending Chats -->
+              <ng-container *ngSwitchCase="'pending'">
+                <div
+                  *ngFor="let chat of pendingChats$ | async"
+                  class="p-3 border-bottom-1 surface-border cursor-pointer hover:surface-200"
+                  [class.surface-hover]="(currentRoom$ | async)?.id === chat.id"
+                  (click)="acceptChat(chat.id)"
+                  (keydown.enter)="acceptChat(chat.id)"
+                  tabindex="0"
+                  role="button"
+                  [attr.aria-label]="'Accept chat from ' + chat.customerName"
+                >
+                  <div class="flex justify-content-between align-items-center">
+                    <span class="font-medium">{{ chat.customerName }}</span>
+                    <p-tag severity="warning" value="Waiting"></p-tag>
+                  </div>
+                  <p
+                    class="text-sm text-color-secondary text-overflow-ellipsis"
+                  >
+                    {{ chat.subject }}
+                  </p>
+                </div>
+              </ng-container>
+
+              <!-- Active Chats -->
+              <ng-container *ngSwitchCase="'active'">
+                <div
+                  *ngFor="let chat of activeChats$ | async"
+                  class="p-3 border-bottom-1 surface-border cursor-pointer hover:surface-200"
+                  [class.surface-hover]="(currentRoom$ | async)?.id === chat.id"
+                  (click)="selectChat(chat.id)"
+                  (keydown)="handleKeyDown($event, 'select', chat.id)"
+                  tabindex="0"
+                >
+                  <div class="flex justify-content-between align-items-center">
+                    <span class="font-medium">{{ chat.customerName }}</span>
+                    <p-tag severity="success" value="Active"></p-tag>
+                  </div>
+                  <p
+                    class="text-sm text-color-secondary text-overflow-ellipsis"
+                  >
+                    {{ chat.subject }}
+                  </p>
+                </div>
+              </ng-container>
+            </ng-container>
+          </p-scrollPanel>
+        </div>
+
+        <p-divider layout="vertical"></p-divider>
+
+        <!-- Right: Chat Content -->
+        <div class="col-8 flex-1 flex flex-column">
+          <ng-container *ngIf="currentRoom$ | async as currentRoom">
+            <!-- Chat Header -->
+            <div class="surface-section p-3 border-bottom-1 surface-border">
+              <div class="flex justify-content-between align-items-center">
+                <div>
+                  <h2 class="font-medium m-0">
+                    {{ currentRoom.customerName }}
+                  </h2>
+                  <p class="text-sm text-color-secondary m-0">
+                    {{ currentRoom.subject }}
+                  </p>
+                </div>
+                <div class="flex align-items-center gap-2">
+                  <p-tag
+                    [severity]="
+                      currentRoom.status === 'ACTIVE' ? 'success' : 'warning'
+                    "
+                    [value]="currentRoom ? currentRoom.status : 'CLOSED'"
+                  >
+                  </p-tag>
+                  <p-button
+                    *ngIf="currentRoom.status === 'ACTIVE'"
+                    label="End Chat"
+                    (onClick)="endChat()"
+                    severity="danger"
+                    styleClass="p-button-sm"
+                  >
+                  </p-button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Messages -->
+            <p-scrollPanel
+              [style]="{ height: '400px' }"
+              #messageContainer
+              styleClass="messages-container"
+            >
+              <div class="p-3">
+                <ng-container *ngFor="let message of chatMessages$ | async">
+                  <div
+                    class="flex mb-3"
+                    [ngClass]="{
+                      'justify-content-end': isMessageFromCurrentUser(
+                        message,
+                        currentUser$ | async
+                      ),
+                    }"
+                  >
+                    <div
+                      class="message surface-card border-round-lg p-3 fadeindown animation-duration-300"
+                      [ngClass]="{
+                        'sent bg-primary text-white': isMessageFromCurrentUser(
+                          message,
+                          currentUser$ | async
+                        ),
+                        'received surface-card': !isMessageFromCurrentUser(
+                          message,
+                          currentUser$ | async
+                        ),
+                      }"
+                      style="max-width: 80%"
+                    >
+                      <ng-container
+                        *ngIf="!message.imageUrl; else imageMessage"
+                      >
+                        {{ message.content }}
+                      </ng-container>
+                      <ng-template #imageMessage>
+                        <p-image
+                          [src]="message.imageUrl"
+                          [alt]="'Message image from ' + message.senderName"
+                          [preview]="true"
+                          imageClass="w-full"
+                        >
+                        </p-image>
+                      </ng-template>
+                      <div
+                        class="message-info flex align-items-center gap-2 mt-2 text-sm"
+                        [ngClass]="{
+                          'text-white': isMessageFromCurrentUser(
+                            message,
+                            currentUser$ | async
+                          ),
+                        }"
+                      >
+                        <span>{{ message.senderName }}</span>
+                        <span>{{ message.timestamp | date: 'shortTime' }}</span>
+                        <i
+                          *ngIf="
+                            isMessageFromCurrentUser(
+                              message,
+                              currentUser$ | async
+                            )
+                          "
+                          class="pi"
+                          [ngClass]="{
+                            'pi-check': !message.isRead,
+                            'pi-check-circle': message.isRead,
+                          }"
+                        >
+                        </i>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </p-scrollPanel>
+
+            <!-- Input Area -->
+            <div
+              *ngIf="currentRoom.status === 'ACTIVE'"
+              class="surface-section p-3 border-top-1 surface-border"
+            >
+              <form
+                [formGroup]="messageForm"
+                (ngSubmit)="sendMessage()"
+                class="flex gap-2"
+              >
+                <p-fileUpload
+                  mode="basic"
+                  chooseIcon="pi pi-camera"
+                  [auto]="true"
+                  accept="image/*"
+                  [maxFileSize]="5000000"
+                  (onSelect)="handleImageUpload($event)"
+                  [customUpload]="true"
+                  styleClass="p-button-text"
+                  [showUploadButton]="false"
+                  [showCancelButton]="false"
+                  [disabled]="isLoading$ | async"
+                >
+                </p-fileUpload>
+                <!-- Loading Overlay -->
+                <div
+                  *ngIf="isLoading$ | async"
+                  class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 rounded"
+                >
+                  <i class="pi pi-spin pi-spinner text-white"></i>
+                </div>
+                <span class="p-input-icon-right flex-1">
+                  <i
+                    class="pi pi-send cursor-pointer"
+                    (click)="sendMessage()"
+                    (keydown.enter)="sendMessage()"
+                    tabindex="0"
+                    role="button"
+                    aria-label="Send message"
+                  ></i>
+                  <input
+                    pInputText
+                    type="text"
+                    formControlName="content"
+                    class="w-full"
+                    placeholder="Type a message..."
+                    (keydown.enter)="handleEnterKey($event)"
+                  />
+                </span>
+              </form>
+            </div>
+          </ng-container>
+
+          <!-- No Chat Selected Message -->
+          <div
+            *ngIf="(currentRoom$ | async) === null"
+            class="flex-1 flex align-items-center justify-content-center"
+          >
+            <p class="text-color-secondary">Select a chat to start messaging</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Customer View -->
+    <ng-template #customerView>
+      <div class="customer-view">
+        <!-- Header -->
+        <div class="surface-section p-3 border-bottom-1 surface-border">
+          <div class="flex align-items-center gap-3">
+            <p-avatar icon="pi pi-user" styleClass="bg-primary"></p-avatar>
+            <div>
+              <h3 class="font-medium m-0">Hỗ trợ</h3>
+              <p class="text-sm text-primary m-0">Luôn đồng hành cùng bạn!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages Container -->
+        <p-scrollPanel [style]="{ height: '400px' }" #messageContainer>
+          <ng-container
+            *ngIf="
+              currentRoom$ | async as currentRoom;
+              else quickActionsTemplate
+            "
+          >
+            <div class="p-3">
+              <ng-container *ngFor="let message of chatMessages$ | async">
+                <div
+                  class="flex mb-3"
+                  [ngClass]="{
+                    'justify-content-end': isMessageFromCurrentUser(
+                      message,
+                      currentUser$ | async
+                    ),
+                  }"
+                >
+                  <div
+                    class="message surface-card border-round-lg p-3 fadeindown animation-duration-300"
+                    [ngClass]="{
+                      'sent bg-primary text-white': isMessageFromCurrentUser(
+                        message,
+                        currentUser$ | async
+                      ),
+                      'received surface-card': !isMessageFromCurrentUser(
+                        message,
+                        currentUser$ | async
+                      ),
+                    }"
+                    style="max-width: 80%"
+                  >
+                    <ng-container *ngIf="!message.imageUrl; else imageMessage">
+                      {{ message.content }}
+                    </ng-container>
+                    <ng-template #imageMessage>
+                      <p-image
+                        [src]="message.imageUrl"
+                        [alt]="'Message image from ' + message.senderName"
+                        [preview]="true"
+                        imageClass="w-full"
+                      >
+                      </p-image>
+                    </ng-template>
+                    <div
+                      class="message-info flex align-items-center gap-2 mt-2 text-sm"
+                      [ngClass]="{
+                        'text-white': isMessageFromCurrentUser(
+                          message,
+                          currentUser$ | async
+                        ),
+                      }"
+                    >
+                      <span>{{ message.senderName }}</span>
+                      <span>{{ message.timestamp | date: 'shortTime' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <ng-template [ngTemplateOutlet]="loadingTemplate"></ng-template>
+          </ng-container>
+        </p-scrollPanel>
+
+        <div
+          *ngIf="currentRoom$ | async as currentRoom"
+          class="surface-section p-3 border-top-1 surface-border"
+        >
+          <ng-container *ngIf="currentRoom.status === 'ACTIVE'">
+            <form
+              [formGroup]="messageForm"
+              (ngSubmit)="sendMessage()"
+              class="flex gap-2"
+            >
+              <p-fileUpload
+                #fileUpload
+                mode="basic"
+                chooseIcon="pi pi-camera"
+                [auto]="true"
+                accept="image/*"
+                [maxFileSize]="5000000"
+                (onSelect)="handleImageUpload($event)"
+                [customUpload]="true"
+                [showUploadButton]="false"
+                [showCancelButton]="false"
+                styleClass="p-button-text"
+                [disabled]="(isLoading$ | async) || isSending"
+              >
+              </p-fileUpload>
+
+              <!-- Loading Overlay -->
+              <div
+                *ngIf="isLoading$ | async"
+                class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/50 rounded"
+              >
+                <i class="pi pi-spin pi-spinner text-white"></i>
+              </div>
+
+              <!-- Message Input -->
+              <span class="flex w-full">
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="content"
+                  class="w-full mr-2"
+                  placeholder="Nhắn tin với CSKH..."
+                  (keydown)="handleEnterKey($event)"
+                  [attr.aria-label]="'Message input'"
+                />
+                <p-button
+                  icon="pi pi-send"
+                  (onClick)="sendMessage()"
+                  [disabled]="messageForm.invalid || isSending"
+                  styleClass="p-button-text p-button-rounded"
+                  [pTooltip]="'Send message'"
+                  tooltipPosition="top"
+                >
+                </p-button>
+              </span>
+            </form>
+          </ng-container>
+        </div>
+        <ng-template #loadingTemplate>
+          <div *ngIf="isFindingStaff" class="flex flex-column align-items-center justify-content-center">
+            <p-progressSpinner styleClass="w-4rem h-4rem" ariaLabel="loading" />
+            <div class="font-medium text-xl">Please wait staff to join your chat...</div>
+          </div>
+        </ng-template>
+
+        <!-- Quick Actions Template -->
+        <ng-template #quickActionsTemplate>
+          <div class="p-3">
+            <div *ngFor="let option of quickActionOptions" class="mb-2">
+              <p-button
+                [label]="option.label"
+                (onClick)="startNewChat(option.subject)"
+                styleClass="p-button-outlined w-full text-left"
+              >
+              </p-button>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </ng-template>
+  </p-overlayPanel>
+</div>
+
+<!-- Toast Messages -->
+<p-toast position="top-right"></p-toast>

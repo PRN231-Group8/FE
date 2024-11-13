@@ -5,4 +5,5 @@ export interface PostsRequest {
   commentsToRemove?: string[];
   removeAllPhotos?: boolean;
   photosToRemove?: string[];
+  isRecommended: boolean;
 }
