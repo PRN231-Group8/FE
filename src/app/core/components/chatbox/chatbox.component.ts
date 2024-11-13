@@ -108,8 +108,8 @@ export class ChatboxComponent implements OnInit, OnDestroy {
   ];
   quickActionOptions = [
     {
-      subject: 'Hỗ trợ khẩn cấp',
-      label: 'Tôi cần được hỗ trợ nhanh',
+      subject: 'Emergency assistance',
+      label: 'I need quick assistance',
     },
   ];
   private destroy$ = new Subject<void>();
