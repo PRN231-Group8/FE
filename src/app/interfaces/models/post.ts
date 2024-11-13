@@ -16,4 +16,5 @@ export interface Post {
   photos: Photo[];
   menuItems?: MenuItem[];
   isRecommended: boolean;
+  tourTripId: string;
 }

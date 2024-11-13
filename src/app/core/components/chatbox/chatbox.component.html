@@ -1,22 +1,22 @@
-<div class="chatbox-container">
+<div class="chatbox-container fixed bottom-0 left-0 m-3 p-3">
   <!-- Chat Button -->
   <p-button
     #chatBtn
-    pButton
-    type="button"
     icon="pi pi-comments"
     (click)="toggleChat($event)"
-    class="p-button-rounded p-button-text fixed bottom-3 right-3"
+    [rounded]="true"
+    size="large"
+    severity="info"
   ></p-button>
 
   <!-- Chat Widget -->
   <p-overlayPanel
     #chatPanel
-    [showCloseIcon]="false"
+    [showCloseIcon]="true"
     [dismissable]="false"
+    appendTo="body"
     [style]="{ width: '800px' }"
     [(visible)]="display"
-    styleClass="chat-widget"
     [ngClass]="{ moderator: isModerator$ | async }"
   >
     <!-- Moderator View -->
@@ -46,27 +46,21 @@
               <p-tag severity="warning" value="Connecting..."></p-tag>
             </span>
           </ng-container>
-          <p-button
-            icon="pi pi-times"
-            (onClick)="toggleChat($event)"
-            styleClass="p-button-text p-button-rounded"
-          >
-          </p-button>
         </div>
       </div>
 
       <!-- Main Layout -->
-      <div class="moderator-layout flex">
+      <div class="grid pt-2">
         <!-- Left: Chat List -->
-        <div class="chat-list w-4 border-right-1 surface-border">
+        <div class="col-4 pr-2">
           <p-tabMenu
             [model]="tabItems"
             [activeItem]="activeTab === 'pending' ? tabItems[0] : tabItems[1]"
+            class="flex justify-content-center align-items-center gap-4"
           >
             <ng-template pTemplate="item" let-item>
-              <div class="flex align-items-center gap-2">
-                <i [class]="item.icon"></i>
-                <span>{{ item.label }}</span>
+              <div class="p-menuitem-link">
+                <span class="text-center mr-2">{{ item.label }}</span>
                 <p-badge
                   *ngIf="item.label === 'Pending'"
                   [value]="pendingChatsCount$ | async"
@@ -93,7 +87,7 @@
                 >
                   <div class="flex justify-content-between align-items-center">
                     <span class="font-medium">{{ chat.customerName }}</span>
-                    <p-tag severity="warning" value="waiting"></p-tag>
+                    <p-tag severity="warning" value="Waiting"></p-tag>
                   </div>
                   <p
                     class="text-sm text-color-secondary text-overflow-ellipsis"
@@ -115,7 +109,7 @@
                 >
                   <div class="flex justify-content-between align-items-center">
                     <span class="font-medium">{{ chat.customerName }}</span>
-                    <p-tag severity="success" value="active"></p-tag>
+                    <p-tag severity="success" value="Active"></p-tag>
                   </div>
                   <p
                     class="text-sm text-color-secondary text-overflow-ellipsis"
@@ -128,8 +122,10 @@
           </p-scrollPanel>
         </div>
 
+        <p-divider layout="vertical"></p-divider>
+
         <!-- Right: Chat Content -->
-        <div class="chat-content flex-1 flex flex-column">
+        <div class="col-8 flex-1 flex flex-column">
           <ng-container *ngIf="currentRoom$ | async as currentRoom">
             <!-- Chat Header -->
             <div class="surface-section p-3 border-bottom-1 surface-border">
@@ -147,7 +143,7 @@
                     [severity]="
                       currentRoom.status === 'ACTIVE' ? 'success' : 'warning'
                     "
-                    [value]="currentRoom.status.toLowerCase()"
+                    [value]="currentRoom ? currentRoom.status : 'CLOSED'"
                   >
                   </p-tag>
                   <p-button
@@ -180,7 +176,7 @@
                     }"
                   >
                     <div
-                      class="message surface-card border-round-lg p-3"
+                      class="message surface-card border-round-lg p-3 fadeindown animation-duration-300"
                       [ngClass]="{
                         'sent bg-primary text-white': isMessageFromCurrentUser(
                           message,
@@ -305,21 +301,15 @@
 
     <!-- Customer View -->
     <ng-template #customerView>
-      <div class="customer-view w-25rem">
+      <div class="customer-view">
         <!-- Header -->
         <div class="surface-section p-3 border-bottom-1 surface-border">
           <div class="flex align-items-center gap-3">
-            <p-avatar icon="pi pi-user" styleClass="bg-pink-500"></p-avatar>
+            <p-avatar icon="pi pi-user" styleClass="bg-primary"></p-avatar>
             <div>
               <h3 class="font-medium m-0">Hỗ trợ</h3>
               <p class="text-sm text-primary m-0">Luôn đồng hành cùng bạn!</p>
             </div>
-            <p-button
-              icon="pi pi-times"
-              (onClick)="toggleChat($event)"
-              styleClass="p-button-text p-button-rounded ml-auto"
-            >
-            </p-button>
           </div>
         </div>
 
@@ -331,7 +321,6 @@
               else quickActionsTemplate
             "
           >
-            <!-- Same message structure as moderator view -->
             <div class="p-3">
               <ng-container *ngFor="let message of chatMessages$ | async">
                 <div
@@ -344,7 +333,7 @@
                   }"
                 >
                   <div
-                    class="message surface-card border-round-lg p-3"
+                    class="message surface-card border-round-lg p-3 fadeindown animation-duration-300"
                     [ngClass]="{
                       'sent bg-primary text-white': isMessageFromCurrentUser(
                         message,
@@ -385,10 +374,10 @@
                 </div>
               </ng-container>
             </div>
+            <ng-template [ngTemplateOutlet]="loadingTemplate"></ng-template>
           </ng-container>
         </p-scrollPanel>
 
-        <!-- Input Area -->
         <div
           *ngIf="currentRoom$ | async as currentRoom"
           class="surface-section p-3 border-top-1 surface-border"
@@ -424,7 +413,16 @@
               </div>
 
               <!-- Message Input -->
-              <span class="p-input-icon-right flex-1">
+              <span class="flex w-full">
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="content"
+                  class="w-full mr-2"
+                  placeholder="Nhắn tin với CSKH..."
+                  (keydown)="handleEnterKey($event)"
+                  [attr.aria-label]="'Message input'"
+                />
                 <p-button
                   icon="pi pi-send"
                   (onClick)="sendMessage()"
@@ -434,32 +432,16 @@
                   tooltipPosition="top"
                 >
                 </p-button>
-                <input
-                  pInputText
-                  type="text"
-                  formControlName="content"
-                  class="w-full"
-                  placeholder="Nhắn tin với CSKH..."
-                  (keydown)="handleEnterKey($event)"
-                  [attr.aria-label]="'Message input'"
-                />
               </span>
             </form>
-
-            <!-- global loading indicator
-            <div
-              *ngIf="isLoading$ | async"
-              class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black/30 z-50"
-            >
-              <div
-                class="bg-white p-4 rounded shadow-lg flex items-center gap-2"
-              >
-                <i class="pi pi-spin pi-spinner"></i>
-                <span>Đang tải...</span>
-              </div>
-            </div> -->
           </ng-container>
         </div>
+        <ng-template #loadingTemplate>
+          <div *ngIf="isFindingStaff" class="flex flex-column align-items-center justify-content-center">
+            <p-progressSpinner styleClass="w-4rem h-4rem" ariaLabel="loading" />
+            <div class="font-medium text-xl">Please wait staff to join your chat...</div>
+          </div>
+        </ng-template>
 
         <!-- Quick Actions Template -->
         <ng-template #quickActionsTemplate>
@@ -480,4 +462,4 @@
 </div>
 
 <!-- Toast Messages -->
-<p-toast position="bottom-right"></p-toast>
+<p-toast position="top-right"></p-toast>

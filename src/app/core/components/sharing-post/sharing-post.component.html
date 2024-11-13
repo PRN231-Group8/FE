@@ -1,6 +1,5 @@
 <div class="layout-wrapper">
   <p-scrollTop> </p-scrollTop>
-  <p-confirmDialog></p-confirmDialog>
   <p-toast> </p-toast>
   <app-navbar class="sticky top-0 z-1"></app-navbar>
   <div class="overflow-hidden z-0 pt-5">
@@ -526,12 +525,18 @@
             <p class="m-0 font-bold font-italic">{{ userName }}</p>
           </div>
         </div>
-        <p-checkbox
-          [(ngModel)]="isRecommended"
-          binary="true"
-          label="Recommend this post?"
-        >
-        </p-checkbox>
+        <div class="card flex justify-content-center">
+          <form [formGroup]="formGroup">
+            <p-selectButton
+              [options]="stateOptions"
+              formControlName="isRecommended"
+              optionLabel="label"
+              optionValue="value"
+              class="flex mb-2 w-full"
+            ></p-selectButton>
+          </form>
+        </div>
+
         <!-- Content Textarea -->
         <textarea
           pInputTextarea

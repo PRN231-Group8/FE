@@ -15,6 +15,8 @@ import { UpdatePhotoRequest } from '../../../interfaces/models/request/photo-req
 import { Guid } from 'guid-typescript';
 import { BaseResponse } from '../../../interfaces/models/base-response';
 import { CommentRequest } from '../../../interfaces/models/request/comment-request';
+import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-sharing-post',
@@ -79,6 +81,8 @@ export class SharingPostComponent implements OnInit {
   isModerator: boolean = false;
   commentDialog: boolean = false;
   isRecommended: boolean = false;
+  tourTripId: string | null = null;
+  title: string | null = null;
   private postPage = 1;
   private commentPage = 1;
   responsiveOptions: any[] = [
@@ -99,6 +103,13 @@ export class SharingPostComponent implements OnInit {
       numVisible: 1,
     },
   ];
+  formGroup!: FormGroup;
+
+  stateOptions: any[] = [
+    { label: 'Recommend', value: true },
+    { label: 'Not Recommend', value: false },
+  ];
+
   constructor(
     private postService: PostService,
     private userService: UserService,
@@ -107,10 +118,24 @@ export class SharingPostComponent implements OnInit {
     private authenticationService: AuthenticationService,
     private cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
+    private route: ActivatedRoute,
+    private fb: FormBuilder,
   ) {}
 
   ngOnInit(): void {
     this.loadUserProfile();
+    this.route.queryParams.subscribe(params => {
+      this.tourTripId = params['tourTripId'] || null;
+      this.title = params['title'] || null;
+
+      // Automatically open the Create Post dialog
+      if (this.tourTripId && this.title) {
+        this.showCreatePostModal = true;
+      }
+    });
+    this.formGroup = this.fb.group({
+      isRecommended: [this.isRecommended], // Initialize isRecommended in the form
+    });
   }
 
   private loadUserProfile(): void {
@@ -222,7 +247,12 @@ export class SharingPostComponent implements OnInit {
     this.isSubmitting = true;
     const formData = new FormData();
     formData.append('content', this.postContent);
-    formData.append('isRecommended', String(this.isRecommended));
+    formData.append(
+      'isRecommended',
+      String(this.formGroup.get('isRecommended')?.value),
+    );
+    formData.append('tourTripId', this.tourTripId ?? '');
+    formData.append('title', this.title ?? '');
     this.selectedFiles.forEach(file => formData.append('Photos', file));
 
     this.postService.createPost(formData).subscribe({
@@ -230,14 +260,11 @@ export class SharingPostComponent implements OnInit {
         if (response.isSucceed) {
           const successMessage = 'Please wait for your post to be approved.';
           this.displayMessage('info', 'Approval Request', successMessage);
-
           this.resetPostCreation();
         }
         this.isSubmitting = false;
       },
       error: errorResponse => {
-        console.error('Full error response:', errorResponse); // Log the entire error response for inspection
-        // Adjusted error message extraction
         const errorMessage =
           errorResponse.error?.message ||
           errorResponse.message ||
@@ -400,7 +427,6 @@ export class SharingPostComponent implements OnInit {
     this.confirmationService.confirm({
       message: 'Are you sure you want to remove this comment?',
       header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
       accept: () => {
         // Temporarily remove the comment from the UI
         this.comments = this.comments.filter(
@@ -435,7 +461,6 @@ export class SharingPostComponent implements OnInit {
     this.confirmationService.confirm({
       message: 'Are you sure you want to remove this photo?',
       header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
       accept: () => {
         // Temporarily remove the photo from the UI
         this.photoDetails = this.photoDetails.filter(
@@ -483,7 +508,6 @@ export class SharingPostComponent implements OnInit {
 
   // Open the Update Dialog
   openUpdateDialog(post: Post): void {
-    console.log(post);
     this.updatePostRequest = {
       postsId: post.postsId,
       content: post.content,
@@ -505,7 +529,6 @@ export class SharingPostComponent implements OnInit {
   }
 
   private generateMenuItems(post: Post): MenuItem[] {
-    console.log(post);
     const isOwner = this.currentUser?.userId === post.user.userId;
     const menuItems: MenuItem[] = [];
     if (isOwner || this.isModerator) {
