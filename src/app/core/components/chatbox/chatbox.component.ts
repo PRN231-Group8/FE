@@ -30,18 +30,17 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ImageViewerComponent } from '../image-view/image-view.component';
 import { User } from '../../../interfaces/models/user';
 import { WelcomeMessage } from '../../../interfaces/models/welcome-message';
-import { OverlayPanel } from 'primeng/overlaypanel';
 import { FileUpload } from 'primeng/fileupload';
+import { OverlayPanel } from 'primeng/overlaypanel';
 export type ConnectionStatus = boolean;
 
 @Component({
   selector: 'app-chatbox',
   templateUrl: './chatbox.component.html',
-  styleUrls: ['./chatbox.component.scss'],
+  providers: [DialogService, MessageService],
 })
 export class ChatboxComponent implements OnInit, OnDestroy {
   @ViewChild('chatPanel') chatPanel!: OverlayPanel;
-  @ViewChild('chatBtn') chatBtn!: ElementRef;
   @ViewChild('fileUpload') fileUpload!: FileUpload;
   @ViewChild('messageContainer')
   @HostListener('scroll', ['$event.target'])
@@ -84,6 +83,7 @@ export class ChatboxComponent implements OnInit, OnDestroy {
   isStartingChat = false;
   display = true;
   isRefreshing = false;
+  isFindingStaff: boolean = false;
   isModerator$ = this.currentUser$.pipe(
     map(user => user?.role === 'MODERATOR'),
     startWith(false),
@@ -107,14 +107,6 @@ export class ChatboxComponent implements OnInit, OnDestroy {
     },
   ];
   quickActionOptions = [
-    {
-      subject: 'Tư vấn thuốc',
-      label: 'Tư vấn các sản phẩm thuốc với dược sĩ chuyên môn',
-    },
-    {
-      subject: 'Tư vấn sức khỏe',
-      label: 'Tư vấn các vấn đề sức khỏe với bác sĩ chuyên khoa',
-    },
     {
       subject: 'Hỗ trợ khẩn cấp',
       label: 'Tôi cần được hỗ trợ nhanh',
@@ -148,7 +140,10 @@ export class ChatboxComponent implements OnInit, OnDestroy {
     this.setupMessageTracking();
 
     this.subscriptions = [
-      this.chatMessages$.subscribe(() => this.scrollToBottom()),
+      this.chatMessages$.subscribe(() => {
+        this.isFindingStaff = false;
+        this.scrollToBottom();
+      }),
 
       this.isModerator$
         .pipe(takeUntil(this.destroy$))
@@ -286,11 +281,9 @@ export class ChatboxComponent implements OnInit, OnDestroy {
             detail: 'Lost connection to chat service. Trying to reconnect...',
           });
         } else if (!prev && current) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Connected',
-            detail: 'Reconnected to chat service',
-          });
+          if (this.currentRoom === null) {
+            this.isFindingStaff = true;
+          }
           this.currentRoom$.pipe(first()).subscribe(async currentRoom => {
             if (currentRoom?.id) {
               await this.chatService.loadChatRoom(currentRoom.id);
@@ -372,7 +365,7 @@ export class ChatboxComponent implements OnInit, OnDestroy {
       });
       return;
     }
-
+    this.isFindingStaff = true;
     this.isStartingChat = true;
     try {
       await this.chatService.initiateChat(subject);
@@ -413,6 +406,7 @@ export class ChatboxComponent implements OnInit, OnDestroy {
       // Load messages after the initial acceptance to speed up response
       await this.chatService.loadChatMessages(chatId);
       await this.chatService.refreshActiveChats();
+      this.isFindingStaff = false;
     } catch (error) {
       this.messageService.add({
         severity: 'error',
@@ -552,25 +546,6 @@ export class ChatboxComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Utility Methods
-  toggleChat(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (this.currentRoom?.status === 'ACTIVE' && !this.display) {
-      this.chatPanel.show(event);
-      this.display = true;
-      return;
-    }
-
-    if (this.display) {
-      this.chatPanel.hide();
-    } else {
-      this.chatPanel.show(event);
-    }
-    this.display = !this.display;
-  }
-
   async handleEnterKey(event: Event): Promise<void> {
     const keyEvent = event as KeyboardEvent;
     if (keyEvent.key === 'Enter' && !keyEvent.shiftKey) {
@@ -615,5 +590,23 @@ export class ChatboxComponent implements OnInit, OnDestroy {
 
   isActiveChat(room: ChatRoom | null): boolean {
     return room?.status === 'ACTIVE';
+  }
+
+  toggleChat(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.currentRoom?.status === 'ACTIVE' && !this.display) {
+      this.chatPanel.show(event);
+      this.display = true;
+      return;
+    }
+
+    if (this.display) {
+      this.chatPanel.hide();
+    } else {
+      this.chatPanel.show(event);
+    }
+    this.display = !this.display;
   }
 }

@@ -162,11 +162,7 @@ export class ChatService {
     // Chat ended event
     this.hubConnection.on('ChatEnded', () => {
       if (this.currentChatRoom.value) {
-        this.currentChatRoom.next({
-          ...this.currentChatRoom.value,
-          isActive: false,
-          status: 'CLOSED',
-        });
+        this.currentChatRoom.next(null);
 
         // Clear messages when chat ends
         this.chatMessages.next([]);
@@ -393,8 +389,6 @@ export class ChatService {
 
   public async sendImage(chatRoomId: string, file: File): Promise<void> {
     try {
-      console.log('Sending image:', { chatRoomId, file });
-
       // Convert to base64
       const base64Image = await this.fileToBase64(file);
 
@@ -406,14 +400,16 @@ export class ChatService {
 
       if (this.hubConnection?.state === 'Connected') {
         // Send via SignalR and wait for response
+        console.log(`request `, request);
         const response = await this.hubConnection.invoke<MessageResponse>(
           'SendImageMessage',
           request,
         );
-
+        console.log(response); // <------ null
         // If successful, manually add the message to the UI
         if (response) {
           const currentMessages = this.chatMessages.value;
+          console.log(response);
           const newMessage: ChatMessage = {
             id: response.senderId,
             chatRoomId: response.chatRoomId,
