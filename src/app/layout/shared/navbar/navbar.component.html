@@ -1,3 +1,4 @@
+<!-- eslint-disable @angular-eslint/template/elements-content -->
 <nav
   class="flex align-items-center justify-content-between px-6 shadow-1 surface-800"
   style="border-top: 2px solid #000; border-bottom: 2px solid #000"
@@ -63,15 +64,19 @@
     </ng-template>
   </p-menu>
 
-  <p-button
+  <button
     *ngIf="isLoggedIn"
+    type="button"
+    pButton
     icon="pi pi-bars"
     (click)="toggleMenu($event)"
-  ></p-button>
+  ></button>
 
-  <p-button
+  <button
     *ngIf="!isLoggedIn"
+    type="button"
+    pButton
     label="Login"
     (click)="goToLogin()"
-  ></p-button>
+  ></button>
 </nav>

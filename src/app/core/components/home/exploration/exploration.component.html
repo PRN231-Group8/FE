@@ -1,9 +1,10 @@
 <div class="layout-wrapper">
   <p-scrollTop />
-  <div class="z-5"><app-chatbox></app-chatbox></div>
-  <app-navbar class="sticky top-0 z-1"></app-navbar>
+  <app-navbar class="sticky top-0 z-4"></app-navbar>
+  <app-chatbox class="z-3"></app-chatbox>
+
   <div class="layout-main-container">
-    <div class="layout-main overflow-hidden z-0">
+    <div class="layout-main overflow-hidden">
       <div class="exploration-page">
         <div class="flex justify-content-center align-items-center">
           <div class="text-6xl font-bold text-primary pb-3">All tour trips</div>
@@ -186,6 +187,7 @@
               [paginator]="true"
               [sortField]="sortField"
               [sortOrder]="sortOrder"
+              class="z-0"
             >
               <ng-template pTemplate="header">
                 <div
