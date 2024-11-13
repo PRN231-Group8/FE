@@ -1,3 +1,4 @@
+import { MenuItem } from 'primeng/api/menuitem';
 import { Comments } from './comment';
 import { Photo } from './photo';
 import { User } from './user';
@@ -13,4 +14,5 @@ export interface Post {
   user: User;
   comments: Comments[];
   photos: Photo[];
+  menuItems?: MenuItem[];
 }

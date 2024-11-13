@@ -25,7 +25,7 @@
   </ul>
 
   <!-- Menu (Profile, Settings, Logout) -->
-  <p-menu #menu [model]="items" popup="true" styleClass="w-full md:w-15rem">
+  <p-menu #menu [model]="items" popup="true" styleClass="w-full md:w-15rem" appendTo="body">
     <ng-template pTemplate="start">
       <span class="inline-flex align-items-center gap-1 px-2 py-2">
         <svg
@@ -50,9 +50,10 @@
         class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround"
       >
         <p-avatar
-          image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+          [image]="avatarPath || defaultAvatarPath"
           class="mr-2"
           shape="circle"
+          (error)="avatarPath = defaultAvatarPath"
         ></p-avatar>
         <span class="inline-flex flex-column">
           <span class="font-bold">{{ firstName }}{{ lastName }}</span>
@@ -62,19 +63,15 @@
     </ng-template>
   </p-menu>
 
-  <button
+  <p-button
     *ngIf="isLoggedIn"
-    type="button"
-    pButton
     icon="pi pi-bars"
     (click)="toggleMenu($event)"
-  ></button>
+  ></p-button>
 
-  <button
+  <p-button
     *ngIf="!isLoggedIn"
-    type="button"
-    pButton
     label="Login"
     (click)="goToLogin()"
-  ></button>
+  ></p-button>
 </nav>

@@ -6,7 +6,7 @@ import { MessageService } from 'primeng/api'; // Import MessageService
 import { SocialAuthService, SocialUser } from '@abacritt/angularx-social-login';
 import { AuthenticationGoogleService } from '../../../services/authentication.google.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ExternalAuthRequest } from '../../../interfaces/models/request/externalAuthRequest';
+import { ExternalAuthRequest } from '../../../interfaces/models/request/external-auth-request';
 
 @Component({
   selector: 'app-login',

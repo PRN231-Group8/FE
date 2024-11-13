@@ -4,105 +4,189 @@ import { Subscription, debounceTime } from 'rxjs';
 import { Product } from '../../../interfaces/models/product';
 import { LayoutService } from '../../../layout/service/app.layout.service';
 import { ProductService } from '../../../services/product.service';
+import { DashboardService } from '../../../services/dashboard.service';
 
 @Component({
-    templateUrl: './dashboard.component.html',
+  templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  items!: MenuItem[];
+  products!: Product[];
+  dailyChartData: any;
+  monthlyChartData: any;
+  moodData: any;
+  dailyChartOptions: any;
+  monthlyChartOptions: any;
+  polarChartOptions: any;
+  dashboardData: any = {};
+  orderHistory: any[] = [];
+  subscription!: Subscription;
+  isLoading = true;
+  constructor(
+    private productService: ProductService,
+    public layoutService: LayoutService,
+    private dashboardService: DashboardService,
+  ) {
+    this.subscription = this.layoutService.configUpdate$
+      .pipe(debounceTime(25))
+      .subscribe(() => {
+        this.initChartOptions();
+      });
+  }
 
-    items!: MenuItem[];
+  ngOnInit(): void {
+    this.dashboardService.getDashboardData().subscribe(data => {
+      this.dashboardData = data;
+      this.orderHistory = data.orderHistory || [];
+      this.isLoading = false;
+      this.initMoodChart();
+      this.updateChartData();
+    });
 
-    products!: Product[];
+    this.productService.getProductsSmall().then((data: Product[]) => {
+      this.products = data;
+    });
 
-    chartData: any;
+    this.items = [
+      { label: 'Add New', icon: 'pi pi-fw pi-plus' },
+      { label: 'Remove', icon: 'pi pi-fw pi-minus' },
+    ];
 
-    chartOptions: any;
+    this.initChartOptions();
+  }
 
-    subscription!: Subscription;
-
-    constructor(private productService: ProductService, public layoutService: LayoutService) {
-        this.subscription = this.layoutService.configUpdate$
-        .pipe(debounceTime(25))
-        .subscribe(() => {
-            this.initChart();
-        });
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
+  }
 
-    ngOnInit(): void {
-        this.initChart();
-        this.productService.getProductsSmall().then((data: Product[]) => {
-            this.products = data;
-        }
-        );
+  updateChartData(): void {
+    const dailyLabels = this.dashboardData.earningsByDay.map((entry: any) =>
+      new Date(entry.date).toLocaleDateString('en-GB'),
+    );
+    const dailyEarnings = this.dashboardData.earningsByDay.map(
+      (entry: any) => entry.totalEarnings,
+    );
 
-        this.items = [
-            { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-            { label: 'Remove', icon: 'pi pi-fw pi-minus' }
-        ];
-    }
+    const monthlyLabels = this.dashboardData.earningsByMonth.map(
+      (entry: any) => `${entry.month}/${entry.year}`,
+    );
+    const monthlyEarnings = this.dashboardData.earningsByMonth.map(
+      (entry: any) => entry.totalEarnings,
+    );
 
-    initChart(): void {
-        const documentStyle = getComputedStyle(document.documentElement);
-        const textColor = documentStyle.getPropertyValue('--text-color');
-        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    this.dailyChartData = {
+      labels: dailyLabels,
+      datasets: [
+        {
+          label: 'Daily Earnings',
+          data: dailyEarnings,
+          fill: false,
+          backgroundColor: '#4CAF50',
+          borderColor: '#4CAF50',
+          tension: 0.4,
+        },
+      ],
+    };
 
-        this.chartData = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [
-                {
-                    label: 'First Dataset',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--bluegray-700'),
-                    borderColor: documentStyle.getPropertyValue('--bluegray-700'),
-                    tension: .4
-                },
-                {
-                    label: 'Second Dataset',
-                    data: [28, 48, 40, 19, 86, 27, 90],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--green-600'),
-                    borderColor: documentStyle.getPropertyValue('--green-600'),
-                    tension: .4
-                }
-            ]
-        };
+    this.monthlyChartData = {
+      labels: monthlyLabels,
+      datasets: [
+        {
+          label: 'Monthly Earnings',
+          data: monthlyEarnings,
+          fill: false,
+          backgroundColor: '#FF9800',
+          borderColor: '#FF9800',
+          tension: 0.4,
+        },
+      ],
+    };
+  }
 
-        this.chartOptions = {
-            plugins: {
-                legend: {
-                    labels: {
-                        color: textColor
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: textColorSecondary
-                    },
-                    grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
-                    }
-                },
-                y: {
-                    ticks: {
-                        color: textColorSecondary
-                    },
-                    grid: {
-                        color: surfaceBorder,
-                        drawBorder: false
-                    }
-                }
-            }
-        };
-    }
+  initMoodChart(): void {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const labels = this.dashboardData.moodUsage.map(
+      (item: any) => item.moodTag,
+    );
+    const data = this.dashboardData.moodUsage.map((item: any) => item.count);
 
-    ngOnDestroy(): void {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-        }
-    }
+    this.moodData = {
+      labels: labels,
+      datasets: [
+        {
+          data: data,
+          backgroundColor: [
+            documentStyle.getPropertyValue('--red-500'),
+            documentStyle.getPropertyValue('--green-500'),
+            documentStyle.getPropertyValue('--yellow-500'),
+            documentStyle.getPropertyValue('--bluegray-500'),
+            documentStyle.getPropertyValue('--blue-500'),
+            documentStyle.getPropertyValue('--purple-500'),
+            documentStyle.getPropertyValue('--pink-500'),
+            documentStyle.getPropertyValue('--cyan-500'),
+            documentStyle.getPropertyValue('--orange-500'),
+            documentStyle.getPropertyValue('--teal-500'),
+          ],
+          label: 'Mood Usage',
+        },
+      ],
+    };
+  }
+
+  initChartOptions(): void {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color');
+    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+    this.dailyChartOptions = {
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor,
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: textColor,
+          },
+          grid: {
+            color: surfaceBorder,
+            drawBorder: false,
+          },
+        },
+        y: {
+          ticks: {
+            color: textColor,
+          },
+          grid: {
+            color: surfaceBorder,
+            drawBorder: false,
+          },
+        },
+      },
+    };
+
+    this.monthlyChartOptions = { ...this.dailyChartOptions };
+
+    this.polarChartOptions = {
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor,
+          },
+        },
+      },
+      scales: {
+        r: {
+          grid: {
+            color: surfaceBorder,
+          },
+        },
+      },
+    };
+  }
 }

@@ -43,10 +43,10 @@ import { FileUploadModule } from 'primeng/fileupload';
     TagModule,
     AvatarModule,
     TabMenuModule,
-    FileUploadModule
+    FileUploadModule,
   ],
   exports: [ChatboxComponent],
   providers: [DialogService, MessageService],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ChatboxModule {}
