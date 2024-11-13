@@ -53,6 +53,7 @@ import { ContextMenuModule } from 'primeng/contextmenu';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { sharedModule } from './layout/shared/shared.module';
 import { VnpayFormModule } from './core/components/home/vnpay-form/vnpay-form.module';
+import { DialogService } from 'primeng/dynamicdialog';
 
 @NgModule({
   declarations: [
@@ -148,6 +149,7 @@ import { VnpayFormModule } from './core/components/home/vnpay-form/vnpay-form.mo
     ConfirmationService,
     ProductService,
     MapApiService,
+    DialogService
   ],
   bootstrap: [AppComponent],
 })
