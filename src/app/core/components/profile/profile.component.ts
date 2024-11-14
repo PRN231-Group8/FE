@@ -56,7 +56,6 @@ export class ProfileComponent implements OnInit {
       gender: ['', Validators.required],
       avatarPath: [''],
     });
-
     this.passwordForm = this.fb.group({
       currentPassword: ['', Validators.required],
       newPassword: ['', Validators.required],

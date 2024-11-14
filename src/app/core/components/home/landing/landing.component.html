@@ -3,211 +3,223 @@
   <app-navbar class="sticky top-0 z-1"></app-navbar>
   <app-chatbox></app-chatbox>
   <div class="layout-main-container">
-      <div class="layout-main overflow-hidden z-0">
-          <div class="layout-main-container">
-              <div class="flex flex-wrap justify-content-center" style="min-height: 200px">
-                  <div
-                    class="z-5 relative flex align-items-center justify-content-center p-4 font-bold"
-                    style="width: 100px; height: 200px; right: 400px"
-                  >
-                    <p-image
-                      src="assets/layout/images/travel-word.svg"
-                      alt="Image"
-                      width="400"
-                      height="300"
-                      class="w-full h-auto"
-                    >
-                    </p-image>
-                  </div>
-                  <div
-                    class="z-1 relative flex align-items-center justify-content-center p-4"
-                    style="width: 100px; height: 100px; left: 40px; top: 80px"
-                  >
-                    <p-image
-                      src="assets/layout/images/travel-location-2.svg"
-                      alt="Image"
-                      width="400"
-                      height="500"
-                      class="w-full h-auto"
-                    >
-                    </p-image>
-                  </div>
-                  <div
-                    class="z-2 relative flex align-items-center justify-content-center p-4"
-                    style="width: 100px; height: 100px; top: 90px; left: 290px"
-                  >
-                    <p-image
-                      src="assets/layout/images/travel-location-1.svg"
-                      alt="Image"
-                      width="200"
-                      height="400"
-                      class="w-full h-auto"
-                    >
-                    </p-image>
-                  </div>
-                  <div
-                    class="z-0 relative flex align-items-center justify-content-center p-4"
-                    style="width: 100px; height: 100px; top: 200px; right: 60px"
-                  >
-                    <p-image
-                      src="assets/layout/images/orange-circle-background.svg"
-                      alt="Image"
-                      width="600"
-                      height="700"
-                      class="w-full h-auto"
-                    >
-                    </p-image>
-                  </div>
-                </div>
-                <div class="text-secondary text-lg text-justify pt-7 w-5">
-                  We want to be on each of your journeys seeking the satisfaction of seeing the
-                  incorruptible trip. We can help you on an adventure around the Vietnam in just
-                  one app and a website. Check it out!
-                </div>
-                <div class="w-5 pt-5 flex align-items-center">
-                  <p-rating [(ngModel)]="value" [readonly]="true" [cancel]="false">
-                    <ng-template pTemplate="onicon" >
-                      <img
-                        src="assets/layout/images/star.png"
-                        width="25px"
-                        height="25px"
-                        alt="icon 1"
-                        class="mr-2"
-                      />
-                    </ng-template>
-                    <ng-template pTemplate="officon">
-                      <img
-                        src="assets/layout/images/outline_star.png"
-                        width="25px"
-                        height="25px"
-                        alt="icon 2"
-                        class="mr-2"
-                      />
-                    </ng-template>
-                  </p-rating>
-                  <div class="font-bold pl-6">
-                    <ngx-animated-counter [params]="params"></ngx-animated-counter>
-                    <div class="font-normal">
-                        Excellent Reviews
-                    </div>
-                  </div>
-                  <div class="font-bold pl-8 text-right">
-                    <ngx-animated-counter [params]="params_2"></ngx-animated-counter>
-                    <div class="font-normal">
-                        Great Reviews
-                    </div>
-                  </div>
-                </div>
-                <div class="pt-5 gap-6 flex align-items-center">
-                  <p-button label="Explore Now" [outlined]="true" icon="pi pi-search" [routerLink]="['explore']"/>
-                    
-                    <a class="font-bold text-900">
-                      <i class="pi pi-android pr-3" style="font-size: 1rem"></i>
-                      Download the app?
-                    </a>
-                </div>
-                
-                <div
-                class="flex align-items-center justify-content-center font-bold text-primary text-4xl pt-8 pb-4"
-              >
-                What is your mood today?
-              </div>
-              <div
-                class="flex align-items-center justify-content-center text-xl text-secondary pb-4"
-              >
-                We want your choice to be the most suitable for your current mood. Tell us
-                your feeling now!
-              </div>
-              
-              <div class="border-round surface-border p-4 surface-card">
-                <p-tabView
-                  [(activeIndex)]="activeIndex"
-                  [scrollable]="true"
-                  class="flex justify-content-center align-items-center"
-                >
-                  <p-tabPanel
-                    *ngFor="let tab of moods"
-                    class="flex justify-content-center align-items-center"
-                  >
-                    <ng-template pTemplate="header">
-                      <i class="{{ tab.iconName }} pr-2" style="color: slateblue"></i>
-                      <span class="font-bold white-space-nowrap m-0">
-                        {{ tab.moodTag }}
-                      </span>
-                    </ng-template>
-                  </p-tabPanel>
-                </p-tabView>
-              
-                <!-- Input Fields -->
-                <div class="p-grid p-dir-col">
-                  <!-- From Address and To Destination in a row -->
-                  <div
-                    class="p-col-12 flex flex-wrap gap-3 justify-content-center align-items-center"
-                  >
-                    <span class="font-bold">From: </span>
-                    <p-dropdown
-                      [options]="locations"
-                      [(ngModel)]="selectedFrom"
-                      placeholder="{{ selectedFrom ? selectedFrom : 'Finding your nearby city' }}"
-                      optionLabel="name"
-                      class="p-mt-4 p-col-12 p-md-6"
-                      appendTo="body"
-                      [loading]="locationLoading"
-                      variant="filled"
-                      [disabled]="true"
-                    ></p-dropdown>
-                    <span class="font-bold">To: </span>
-                    <p-dropdown
-                      [options]="locations"
-                      [(ngModel)]="selectedTo"
-                      placeholder="To Destination"
-                      optionLabel="name"
-                      class="p-mt-4 p-col-12 p-md-6"
-                      scrollHeight="200px"
-                      [loading]="locationLoading"
-                      appendTo="body"
-                    ></p-dropdown>
-                  </div>
-              
-                  <div class="p-col flex align-items-center mt-2 w-full justify-content-center">
-                    <span class="font-bold">Price: </span>
-                    <p-inputNumber
-                      [(ngModel)]="priceRange"
-                      mode="currency"
-                      prefix="≥"
-                      inputId="withoutgrouping"
-                      currency="VND"
-                      class="p-mt-4 ml-2"
-                    ></p-inputNumber>
-                  </div>
-              
-                  <div class="p-col flex align-items-center mt-2 w-full justify-content-center">
-                    <span class="font-bold">Transportation: </span>
-                    <p-dropdown
-                      [options]="transportOptions"
-                      optionLabel="type"
-                      [(ngModel)]="selectedTransport"
-                      placeholder="Select Transportation"
-                      class="p-mt-4 ml-2 w-auto"
-                      [loading]="transportationLoading"
-                      scrollHeight="200px"
-                      appendTo="body"
-                    ></p-dropdown>
-                  </div>
-              
-                  <div class="p-col flex align-items-center mt-6 justify-content-center">
-                    <p-button
-                      label="Search"
-                      icon="pi pi-search"
-                      class="p-mt-4"
-                      (click)="searchTours()"
-                    />
-                  </div>
-                </div>
-              </div>    
+    <div class="layout-main overflow-hidden z-0">
+      <div class="layout-main-container">
+        <div
+          class="flex flex-wrap justify-content-center"
+          style="min-height: 200px"
+        >
+          <div
+            class="z-5 relative flex align-items-center justify-content-center p-4 font-bold"
+            style="width: 100px; height: 200px; right: 400px"
+          >
+            <p-image
+              src="assets/layout/images/travel-word.svg"
+              alt="Image"
+              width="400"
+              height="300"
+              class="w-full h-auto"
+            >
+            </p-image>
           </div>
+          <div
+            class="z-1 relative flex align-items-center justify-content-center p-4"
+            style="width: 100px; height: 100px; left: 40px; top: 80px"
+          >
+            <p-image
+              src="assets/layout/images/travel-location-2.svg"
+              alt="Image"
+              width="400"
+              height="500"
+              class="w-full h-auto"
+            >
+            </p-image>
+          </div>
+          <div
+            class="z-2 relative flex align-items-center justify-content-center p-4"
+            style="width: 100px; height: 100px; top: 90px; left: 290px"
+          >
+            <p-image
+              src="assets/layout/images/travel-location-1.svg"
+              alt="Image"
+              width="200"
+              height="400"
+              class="w-full h-auto"
+            >
+            </p-image>
+          </div>
+          <div
+            class="z-0 relative flex align-items-center justify-content-center p-4"
+            style="width: 100px; height: 100px; top: 200px; right: 60px"
+          >
+            <p-image
+              src="assets/layout/images/orange-circle-background.svg"
+              alt="Image"
+              width="600"
+              height="700"
+              class="w-full h-auto"
+            >
+            </p-image>
+          </div>
+        </div>
+        <div class="text-secondary text-lg text-justify pt-7 w-5">
+          We want to be on each of your journeys seeking the satisfaction of
+          seeing the incorruptible trip. We can help you on an adventure around
+          the Vietnam in just one app and a website. Check it out!
+        </div>
+        <div class="w-5 pt-5 flex align-items-center">
+          <p-rating [(ngModel)]="value" [readonly]="true" [cancel]="false">
+            <ng-template pTemplate="onicon">
+              <img
+                src="assets/layout/images/star.png"
+                width="25px"
+                height="25px"
+                alt="icon 1"
+                class="mr-2"
+              />
+            </ng-template>
+            <ng-template pTemplate="officon">
+              <img
+                src="assets/layout/images/outline_star.png"
+                width="25px"
+                height="25px"
+                alt="icon 2"
+                class="mr-2"
+              />
+            </ng-template>
+          </p-rating>
+          <div class="font-bold pl-6">
+            <ngx-animated-counter [params]="params"></ngx-animated-counter>
+            <div class="font-normal">Excellent Reviews</div>
+          </div>
+          <div class="font-bold pl-8 text-right">
+            <ngx-animated-counter [params]="params_2"></ngx-animated-counter>
+            <div class="font-normal">Great Reviews</div>
+          </div>
+        </div>
+        <div class="pt-5 gap-6 flex align-items-center">
+          <p-button
+            label="Explore Now"
+            [outlined]="true"
+            icon="pi pi-search"
+            [routerLink]="['explore']"
+          />
+
+          <a class="font-bold text-900">
+            <i class="pi pi-android pr-3" style="font-size: 1rem"></i>
+            Download the app?
+          </a>
+        </div>
+
+        <div
+          class="flex align-items-center justify-content-center font-bold text-primary text-4xl pt-8 pb-4"
+        >
+          What is your mood today?
+        </div>
+        <div
+          class="flex align-items-center justify-content-center text-xl text-secondary pb-4"
+        >
+          We want your choice to be the most suitable for your current mood.
+          Tell us your feeling now!
+        </div>
+
+        <div class="border-round surface-border p-4 surface-card">
+          <p-tabView
+            [(activeIndex)]="activeIndex"
+            [scrollable]="true"
+            class="flex justify-content-center align-items-center"
+          >
+            <p-tabPanel
+              *ngFor="let tab of moods"
+              class="flex justify-content-center align-items-center"
+            >
+              <ng-template pTemplate="header">
+                <i class="{{ tab.iconName }} pr-2" style="color: slateblue"></i>
+                <span class="font-bold white-space-nowrap m-0">
+                  {{ tab.moodTag }}
+                </span>
+              </ng-template>
+            </p-tabPanel>
+          </p-tabView>
+
+          <!-- Input Fields -->
+          <div class="p-grid p-dir-col">
+            <!-- From Address and To Destination in a row -->
+            <div
+              class="p-col-12 flex flex-wrap gap-3 justify-content-center align-items-center"
+            >
+              <span class="font-bold">From: </span>
+              <p-dropdown
+                [options]="locations"
+                [(ngModel)]="selectedFrom"
+                placeholder="{{
+                  selectedFrom ? selectedFrom : 'Finding your nearby city'
+                }}"
+                optionLabel="name"
+                class="p-mt-4 p-col-12 p-md-6"
+                appendTo="body"
+                [loading]="locationLoading"
+                variant="filled"
+                [disabled]="true"
+              ></p-dropdown>
+              <span class="font-bold">To: </span>
+              <p-dropdown
+                [options]="locations"
+                [(ngModel)]="selectedTo"
+                placeholder="To Destination"
+                optionLabel="name"
+                class="p-mt-4 p-col-12 p-md-6"
+                scrollHeight="200px"
+                [loading]="locationLoading"
+                appendTo="body"
+              ></p-dropdown>
+            </div>
+
+            <div
+              class="p-col flex align-items-center mt-2 w-full justify-content-center"
+            >
+              <span class="font-bold">Price: </span>
+              <p-inputNumber
+                [(ngModel)]="priceRange"
+                mode="currency"
+                prefix="≥"
+                inputId="withoutgrouping"
+                currency="VND"
+                class="p-mt-4 ml-2"
+              ></p-inputNumber>
+            </div>
+
+            <div
+              class="p-col flex align-items-center mt-2 w-full justify-content-center"
+            >
+              <span class="font-bold">Transportation: </span>
+              <p-dropdown
+                [options]="transportOptions"
+                optionLabel="type"
+                [(ngModel)]="selectedTransport"
+                placeholder="Select Transportation"
+                class="p-mt-4 ml-2 w-auto"
+                [loading]="transportationLoading"
+                scrollHeight="200px"
+                appendTo="body"
+              ></p-dropdown>
+            </div>
+
+            <div
+              class="p-col flex align-items-center mt-6 justify-content-center"
+            >
+              <p-button
+                label="Search"
+                icon="pi pi-search"
+                class="p-mt-4"
+                (click)="searchTours()"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <app-shared-footer></app-shared-footer>
+    </div>
+    <app-shared-footer></app-shared-footer>
   </div>
   <div class="layout-mask"></div>
 </div>
