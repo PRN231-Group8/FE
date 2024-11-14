@@ -6,7 +6,6 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LocationService } from '../../../../services/location.service';
 import { MessageService } from 'primeng/api';
 import { Location } from '../../../../interfaces/models/location';
-import { FileUploadEvent } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-location-management',
@@ -66,6 +65,7 @@ export class LocationManagementComponent implements OnInit {
     this.locationService.getLocations(pageNumber, pageSize).subscribe({
       next: data => {
         this.locations = data.results as Location[];
+        this.totalRecords = data.numberOfElements as number;
         this.loading = false;
       },
       error: error => {
@@ -81,7 +81,6 @@ export class LocationManagementComponent implements OnInit {
   }
 
   editLocation(location: Location): void {
-    console.log(location);
     this.createLocationDialog = true;
     this.isEdit = true;
     this.selectedEditLocation = location;
@@ -100,7 +99,12 @@ export class LocationManagementComponent implements OnInit {
     const photosFormArray = this.locationForm.get('photos') as FormArray;
     photosFormArray.clear();
     location.photos.forEach(photo => {
-      photosFormArray.push(this.fb.group({ url: photo.url, alt: photo.alt }));
+      photosFormArray.push(
+        this.fb.group({
+          url: [photo.url, Validators.required],
+          alt: [photo.alt, Validators.required],
+        }),
+      );
     });
   }
 
@@ -114,7 +118,9 @@ export class LocationManagementComponent implements OnInit {
 
   removePhoto(index: number): void {
     this.photos.removeAt(index);
-    this.selectedEditLocation.photos = this.photos.controls.map(control => control.value);
+    this.selectedEditLocation.photos = this.photos.controls.map(
+      control => control.value,
+    );
   }
 
   onFileSelect(event: any): void {
@@ -176,7 +182,7 @@ export class LocationManagementComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Update failed',
+            detail: err.message,
           });
           this.savingState = false;
         },
@@ -207,7 +213,7 @@ export class LocationManagementComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Creation failed',
+            detail: err.message,
           });
         },
       });

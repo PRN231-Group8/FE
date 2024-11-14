@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { User } from '../interfaces/models/user';
 import { environment } from '../../environments/environment';
-import { ExternalAuthRequest } from '../interfaces/models/request/externalAuthRequest';
+import { ExternalAuthRequest } from '../interfaces/models/request/external-auth-request';
 import { AuthenticationService } from './authentication.service';
 import { jwtDecode } from 'jwt-decode';
 
@@ -41,7 +41,6 @@ export class AuthenticationGoogleService {
     this.externalAuthService
       .signIn(GoogleLoginProvider.PROVIDER_ID)
       .then((user: SocialUser) => {
-        console.log('Google Sign-In successful', user);
         this.extAuthChangeSub.next(user);
       })
       .catch(error => {
@@ -72,9 +71,7 @@ export class AuthenticationGoogleService {
     return this.http.post<any>(url, externalAuth).pipe(
       map(res => {
         if (res.token) {
-          console.log('Rsponse from server:', res);
           const decodedToken: any = jwtDecode(res.token);
-          console.log('Decoded Token:', decodedToken);
           const user: User = {
             email: res.email,
             firstName: decodedToken.FirstName,
@@ -90,10 +87,8 @@ export class AuthenticationGoogleService {
       catchError(error => {
         console.error('External login error:', error);
         if (error.error instanceof ErrorEvent) {
-          // Client-side or network error
           console.error('Client-side error:', error.error.message);
         } else {
-          // Backend returned unsuccessful response code
           console.error(
             `Backend returned code ${error.status}, body was:`,
             error.error,

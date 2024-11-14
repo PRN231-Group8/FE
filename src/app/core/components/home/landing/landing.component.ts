@@ -61,7 +61,7 @@ export class LandingComponent implements OnInit {
     private mapApiService: MapApiService,
     private moodService: MoodService,
     private locationService: LocationService,
-    private transportationService: TransportationService
+    private transportationService: TransportationService,
   ) {}
 
   ngOnInit(): void {
@@ -91,7 +91,9 @@ export class LandingComponent implements OnInit {
           }
         },
         () => {
-          alert('You should provide us your location to have better experience.');
+          alert(
+            'You should provide us your location to have better experience.',
+          );
         },
       );
     } else {
@@ -102,21 +104,22 @@ export class LandingComponent implements OnInit {
   reverseGeocode(): void {
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${this.lat}&lon=${this.lng}&zoom=10&addressdetails=1`;
 
-    this.http.get<any>(url).subscribe(
-      data => {
-        this.address = data.display_name;
+    this.http.get<any>(url).subscribe(data => {
+      this.address = data.display_name;
 
-        // fetch map API to get cities list
-        this.mapApiService.getCities().subscribe((mapData: any) => {
-          mapData.forEach((map: any) => {
-            if (this.address.includes(map.city)) {
-              this.selectedFrom = map.city;
-            }
-          });
-          this.locationLoading = false;
+      // fetch map API to get cities list
+      this.mapApiService.getCities().subscribe((mapData: any) => {
+        mapData.forEach((map: any) => {
+          if (
+            this.address.includes(map.city) ||
+            this.address.includes(map.admin_name)
+          ) {
+            this.selectedFrom = map.admin_name;
+          }
         });
-      }
-    );
+        this.locationLoading = false;
+      });
+    });
   }
 
   searchTours(): void {
@@ -132,32 +135,30 @@ export class LandingComponent implements OnInit {
   }
 
   getAllMoods(): void {
-    this.moodService.getMoods(1, 20).subscribe(
-      (data: BaseResponse<Mood>) => {
-        if (data.isSucceed) {
-          this.moods = data.results as Mood[];
-        }
+    this.moodService.getMoods(1, 20).subscribe((data: BaseResponse<Mood>) => {
+      if (data.isSucceed) {
+        this.moods = data.results as Mood[];
       }
-    );
+    });
   }
 
   getAllLocations(): void {
-    this.locationService.getLocations(1, 20).subscribe(
-      (data: BaseResponse<Location>) => {
+    this.locationService
+      .getLocations(1, 20)
+      .subscribe((data: BaseResponse<Location>) => {
         if (data.isSucceed) {
           this.locations = data.results as Location[];
         }
-      }
-    );
+      });
   }
 
   getAllTransportations(): void {
-    this.transportationService.getTransportations(1, 20).subscribe(
-      (data: BaseResponse<Transportation>) => {
+    this.transportationService
+      .getTransportations(1, 20)
+      .subscribe((data: BaseResponse<Transportation>) => {
         if (data.isSucceed) {
           this.transportOptions = data.results as Transportation[];
         }
-      }
-    );
+      });
   }
 }

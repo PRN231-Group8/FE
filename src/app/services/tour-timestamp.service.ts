@@ -44,9 +44,8 @@ export class TourTimestampService {
 
   createBatchTourTimestamps(
     tourTimestamps: TourTimestamp[],
-    durationMinutes: number
   ): Observable<BaseResponse<TourTimestamp>> {
-    return this.http.post<BaseResponse<TourTimestamp>>(`${this.apiUrl}/${durationMinutes}`, tourTimestamps);
+    return this.http.post<BaseResponse<TourTimestamp>>(`${this.apiUrl}`, tourTimestamps);
   }
 
   updateTourTimestamp(id: Guid, tourTimestamp: TourTimestamp): Observable<BaseResponse<TourTimestamp>> {

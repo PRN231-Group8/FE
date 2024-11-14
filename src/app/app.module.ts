@@ -11,18 +11,16 @@ import { CustomerService } from './services/customer.service';
 import { EventService } from './services/event.service';
 import { IconService } from './services/icon.service';
 import { NodeService } from './services/node.service';
-import { PhotoService } from './services/photo.service';
 import { ProductService } from './services/product.service';
 import { NotfoundComponent } from './core/components/notfound/notfound.component';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { MenuModule } from 'primeng/menu';
 import { ToastModule } from 'primeng/toast';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// Third-party imports
 import {
   GoogleLoginProvider,
   GoogleSigninButtonModule,
@@ -35,9 +33,14 @@ import { ErrorInterceptor } from './_helper/error.interceptor';
 import { AuthenticationService } from './services/authentication.service';
 import { FakeBackendInterceptor } from './_helper/fake-backend';
 import { ButtonModule } from 'primeng/button';
+import { GalleriaModule } from 'primeng/galleria';
+import { AvatarModule } from 'primeng/avatar';
 import { LoginComponent } from './core/components/login/login.component';
 import { MapApiService } from './services/map-api.service';
 import { VerifyEmailComponent } from './core/components/verify-email/verify-email.component';
+import { DialogModule } from 'primeng/dialog';
+import { FileUploadModule } from 'primeng/fileupload';
+import { BadgeModule } from 'primeng/badge';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { TabMenuModule } from 'primeng/tabmenu';
@@ -49,15 +52,15 @@ import { CarouselModule } from 'primeng/carousel';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { sharedModule } from './layout/shared/shared.module';
-import { FileUploadModule } from 'primeng/fileupload';
-// Third-party imports
+import { VnpayFormModule } from './core/components/home/vnpay-form/vnpay-form.module';
+import { DialogService } from 'primeng/dynamicdialog';
 
 @NgModule({
   declarations: [
     AppComponent,
     NotfoundComponent,
     LoginComponent,
-    VerifyEmailComponent
+    VerifyEmailComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -79,6 +82,11 @@ import { FileUploadModule } from 'primeng/fileupload';
     ReactiveFormsModule,
     ToastModule,
     GoogleSigninButtonModule,
+    GalleriaModule,
+    AvatarModule,
+    DialogModule,
+    FileUploadModule,
+    BadgeModule,
     InputTextareaModule,
     InputTextModule,
     MenuModule,
@@ -92,6 +100,7 @@ import { FileUploadModule } from 'primeng/fileupload';
     TabMenuModule,
     sharedModule,
     FileUploadModule,
+    VnpayFormModule,
   ],
   exports: [
     SocialLoginModule,
@@ -115,7 +124,7 @@ import { FileUploadModule } from 'primeng/fileupload';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: FakeBackendInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: 'SocialAuthServiceConfig',
@@ -137,9 +146,10 @@ import { FileUploadModule } from 'primeng/fileupload';
     EventService,
     IconService,
     NodeService,
-    PhotoService,
+    ConfirmationService,
     ProductService,
     MapApiService,
+    DialogService
   ],
   bootstrap: [AppComponent],
 })

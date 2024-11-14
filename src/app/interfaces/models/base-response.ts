@@ -1,14 +1,19 @@
 export interface BaseResponse<T> {
+  isSucceed: boolean;
+  result?: T;
+  results?: T[];
+  message: string;
   totalElements?: number;
   totalPages?: number;
   last?: boolean;
-  first?: boolean;
   size?: number;
   number?: number;
+  sort?: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
   numberOfElements?: number;
-  isSucceed: boolean;
-  result?: T;
-  data?: T;
-  results?: T[];
-  message: string;
+  first?: boolean;
+  empty?: boolean;
 }

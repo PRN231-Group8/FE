@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BaseResponse } from '../interfaces/models/base-response';
-import { UserProfileRequest } from '../interfaces/models/request/userProfileRequest';
-import { UserProfileResponse } from '../interfaces/models/response/userProfileResponse';
+import { UserProfileRequest } from '../interfaces/models/request/user-profile-request';
+import { UserProfileResponse } from '../interfaces/models/response/user-profile-response';
+import { User } from '../interfaces/models/user';
 
 @Injectable({
   providedIn: 'root',
@@ -32,5 +33,9 @@ export class UserService {
   getUserByEmail(email: string): Observable<BaseResponse<UserProfileResponse>> {
     const url = `${this.apiUrl}/${email}`;
     return this.http.get<BaseResponse<UserProfileResponse>>(url);
+  }
+  getAllUsers(): Observable<BaseResponse<User[]>> {
+    const url = `${this.apiUrl}`;
+    return this.http.get<BaseResponse<User[]>>(url);
   }
 }

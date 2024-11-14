@@ -3,7 +3,7 @@ export interface User {
   userId?: string;
   firstName?: string;
   lastName?: string;
-  dob?: Date;
+  dob?: Date | null;
   gender?: string;
   address?: string;
   createdDate?: Date;

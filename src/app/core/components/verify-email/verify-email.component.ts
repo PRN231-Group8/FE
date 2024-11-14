@@ -45,7 +45,8 @@ export class VerifyEmailComponent implements OnInit {
     )}&token=${encodeURIComponent(this.token!)}`;
     this.http.get<BaseResponse<any>>(url).subscribe({
       next: (response: BaseResponse<any>) => {
-        this.verificationMessage = response.message;
+        this.verificationMessage =
+          response.message || 'Verification completed.';
         this.loading = false;
 
         if (response.isSucceed) {
