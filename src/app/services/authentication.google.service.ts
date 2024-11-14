@@ -72,19 +72,17 @@ export class AuthenticationGoogleService {
     return this.http.post<any>(url, externalAuth).pipe(
       map(res => {
         if (res.token) {
-          console.log('Response from server:', res);
+          console.log('Rsponse from server:', res);
           const decodedToken: any = jwtDecode(res.token);
           console.log('Decoded Token:', decodedToken);
           const user: User = {
-            email: decodedToken.email,
+            email: res.email,
             firstName: decodedToken.FirstName,
             lastName: decodedToken.LastName,
-            phoneNumber: decodedToken.phoneNumber,
+            phoneNumber: decodedToken.PhoneNumber,
             token: res.token,
             role: res.role,
           };
-
-          this.authService.setUserValue(user);
           this.saveSocialUser(user);
         }
         return res;
@@ -115,8 +113,10 @@ export class AuthenticationGoogleService {
       token: res.token,
       role: res.role,
     };
+    console.log(`social user: `, socialUser);
     localStorage.setItem('socialUser', JSON.stringify(socialUser));
-    localStorage.setItem('user', JSON.stringify(res));
+    localStorage.setItem('user', JSON.stringify(socialUser));
+    this.authService.setUserValue(socialUser);
     this.userSocialSubject.next(socialUser);
   }
 }

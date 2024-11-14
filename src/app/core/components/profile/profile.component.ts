@@ -12,7 +12,6 @@ import { environment } from '../../../../environments/environment';
   providers: [MessageService],
 })
 export class ProfileComponent implements OnInit {
-  private apiUrl = `${environment.BACKEND_API_URL}/api/users`;
   items!: MenuItem[];
   activeItem!: MenuItem;
   profileForm!: FormGroup;
@@ -71,12 +70,12 @@ export class ProfileComponent implements OnInit {
       {
         label: 'Account',
         icon: 'pi pi-fw pi-user',
-        command: () => this.selectPage('account'),
+        command: (): void => this.selectPage('account'),
       },
       {
         label: 'Password',
         icon: 'pi pi-fw pi-key',
-        command: () => this.selectPage('password'),
+        command: (): void => this.selectPage('password'),
       },
     ];
   }

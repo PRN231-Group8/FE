@@ -32,7 +32,6 @@ export class AuthenticationService {
           const decodedToken: any = jwtDecode(storedUser.token);
           storedUser.firstName = decodedToken.FirstName;
           storedUser.lastName = decodedToken.LastName;
-          storedUser.email = decodedToken.email;
         }
       } catch (error) {
         console.error('Error parsing stored user JSON:', error);
@@ -92,9 +91,9 @@ export class AuthenticationService {
   }
   public getEmailFromToken(): string | null {
     const user = this.userSubject.value;
+    console.log(user);
     if (user && user.token) {
-      const decodedToken: any = jwtDecode(user.token);
-      return decodedToken.email;
+      return user.email ?? null;
     }
     return null;
   }
