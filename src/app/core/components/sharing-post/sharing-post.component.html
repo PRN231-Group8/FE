@@ -168,6 +168,9 @@
                   [model]="post.menuItems"
                 ></p-menu>
               </ng-template>
+              <p class="pi pi-ethereum mt-0 font-bold text-xl text-primary-500">
+                {{ post.title }}
+              </p>
               <p class="mt-0">{{ post.content }}</p>
 
               <!-- Image Preview Section -->
@@ -379,6 +382,23 @@
               placeholder="Select Status"
               class="w-full"
             ></p-dropdown>
+          </div>
+          <!-- isRecommended Toggle for MODERATOR only -->
+          <div *ngIf="isModerator" class="field mt-4">
+            <label
+              for="isRecommended"
+              class="text-lg font-semibold text-800 mb-2"
+            >
+              Recommended
+            </label>
+            <p-selectButton
+              [(ngModel)]="updatePostRequest.isRecommended"
+              [options]="[
+                { label: 'Recommended', value: true },
+                { label: 'Not Recommended', value: false },
+              ]"
+              class="w-full"
+            ></p-selectButton>
           </div>
         </div>
         <div class="col-8">

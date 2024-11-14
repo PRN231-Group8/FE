@@ -17,4 +17,5 @@ export interface Post {
   menuItems?: MenuItem[];
   isRecommended: boolean;
   tourTripId: string;
+  title: string;
 }

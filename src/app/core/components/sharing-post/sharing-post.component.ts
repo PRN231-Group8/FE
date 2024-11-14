@@ -67,6 +67,7 @@ export class SharingPostComponent implements OnInit {
     commentsToRemove: [],
     removeAllPhotos: false,
     photosToRemove: [],
+    isRecommended: false,
   };
   isCommentLoading: boolean = false;
   isPhotoLoading = false;
@@ -516,6 +517,7 @@ export class SharingPostComponent implements OnInit {
       commentsToRemove: [],
       removeAllPhotos: false,
       photosToRemove: [],
+      isRecommended: post.isRecommended,
     };
 
     this.comments = post.comments || [];
